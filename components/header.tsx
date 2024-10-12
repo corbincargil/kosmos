@@ -4,6 +4,14 @@ import { cn } from "@/lib/utils";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useState } from "react";
+import { useWorkspace } from "@/contexts/workspace-context";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface HeaderProps {
   title: string;
@@ -11,6 +19,8 @@ interface HeaderProps {
 
 export default function Header({ title }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { workspaces, selectedWorkspace, setSelectedWorkspace } =
+    useWorkspace();
 
   const links = [
     { href: "/dashboard", label: "Dashboard" },
@@ -22,6 +32,21 @@ export default function Header({ title }: HeaderProps) {
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
         <div className="flex items-center space-x-4">
+          <Select
+            value={selectedWorkspace}
+            onValueChange={setSelectedWorkspace}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select workspace" />
+            </SelectTrigger>
+            <SelectContent>
+              {workspaces.map((workspace) => (
+                <SelectItem key={workspace.id} value={workspace.id.toString()}>
+                  {workspace.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <div className="hidden md:flex items-center space-x-4">
             {links.map((link) => (
               <Link

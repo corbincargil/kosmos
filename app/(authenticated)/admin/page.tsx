@@ -1,34 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { Workspace } from "@/types/workspaces";
 import WorkspaceList from "./components/workspace-list";
 import AddWorkspaceForm from "./components/workspace-form";
+import { useWorkspace } from "@/contexts/workspace-context";
 
 export default function AdminPage() {
   const { user, isLoaded } = useUser();
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const { workspaces, refreshWorkspaces } = useWorkspace();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (isLoaded && user) {
-      const storedDbUserId = user.publicMetadata.dbUserId as number;
-      if (storedDbUserId) {
-        fetchWorkspaces(storedDbUserId);
-      }
-    }
-  }, [isLoaded, user]);
-
-  const fetchWorkspaces = async (userId: number) => {
-    const response = await fetch(`/api/workspaces?userId=${userId}`);
-    if (response.ok) {
-      const data = await response.json();
-      setWorkspaces(data);
-    } else {
-      console.error("Failed to fetch workspaces");
-    }
-  };
 
   const handleAddWorkspace = async (name: string) => {
     if (!user) return;
@@ -39,7 +20,7 @@ export default function AdminPage() {
       body: JSON.stringify({ userId: dbUserId, name }),
     });
     if (response.ok) {
-      fetchWorkspaces(dbUserId);
+      refreshWorkspaces();
       setIsModalOpen(false);
     } else {
       console.error("Failed to add workspace");
