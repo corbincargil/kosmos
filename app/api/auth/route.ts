@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 
 const prisma = new PrismaClient();
 
@@ -24,6 +24,11 @@ export async function POST(request: NextRequest) {
         email: clerkUser.email,
         clerkUserId: userId,
       },
+    });
+
+    // Set the dbUserId in Clerk's public metadata
+    await clerkClient.users.updateUserMetadata(userId, {
+      publicMetadata: { dbUserId: user.id },
     });
 
     return NextResponse.json(user);
