@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser, SignIn } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -9,26 +9,30 @@ export default function AuthWrapper({
 }: {
   children: React.ReactNode;
 }) {
-  const { isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push("/");
+    } else if (isLoaded && isSignedIn && user) {
+      // Sync user with database
+      fetch("/api/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: user.primaryEmailAddress?.emailAddress,
+        }),
+      }).catch((error) => console.error("Error syncing user:", error));
     }
-  }, [isLoaded, isSignedIn, router]);
+  }, [isLoaded, isSignedIn, user, router]);
 
   if (!isLoaded) {
     return null;
   }
 
-  if (!isSignedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <SignIn routing="hash" />
-      </div>
-    );
-  }
-
+  // Remove the SignIn component and conditional rendering
   return <>{children}</>;
 }

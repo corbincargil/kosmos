@@ -1,7 +1,7 @@
 "use client";
 
 import { UserButton, useUser } from "@clerk/nextjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -10,20 +10,39 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { User } from "@/types/user";
+
+interface UserCardProps {
+  email: string;
+  clerkUserId: string;
+}
+
+function UserCard({ email, clerkUserId }: UserCardProps) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{email}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p>Clerk User ID: {clerkUserId}</p>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Dashboard() {
-  const { isLoaded, isSignedIn, user } = useUser();
-  const router = useRouter();
+  const { user } = useUser();
+  const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    if (isLoaded && !isSignedIn) {
-      router.push("/");
+    async function fetchUsers() {
+      const response = await fetch("/api/users");
+      const data = await response.json();
+      setUsers(data);
     }
-  }, [isLoaded, isSignedIn, router]);
 
-  if (!isLoaded || !isSignedIn) {
-    return null;
-  }
+    fetchUsers();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -36,17 +55,23 @@ export default function Dashboard() {
       <main>
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
-            <Card>
+            <Card className="mb-6">
               <CardHeader>
-                <CardTitle>Welcome, {user.firstName}!</CardTitle>
+                <CardTitle>Welcome, {user?.firstName}!</CardTitle>
                 <CardDescription>
-                  This is your dashboard. You can add more content here.
+                  This is your dashboard. You can see all users below.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p>Your personalized dashboard content goes here.</p>
-              </CardContent>
             </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {users.map((user: User) => (
+                <UserCard
+                  key={user.id}
+                  email={user.email}
+                  clerkUserId={user.clerkUserId}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </main>
