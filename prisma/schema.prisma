@@ -19,6 +19,7 @@ model User {
 model Workspace {
   id        Int      @id @default(autoincrement())
   name      String   @db.VarChar(50)
+  color     String   @default("#3B82F6")
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
   createdAt DateTime @default(now())

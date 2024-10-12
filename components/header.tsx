@@ -28,9 +28,11 @@ export default function Header({ title }: HeaderProps) {
   ];
 
   return (
-    <header className="bg-white shadow">
+    <header className="bg-white shadow-md shadow-[color:var(--accent-lighter)]">
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
+        <h1 className="text-3xl font-bold text-[color:var(--accent-darker)]">
+          {title}
+        </h1>
         <div className="flex items-center space-x-4">
           <Select
             value={selectedWorkspace}
@@ -53,8 +55,9 @@ export default function Header({ title }: HeaderProps) {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "text-blue-600 hover:text-blue-800",
-                  title.includes(link.label) && "text-blue-800"
+                  "text-[color:var(--accent-color)] hover:text-[color:var(--accent-darker)]",
+                  title.includes(link.label) &&
+                    "text-[color:var(--accent-darker)]"
                 )}
               >
                 {link.label}

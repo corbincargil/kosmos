@@ -4,6 +4,7 @@ import Header from "@/components/header";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import { WorkspaceProvider } from "@/contexts/workspace-context";
+import { ThemeManager } from "@/components/theme-manager";
 
 export default function AuthenticatedLayout({
   children,
@@ -15,6 +16,7 @@ export default function AuthenticatedLayout({
 
   return (
     <WorkspaceProvider>
+      <ThemeManager />
       <div className="min-h-screen bg-gray-100">
         <Header title={title} />
         <main>

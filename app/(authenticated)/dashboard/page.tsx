@@ -53,15 +53,6 @@ export default function Dashboard() {
           </CardDescription>
         </CardHeader>
       </Card>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {users.map((user: User) => (
-          <UserCard
-            key={user.id}
-            email={user.email}
-            clerkUserId={user.clerkUserId}
-          />
-        ))}
-      </div>
     </>
   );
 }

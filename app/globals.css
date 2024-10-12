@@ -35,6 +35,9 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --accent-color: #3B82F6;
+    --accent-darker: #2563EB;
+    --accent-lighter: #60A5FA;
   }
   .dark {
     --background: 0 0% 3.9%;

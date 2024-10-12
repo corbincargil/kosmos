@@ -13,6 +13,7 @@ import { Workspace } from "@/types/workspaces";
 interface WorkspaceContextType {
   workspaces: Workspace[];
   selectedWorkspace: string;
+  selectedWorkspaceColor: string;
   setSelectedWorkspace: (id: string) => void;
   refreshWorkspaces: () => Promise<void>;
 }
@@ -24,6 +25,8 @@ const WorkspaceContext = createContext<WorkspaceContextType | undefined>(
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [selectedWorkspace, setSelectedWorkspace] = useState<string>("");
+  const [selectedWorkspaceColor, setSelectedWorkspaceColor] =
+    useState<string>("#3B82F6");
   const { user, isLoaded } = useUser();
 
   const fetchWorkspaces = async (userId: number) => {
@@ -33,6 +36,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       setWorkspaces(data);
       if (data.length > 0 && !selectedWorkspace) {
         setSelectedWorkspace(data[0].id.toString());
+        setSelectedWorkspaceColor(data[0].color);
       }
     } else {
       console.error("Failed to fetch workspaces");
@@ -52,11 +56,21 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     refreshWorkspaces();
   }, [isLoaded, user]);
 
+  useEffect(() => {
+    const workspace = workspaces.find(
+      (w) => w.id.toString() === selectedWorkspace
+    );
+    if (workspace) {
+      setSelectedWorkspaceColor(workspace.color);
+    }
+  }, [selectedWorkspace, workspaces]);
+
   return (
     <WorkspaceContext.Provider
       value={{
         workspaces,
         selectedWorkspace,
+        selectedWorkspaceColor,
         setSelectedWorkspace,
         refreshWorkspaces,
       }}
