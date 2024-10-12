@@ -34,22 +34,25 @@ export default function Header({ title }: HeaderProps) {
           {title}
         </h1>
         <div className="flex items-center space-x-4">
-          <Select
-            value={selectedWorkspace}
-            onValueChange={setSelectedWorkspace}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select workspace" />
-            </SelectTrigger>
-            <SelectContent>
-              {workspaces.map((workspace) => (
-                <SelectItem key={workspace.id} value={workspace.id.toString()}>
-                  {workspace.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <div className="hidden md:flex items-center space-x-4">
+            <Select
+              value={selectedWorkspace}
+              onValueChange={setSelectedWorkspace}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select workspace" />
+              </SelectTrigger>
+              <SelectContent>
+                {workspaces.map((workspace) => (
+                  <SelectItem
+                    key={workspace.id}
+                    value={workspace.id.toString()}
+                  >
+                    {workspace.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {links.map((link) => (
               <Link
                 key={link.href}
@@ -86,14 +89,38 @@ export default function Header({ title }: HeaderProps) {
         </div>
       </div>
       {isMenuOpen && (
-        <div className="md:hidden">
+        <div className="md:hidden bg-white border-t border-gray-200">
+          <div className="px-4 py-2">
+            <Select
+              value={selectedWorkspace}
+              onValueChange={(value) => {
+                setSelectedWorkspace(value);
+                setIsMenuOpen(false);
+              }}
+            >
+              <SelectTrigger className="w-full mb-2">
+                <SelectValue placeholder="Select workspace" />
+              </SelectTrigger>
+              <SelectContent>
+                {workspaces.map((workspace) => (
+                  <SelectItem
+                    key={workspace.id}
+                    value={workspace.id.toString()}
+                  >
+                    {workspace.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
-                "block px-4 py-2 text-blue-600 hover:text-blue-800 hover:bg-gray-100",
-                title.includes(link.label) && "text-blue-800 bg-gray-100"
+                "block px-4 py-2 text-[color:var(--accent-color)] hover:text-[color:var(--accent-darker)] hover:bg-gray-100",
+                title.includes(link.label) &&
+                  "text-[color:var(--accent-darker)] bg-gray-100"
               )}
               onClick={() => setIsMenuOpen(false)}
             >
