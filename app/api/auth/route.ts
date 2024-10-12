@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Set the dbUserId in Clerk's public metadata
-    await clerkClient.users.updateUserMetadata(userId, {
+    await clerkClient().users.updateUserMetadata(userId, {
       publicMetadata: { dbUserId: user.id },
     });
 

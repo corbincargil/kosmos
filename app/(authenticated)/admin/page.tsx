@@ -9,12 +9,11 @@ import AddWorkspaceForm from "./components/workspace-form";
 export default function AdminPage() {
   const { user, isLoaded } = useUser();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [dbUserId, setDbUserId] = useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (isLoaded && user) {
       const storedDbUserId = user.publicMetadata.dbUserId as number;
-      setDbUserId(storedDbUserId);
       if (storedDbUserId) {
         fetchWorkspaces(storedDbUserId);
       }
@@ -32,7 +31,8 @@ export default function AdminPage() {
   };
 
   const handleAddWorkspace = async (name: string) => {
-    if (!dbUserId) return;
+    if (!user) return;
+    const dbUserId = user.publicMetadata.dbUserId as number;
     const response = await fetch("/api/workspaces", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -40,6 +40,7 @@ export default function AdminPage() {
     });
     if (response.ok) {
       fetchWorkspaces(dbUserId);
+      setIsModalOpen(false);
     } else {
       console.error("Failed to add workspace");
     }
@@ -54,16 +55,35 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+    <>
+      <h1 className="text-2xl font-bold mb-4">Admin</h1>
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">Your Workspaces</h2>
         <WorkspaceList workspaces={workspaces} />
       </div>
       <div>
-        <h2 className="text-xl font-semibold mb-2">Add New Workspace</h2>
-        <AddWorkspaceForm onAddWorkspace={handleAddWorkspace} />
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-blue-500 text-white px-4 py-2 rounded inline-block"
+        >
+          Add Workspace
+        </button>
       </div>
-    </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg">
+            <h2 className="text-xl font-semibold mb-4">Add New Workspace</h2>
+            <AddWorkspaceForm onAddWorkspace={handleAddWorkspace} />
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="mt-4 bg-gray-300 text-black px-4 py-2 rounded"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -18,7 +18,7 @@ export default function AddWorkspaceForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <input
         type="text"
         value={name}
@@ -30,7 +30,7 @@ export default function AddWorkspaceForm({
       />
       <button
         type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded"
+        className="bg-blue-500 text-white px-4 py-2 rounded w-full"
       >
         Add Workspace
       </button>
