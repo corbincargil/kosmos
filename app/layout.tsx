@@ -18,6 +18,9 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "Life Organization",
   description: "Keep your life organized",
+  icons: {
+    icon: [{ url: "/favicon.svg" }, { url: "/favicon.ico", sizes: "any" }],
+  },
 };
 
 export default function RootLayout({
@@ -28,6 +31,15 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
+        <head>
+          <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+          <link
+            rel="alternate icon"
+            href="/favicon.ico"
+            type="image/png"
+            sizes="16x16"
+          />
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
