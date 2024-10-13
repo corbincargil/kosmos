@@ -6,6 +6,7 @@ import WorkspaceList from "./components/workspace-list";
 import WorkspaceForm from "./components/workspace-form";
 import { useWorkspace } from "@/contexts/workspace-context";
 import { Workspace } from "@/types/workspaces";
+import { addWorkspace, editWorkspace } from "./helpers/workspace-helpers";
 
 export default function AdminPage() {
   const { user, isLoaded } = useUser();
@@ -16,19 +17,15 @@ export default function AdminPage() {
   );
 
   const handleAddWorkspace = async (name: string, color: string) => {
-    if (!user) return;
+    if (!user) return false;
     const dbUserId = user.publicMetadata.dbUserId as number;
-    const response = await fetch("/api/workspaces", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: dbUserId, name, color }),
-    });
-    if (response.ok) {
+    const success = await addWorkspace(dbUserId, name, color);
+    if (success) {
       refreshWorkspaces();
       setIsModalOpen(false);
-    } else {
-      console.error("Failed to add workspace");
+      return true;
     }
+    return false;
   };
 
   const handleEditWorkspace = async (
@@ -36,17 +33,13 @@ export default function AdminPage() {
     name: string,
     color: string
   ) => {
-    const response = await fetch(`/api/workspaces/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, name, color }),
-    });
-    if (response.ok) {
+    const success = await editWorkspace(id, name, color);
+    if (success) {
       refreshWorkspaces();
       setEditingWorkspace(null);
-    } else {
-      console.error("Failed to edit workspace");
+      return true;
     }
+    return false;
   };
 
   const openEditModal = (workspace: Workspace) => {

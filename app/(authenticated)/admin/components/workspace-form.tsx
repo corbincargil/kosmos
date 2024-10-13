@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface WorkspaceFormProps {
   initialName?: string;
   initialColor?: string;
-  onSubmit: (name: string, color: string) => Promise<void>;
+  onSubmit: (name: string, color: string) => Promise<boolean>;
   onCancel?: () => void;
 }
 
@@ -15,13 +16,40 @@ export default function WorkspaceForm({
 }: WorkspaceFormProps) {
   const [name, setName] = useState(initialName);
   const [color, setColor] = useState(initialColor);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      await onSubmit(name.trim(), color);
-      setName("");
-      setColor("#000000");
+      setIsSubmitting(true);
+      try {
+        const success = await onSubmit(name.trim(), color);
+        if (success) {
+          toast({
+            title: "Success",
+            description: initialName
+              ? "Workspace updated successfully"
+              : "Workspace added successfully",
+          });
+          setName("");
+          setColor("#000000");
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to save workspace",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -36,25 +64,33 @@ export default function WorkspaceForm({
           className="border p-2 rounded w-full"
           maxLength={50}
           required
+          disabled={isSubmitting}
         />
         <input
           type="color"
           value={color}
           onChange={(e) => setColor(e.target.value)}
           required
+          disabled={isSubmitting}
         />
       </div>
       <button
         type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded w-full"
+        className="bg-blue-500 text-white px-4 py-2 rounded w-full disabled:opacity-50"
+        disabled={isSubmitting}
       >
-        {initialName ? "Update Workspace" : "Add Workspace"}
+        {isSubmitting
+          ? "Submitting..."
+          : initialName
+          ? "Update Workspace"
+          : "Add Workspace"}
       </button>
       {onCancel && (
         <button
           type="button"
           onClick={onCancel}
           className="bg-gray-300 text-black px-4 py-2 rounded w-full mt-2"
+          disabled={isSubmitting}
         >
           Cancel
         </button>
