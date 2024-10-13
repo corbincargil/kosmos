@@ -42,6 +42,7 @@ export default function WorkspaceForm({
           });
         }
       } catch (error) {
+        console.error("error", error);
         toast({
           title: "Error",
           description: "An unexpected error occurred",
