@@ -4,8 +4,12 @@ import { WorkspaceService } from "../services/workspace-service";
 export const WorkspaceController = {
   createWorkspace: async (req: NextRequest) => {
     try {
-      const { userId, name } = await req.json();
-      const workspace = await WorkspaceService.createWorkspace(userId, name);
+      const { userId, name, color } = await req.json();
+      const workspace = await WorkspaceService.createWorkspace(
+        userId,
+        name,
+        color
+      );
       return NextResponse.json(workspace, { status: 201 });
     } catch (error) {
       console.error("Error creating workspace:", error);
@@ -36,6 +40,20 @@ export const WorkspaceController = {
       console.error("Error fetching workspaces:", error);
       return NextResponse.json(
         { error: "Failed to fetch workspaces" },
+        { status: 500 }
+      );
+    }
+  },
+
+  editWorkspace: async (req: NextRequest) => {
+    try {
+      const { id, name, color } = await req.json();
+      const workspace = await WorkspaceService.editWorkspace(id, name, color);
+      return NextResponse.json(workspace);
+    } catch (error) {
+      console.error("Error editing workspace:", error);
+      return NextResponse.json(
+        { error: "Failed to edit workspace" },
         { status: 500 }
       );
     }

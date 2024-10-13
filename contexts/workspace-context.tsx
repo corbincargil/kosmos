@@ -33,7 +33,11 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     const response = await fetch(`/api/workspaces?userId=${userId}`);
     if (response.ok) {
       const data = await response.json();
-      setWorkspaces(data);
+      setWorkspaces(
+        data.sort((a: Workspace, b: Workspace) =>
+          a.createdAt < b.createdAt ? -1 : 1
+        )
+      );
       if (data.length > 0 && !selectedWorkspace) {
         setSelectedWorkspace(data[0].id.toString());
         setSelectedWorkspaceColor(data[0].color);

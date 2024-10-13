@@ -3,21 +3,25 @@
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import WorkspaceList from "./components/workspace-list";
-import AddWorkspaceForm from "./components/workspace-form";
+import WorkspaceForm from "./components/workspace-form";
 import { useWorkspace } from "@/contexts/workspace-context";
+import { Workspace } from "@/types/workspaces";
 
 export default function AdminPage() {
   const { user, isLoaded } = useUser();
   const { workspaces, refreshWorkspaces } = useWorkspace();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingWorkspace, setEditingWorkspace] = useState<Workspace | null>(
+    null
+  );
 
-  const handleAddWorkspace = async (name: string) => {
+  const handleAddWorkspace = async (name: string, color: string) => {
     if (!user) return;
     const dbUserId = user.publicMetadata.dbUserId as number;
     const response = await fetch("/api/workspaces", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: dbUserId, name }),
+      body: JSON.stringify({ userId: dbUserId, name, color }),
     });
     if (response.ok) {
       refreshWorkspaces();
@@ -25,6 +29,28 @@ export default function AdminPage() {
     } else {
       console.error("Failed to add workspace");
     }
+  };
+
+  const handleEditWorkspace = async (
+    id: number,
+    name: string,
+    color: string
+  ) => {
+    const response = await fetch(`/api/workspaces/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, name, color }),
+    });
+    if (response.ok) {
+      refreshWorkspaces();
+      setEditingWorkspace(null);
+    } else {
+      console.error("Failed to edit workspace");
+    }
+  };
+
+  const openEditModal = (workspace: Workspace) => {
+    setEditingWorkspace(workspace);
   };
 
   if (!isLoaded) {
@@ -36,11 +62,14 @@ export default function AdminPage() {
   }
 
   return (
-    <>
+    <div className="max-w-3xl mx-auto px-4">
       <h1 className="text-2xl font-bold mb-4">Admin</h1>
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">Your Workspaces</h2>
-        <WorkspaceList workspaces={workspaces} />
+        <WorkspaceList
+          workspaces={workspaces}
+          onEditWorkspace={openEditModal}
+        />
       </div>
       <div>
         <button
@@ -51,20 +80,29 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {isModalOpen && (
+      {(isModalOpen || editingWorkspace) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Add New Workspace</h2>
-            <AddWorkspaceForm onAddWorkspace={handleAddWorkspace} />
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="mt-4 bg-gray-300 text-black px-4 py-2 rounded"
-            >
-              Cancel
-            </button>
+            <h2 className="text-xl font-semibold mb-4">
+              {editingWorkspace ? "Edit Workspace" : "Add New Workspace"}
+            </h2>
+            <WorkspaceForm
+              initialName={editingWorkspace?.name}
+              initialColor={editingWorkspace?.color}
+              onSubmit={
+                editingWorkspace
+                  ? (name, color) =>
+                      handleEditWorkspace(editingWorkspace.id, name, color)
+                  : handleAddWorkspace
+              }
+              onCancel={() => {
+                setIsModalOpen(false);
+                setEditingWorkspace(null);
+              }}
+            />
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
