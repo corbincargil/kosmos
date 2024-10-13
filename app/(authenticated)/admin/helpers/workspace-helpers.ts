@@ -31,3 +31,16 @@ export async function editWorkspace(id: number, name: string, color: string) {
 
   return true;
 }
+
+export async function deleteWorkspace(id: number) {
+  const response = await fetch(`/api/workspaces/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    console.error("Failed to delete workspace");
+    return false;
+  }
+
+  return true;
+}

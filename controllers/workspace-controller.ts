@@ -58,4 +58,24 @@ export const WorkspaceController = {
       );
     }
   },
+
+  deleteWorkspace: async (req: NextRequest) => {
+    try {
+      const id = Number(req.url.split("/").pop());
+      if (isNaN(id)) {
+        return NextResponse.json(
+          { error: "Invalid workspace ID" },
+          { status: 400 }
+        );
+      }
+      await WorkspaceService.deleteWorkspace(id);
+      return NextResponse.json({ success: true }, { status: 200 });
+    } catch (error) {
+      console.error("Error deleting workspace:", error);
+      return NextResponse.json(
+        { error: "Failed to delete workspace" },
+        { status: 500 }
+      );
+    }
+  },
 };

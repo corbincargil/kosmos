@@ -1,13 +1,16 @@
 import { Workspace } from "@/types/workspaces";
+import { Trash } from "lucide-react";
 
 interface WorkspaceListProps {
   workspaces: Workspace[];
   onEditWorkspace: (workspace: Workspace) => void;
+  onDeleteWorkspace: (workspace: Workspace) => void;
 }
 
 export default function WorkspaceList({
   workspaces,
   onEditWorkspace,
+  onDeleteWorkspace,
 }: WorkspaceListProps) {
   return (
     <ul className="space-y-2">
@@ -27,12 +30,20 @@ export default function WorkspaceList({
               Created: {new Date(workspace.createdAt).toLocaleDateString()}
             </p>
           </div>
-          <button
-            onClick={() => onEditWorkspace(workspace)}
-            className="mt-2 bg-blue-500 text-white px-2 py-1 rounded text-sm"
-          >
-            Edit
-          </button>
+          <div className="flex items-center">
+            <button
+              onClick={() => onEditWorkspace(workspace)}
+              className="bg-blue-500 text-white px-2 py-1 rounded text-sm mr-2"
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => onDeleteWorkspace(workspace)}
+              className="p-1 rounded hover:text-red-500"
+            >
+              <Trash size={20} />
+            </button>
+          </div>
         </li>
       ))}
     </ul>

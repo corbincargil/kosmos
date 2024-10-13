@@ -4,3 +4,7 @@ import { WorkspaceController } from "../../../../controllers/workspace-controlle
 export async function PUT(req: NextRequest) {
   return WorkspaceController.editWorkspace(req);
 }
+
+export async function DELETE(req: NextRequest) {
+  return WorkspaceController.deleteWorkspace(req);
+}

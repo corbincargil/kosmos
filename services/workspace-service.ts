@@ -35,4 +35,10 @@ export const WorkspaceService = {
       data: { name, color },
     });
   },
+
+  deleteWorkspace: async (id: number): Promise<void> => {
+    await prisma.workspace.delete({
+      where: { id },
+    });
+  },
 };
