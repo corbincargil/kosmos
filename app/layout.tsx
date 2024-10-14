@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
-import AuthWrapper from "./auth-wrapper";
 import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
@@ -44,7 +43,7 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <AuthWrapper>{children}</AuthWrapper>
+          {children}
           <Toaster />
         </body>
       </html>
