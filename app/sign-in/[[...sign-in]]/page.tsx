@@ -40,7 +40,7 @@ export default function SignInPage() {
               shouldAnimate ? "animate-fade-in-up" : ""
             }`}
           >
-            <SignIn />
+            <SignIn fallbackRedirectUrl="/signed-in" />
           </div>
         </div>
       </div>

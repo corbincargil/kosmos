@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/card";
 
 export default function AdminPage() {
-  const { user, isLoaded } = useUser();
+  const { user } = useUser();
   const { workspaces, refreshWorkspaces } = useWorkspace();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingWorkspace, setEditingWorkspace] = useState<Workspace | null>(
@@ -84,14 +84,6 @@ export default function AdminPage() {
   const openDeleteModal = (workspace: Workspace) => {
     setDeletingWorkspace(workspace);
   };
-
-  if (!isLoaded) {
-    return <div>Loading...</div>;
-  }
-
-  if (!user) {
-    return <div>Access denied. Please log in.</div>;
-  }
 
   return (
     <div className="max-w-3xl mx-auto px-4">

@@ -27,32 +27,32 @@ export default function Header({ title }: HeaderProps) {
     { href: "/admin", label: "Admin" },
   ];
 
+  const selectedWorkspaceName = workspaces.find(
+    (workspace) => workspace.id.toString() === selectedWorkspace
+  )?.name;
+
   return (
     <header className="bg-white shadow-md shadow-[color:var(--accent-lighter)]">
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-[color:var(--accent-darker)]">
-          {title}
-        </h1>
+        <Select value={selectedWorkspace} onValueChange={setSelectedWorkspace}>
+          <SelectTrigger className="text-3xl font-bold text-[color:var(--accent-darker)] border-none p-0 focus:ring-0 w-[180px]">
+            <SelectValue>{selectedWorkspaceName}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {workspaces.map((workspace) => (
+              <SelectItem
+                key={workspace.id}
+                value={workspace.id.toString()}
+                className="text-[color:var(--accent-darker)]"
+                style={{ color: workspace.color }}
+              >
+                {workspace.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className="flex items-center space-x-4">
           <div className="hidden md:flex items-center space-x-4">
-            <Select
-              value={selectedWorkspace}
-              onValueChange={setSelectedWorkspace}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select workspace" />
-              </SelectTrigger>
-              <SelectContent>
-                {workspaces.map((workspace) => (
-                  <SelectItem
-                    key={workspace.id}
-                    value={workspace.id.toString()}
-                  >
-                    {workspace.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             {links.map((link) => (
               <Link
                 key={link.href}
@@ -90,29 +90,7 @@ export default function Header({ title }: HeaderProps) {
       </div>
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200">
-          <div className="px-4 py-2">
-            <Select
-              value={selectedWorkspace}
-              onValueChange={(value) => {
-                setSelectedWorkspace(value);
-                setIsMenuOpen(false);
-              }}
-            >
-              <SelectTrigger className="w-full mb-2">
-                <SelectValue placeholder="Select workspace" />
-              </SelectTrigger>
-              <SelectContent>
-                {workspaces.map((workspace) => (
-                  <SelectItem
-                    key={workspace.id}
-                    value={workspace.id.toString()}
-                  >
-                    {workspace.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <div className="px-4 py-2"></div>
           {links.map((link) => (
             <Link
               key={link.href}
