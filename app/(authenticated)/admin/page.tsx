@@ -5,7 +5,7 @@ import { useUser } from "@clerk/nextjs";
 import WorkspaceList from "./components/workspace-list";
 import WorkspaceForm from "./components/workspace-form";
 import { useWorkspace } from "@/contexts/workspace-context";
-import { Workspace } from "@/types/workspaces";
+import { Workspace } from "@/types/workspace";
 import {
   addWorkspace,
   editWorkspace,
