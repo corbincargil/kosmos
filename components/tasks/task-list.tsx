@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { CreateTaskForm } from "./create-task-form";
 import { Task } from "@/types/task";
+import { Workspace } from "@/types/workspace";
 import dayjs from "dayjs";
 
 interface TaskListProps {
   tasks: Task[];
   userId: number;
-  workspaceId: number;
+  workspaceId?: number;
+  workspaces: Workspace[];
   onTaskCreated: () => void;
 }
 
@@ -14,6 +16,7 @@ const TaskList: React.FC<TaskListProps> = ({
   tasks,
   userId,
   workspaceId,
+  workspaces,
   onTaskCreated,
 }) => {
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -49,6 +52,7 @@ const TaskList: React.FC<TaskListProps> = ({
           onSubmit={handleCreateTask}
           userId={userId}
           workspaceId={workspaceId}
+          workspaces={workspaces}
         />
       )}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-4">

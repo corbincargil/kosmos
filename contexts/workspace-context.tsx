@@ -24,7 +24,7 @@ const WorkspaceContext = createContext<WorkspaceContextType | undefined>(
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<string>("");
+  const [selectedWorkspace, setSelectedWorkspace] = useState<string>("all");
   const [selectedWorkspaceColor, setSelectedWorkspaceColor] =
     useState<string>("#3B82F6");
   const { user, isLoaded } = useUser();
@@ -61,11 +61,15 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, [isLoaded, user]);
 
   useEffect(() => {
-    const workspace = workspaces.find(
-      (w) => w.id.toString() === selectedWorkspace
-    );
-    if (workspace) {
-      setSelectedWorkspaceColor(workspace.color);
+    if (selectedWorkspace === "all") {
+      setSelectedWorkspaceColor("#000000");
+    } else {
+      const workspace = workspaces.find(
+        (w) => w.id.toString() === selectedWorkspace
+      );
+      if (workspace) {
+        setSelectedWorkspaceColor(workspace.color);
+      }
     }
   }, [selectedWorkspace, workspaces]);
 

@@ -35,10 +35,23 @@ export default function Header({ title }: HeaderProps) {
     <header className="bg-white shadow-md shadow-[color:var(--accent-lighter)]">
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         <Select value={selectedWorkspace} onValueChange={setSelectedWorkspace}>
-          <SelectTrigger className="text-3xl font-bold text-[color:var(--accent-darker)] border-none p-0 focus:ring-0 w-[180px]">
-            <SelectValue>{selectedWorkspaceName}</SelectValue>
+          <SelectTrigger className="font-bold text-[color:var(--accent-darker)] border-none p-0 focus:ring-0 min-w-[100px] max-w-[250px] truncate">
+            <SelectValue>
+              <span className="text-lg md:text-2xl lg:text-3xl truncate">
+                {selectedWorkspace === "all"
+                  ? "All Workspaces"
+                  : selectedWorkspaceName}
+              </span>
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
+            <SelectItem
+              value="all"
+              className="text-[color:var(--accent-darker)]"
+              style={{ color: "#000000" }}
+            >
+              All
+            </SelectItem>
             {workspaces.map((workspace) => (
               <SelectItem
                 key={workspace.id}

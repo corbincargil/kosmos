@@ -15,14 +15,18 @@ import { useWorkspace } from "@/contexts/workspace-context";
 
 export default function Dashboard() {
   const { user } = useUser();
-  const { selectedWorkspace } = useWorkspace();
+  const { selectedWorkspace, workspaces } = useWorkspace();
   const [tasks, setTasks] = useState<Task[]>([]);
 
   const fetchTasks = useCallback(async () => {
-    if (user && selectedWorkspace) {
-      const response = await fetch(
-        `/api/tasks?workspaceId=${selectedWorkspace}`
-      );
+    if (user) {
+      const userId = user.publicMetadata.dbUserId as number;
+      const queryParam =
+        selectedWorkspace === "all"
+          ? `userId=${userId}`
+          : `workspaceId=${selectedWorkspace}`;
+
+      const response = await fetch(`/api/tasks?${queryParam}`);
       if (response.ok) {
         const tasksData = await response.json();
         setTasks(tasksData);
@@ -53,7 +57,12 @@ export default function Dashboard() {
           <TaskList
             tasks={tasks}
             userId={user?.publicMetadata.dbUserId as number}
-            workspaceId={Number(selectedWorkspace)}
+            workspaceId={
+              selectedWorkspace === "all"
+                ? undefined
+                : Number(selectedWorkspace)
+            }
+            workspaces={workspaces}
             onTaskCreated={fetchTasks}
           />
         </CardContent>
