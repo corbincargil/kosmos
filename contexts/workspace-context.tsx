@@ -8,7 +8,7 @@ import React, {
   ReactNode,
 } from "react";
 import { useUser } from "@clerk/nextjs";
-import { Workspace } from "@/types/workspaces";
+import { Workspace } from "@/types/workspace";
 
 interface WorkspaceContextType {
   workspaces: Workspace[];

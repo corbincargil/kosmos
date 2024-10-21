@@ -1,4 +1,4 @@
-import { Workspace } from "@/types/workspaces";
+import { Workspace } from "@/types/workspace";
 import { Trash } from "lucide-react";
 
 interface WorkspaceListProps {
