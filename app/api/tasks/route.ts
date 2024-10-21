@@ -7,12 +7,12 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const userId = searchParams.get("userId");
+  const workspaceId = searchParams.get("workspaceId");
 
-  if (userId) {
-    return TaskController.getTasksByUser(req);
-  } else {
+  if (workspaceId) {
     return TaskController.getTasksByWorkspaceId(req);
+  } else {
+    return TaskController.getTasksByUser(req);
   }
 }
 

@@ -19,26 +19,26 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   const fetchTasks = useCallback(async () => {
-    if (user) {
+    if (user && selectedWorkspace) {
       const response = await fetch(
-        `/api/tasks?userId=${user?.publicMetadata.dbUserId as number}`
+        `/api/tasks?workspaceId=${selectedWorkspace}`
       );
       if (response.ok) {
         const tasksData = await response.json();
         setTasks(tasksData);
       }
     }
-  }, [user]);
+  }, [user, selectedWorkspace]);
 
   useEffect(() => {
     fetchTasks();
-  }, [user, fetchTasks]);
+  }, [user, selectedWorkspace, fetchTasks]);
 
   return (
     <>
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Welcome, {user?.firstName}!</CardTitle>
+          <CardTitle>Welcome, {user?.firstName || user?.username}!</CardTitle>
           <CardDescription>
             This is your dashboard. You can see all your tasks below.
           </CardDescription>
