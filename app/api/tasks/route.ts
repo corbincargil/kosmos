@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { TaskController } from "../../../controllers/task-controller";
 
 export async function POST(req: NextRequest) {

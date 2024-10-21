@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -15,24 +15,24 @@ import { useWorkspace } from "@/contexts/workspace-context";
 
 export default function Dashboard() {
   const { user } = useUser();
-  const [tasks, setTasks] = useState<Task[]>([]);
   const { selectedWorkspace } = useWorkspace();
+  const [tasks, setTasks] = useState<Task[]>([]);
 
-  const storedDbUserId = user?.publicMetadata.dbUserId as number;
-
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     if (user) {
-      const response = await fetch(`/api/tasks?userId=${storedDbUserId}`);
+      const response = await fetch(
+        `/api/tasks?userId=${user?.publicMetadata.dbUserId as number}`
+      );
       if (response.ok) {
         const tasksData = await response.json();
         setTasks(tasksData);
       }
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchTasks();
-  }, [user?.id]);
+  }, [user, fetchTasks]);
 
   return (
     <>
@@ -52,7 +52,7 @@ export default function Dashboard() {
         <CardContent>
           <TaskList
             tasks={tasks}
-            userId={storedDbUserId}
+            userId={user?.publicMetadata.dbUserId as number}
             workspaceId={Number(selectedWorkspace)}
             onTaskCreated={fetchTasks}
           />
