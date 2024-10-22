@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { CreateTaskForm } from "./create-task-form";
 import { Task, TaskStatus } from "@/types/task";
-import { Workspace } from "@/types/workspace";
 import { useToast } from "@/hooks/use-toast";
 import { TaskListProps } from "./types";
 import { sortTasks } from "./utils";
