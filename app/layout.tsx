@@ -16,7 +16,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Life Organization",
+  title: "Kosmos",
   description: "Keep your life organized",
   icons: {
     icon: [{ url: "/favicon.svg" }, { url: "/favicon.ico", sizes: "any" }],

@@ -20,7 +20,7 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({
     description: "",
     dueDate: "",
     status: "TODO" as TaskStatus,
-    priority: "MEDIUM" as TaskPriority,
+    priority: "LOW" as TaskPriority,
     workspaceId: workspaceId || "",
   });
 
