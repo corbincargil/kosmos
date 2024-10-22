@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { clerkClient } from "@clerk/nextjs/server";
 
 const prisma = new PrismaClient();
 
@@ -15,18 +14,32 @@ export async function createUser(userData: Omit<User, "id">): Promise<User> {
   });
 }
 
-export async function syncUser(userId: string, clerkUser: { email: string }) {
-  const user = await prisma.user.upsert({
+export async function syncUser(
+  userId: string,
+  clerkUser: { email: string }
+): Promise<User> {
+  let user = await prisma.user.findUnique({
     where: { clerkUserId: userId },
-    update: {
-      email: clerkUser.email,
-      updatedAt: new Date(),
-    },
-    create: {
-      email: clerkUser.email,
-      clerkUserId: userId,
-    },
   });
+
+  if (user) {
+    if (user.email !== clerkUser.email) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          email: clerkUser.email,
+          updatedAt: new Date(),
+        },
+      });
+    }
+  } else {
+    user = await prisma.user.create({
+      data: {
+        email: clerkUser.email,
+        clerkUserId: userId,
+      },
+    });
+  }
 
   return user;
 }
