@@ -83,15 +83,13 @@ export const TaskController = {
     }
   },
 
-  editTask: async (req: NextRequest) => {
+  editTask: async (req: NextRequest, taskId: number) => {
     try {
       const taskData = await req.json();
-      const validatedData = TaskSchema.parse(taskData);
-      if (validatedData.id === undefined) {
-        throw new Error("Task ID is required");
-      }
+      const validatedData = TaskSchema.partial().parse(taskData);
+
       const task = await TaskService.editTask(
-        validatedData.id,
+        taskId,
         validatedData.title,
         validatedData.description,
         validatedData.dueDate,

@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { TaskController } from "../../../controllers/task-controller";
 
 export async function POST(req: NextRequest) {
@@ -16,8 +16,15 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function PUT(req: NextRequest) {
-  return TaskController.editTask(req);
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const taskId = parseInt(params.id, 10);
+  if (isNaN(taskId)) {
+    return NextResponse.json({ error: "Invalid task ID" }, { status: 400 });
+  }
+  return TaskController.editTask(req, taskId);
 }
 
 export async function DELETE(req: NextRequest) {

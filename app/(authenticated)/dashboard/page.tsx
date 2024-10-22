@@ -63,7 +63,6 @@ export default function Dashboard() {
                 : Number(selectedWorkspace)
             }
             workspaces={workspaces}
-            onTaskCreated={fetchTasks}
           />
         </CardContent>
       </Card>

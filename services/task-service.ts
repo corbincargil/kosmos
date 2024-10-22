@@ -51,15 +51,22 @@ export const TaskService = {
 
   editTask: async (
     id: number,
-    title: string,
+    title?: string,
     description?: string,
     dueDate?: Date,
     status?: TaskStatus,
     priority?: TaskPriority
   ): Promise<Task> => {
+    const updateData: any = {};
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (dueDate !== undefined) updateData.dueDate = dueDate;
+    if (status !== undefined) updateData.status = status;
+    if (priority !== undefined) updateData.priority = priority;
+
     return prisma.task.update({
       where: { id },
-      data: { title, description, dueDate, status, priority },
+      data: updateData,
     });
   },
 
