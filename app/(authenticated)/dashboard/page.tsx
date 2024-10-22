@@ -21,7 +21,7 @@ import {
 import { Task } from "@/types/task";
 import TaskList from "@/components/tasks/task-list/task-list";
 import { useWorkspace } from "@/contexts/workspace-context";
-import { CreateTaskForm } from "@/components/tasks/task-forms/create-task-form";
+import { TaskForm } from "@/components/tasks/task-forms/create-task-form";
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -95,7 +95,7 @@ export default function Dashboard() {
               </DialogHeader>
               <DialogDescription></DialogDescription>
               <div className="max-h-[80vh] overflow-y-auto pr-6">
-                <CreateTaskForm
+                <TaskForm
                   onSubmit={handleTaskCreated}
                   userId={user?.publicMetadata.dbUserId as number}
                   workspaceId={

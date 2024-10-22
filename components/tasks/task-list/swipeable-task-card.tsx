@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useSwipeable } from "react-swipeable";
+import { Task } from "@/types/task";
+import { Workspace } from "@/types/workspace";
 import dayjs from "dayjs";
-import { SwipeableTaskCardProps } from "./types";
 import {
   getStatusColor,
   getSwipeText,
@@ -10,10 +11,18 @@ import {
 } from "./utils";
 import { TaskStatus } from "@/types/task";
 
+type SwipeableTaskCardProps = {
+  task: Task;
+  workspace: Workspace;
+  onUpdateStatus: (taskId: number, newStatus: string) => void;
+  onEdit: () => void;
+};
+
 export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
   task,
   workspace,
   onUpdateStatus,
+  onEdit,
 }) => {
   const [offset, setOffset] = useState(0);
 
@@ -85,7 +94,8 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
   return (
     <div
       {...handlers}
-      className="relative w-full rounded-md overflow-hidden max-w-sm mx-auto"
+      className="relative w-full rounded-md overflow-hidden max-w-sm mx-auto hover:shadow-lg hover:scale-[1.02] transition-all duration-200 ease-in-out"
+      onClick={onEdit}
       style={{
         touchAction: "pan-y",
         height: "clamp(60px, 45vw, 130px)",
@@ -177,6 +187,27 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
           </div>
         </div>
       </div>
+      {/* <div>
+        <button
+          onClick={onEdit}
+          className="p-1 text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            className="w-5 h-5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+            />
+          </svg>
+        </button>
+      </div> */}
     </div>
   );
 };

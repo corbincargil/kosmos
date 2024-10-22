@@ -1,19 +1,25 @@
 import { Task, TaskPriority, TaskStatus } from "@/types/task";
 import { Workspace } from "@/types/workspace";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-type CreateTaskFormProps = {
-  onSubmit: (data: Omit<Task, "id" | "createdAt" | "updatedAt">) => void;
+type TaskFormProps = {
+  onSubmit: (
+    data: Omit<Task, "id" | "createdAt" | "updatedAt">
+  ) => Promise<void>;
   userId: number;
   workspaceId?: number;
   workspaces: Workspace[];
+  task?: Task;
+  isEditing?: boolean;
 };
 
-export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({
+export const TaskForm: React.FC<TaskFormProps> = ({
   onSubmit,
   userId,
   workspaceId,
   workspaces,
+  task,
+  isEditing = false,
 }) => {
   const [formData, setFormData] = useState({
     title: "",
@@ -23,6 +29,22 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({
     priority: "LOW" as TaskPriority,
     workspaceId: workspaceId || "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (task && isEditing) {
+      setFormData({
+        title: task.title,
+        description: task.description || "",
+        dueDate: task.dueDate
+          ? new Date(task.dueDate).toISOString().split("T")[0]
+          : "",
+        status: task.status,
+        priority: task.priority || "LOW",
+        workspaceId: task.workspaceId.toString(),
+      });
+    }
+  }, [task, isEditing]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -36,15 +58,25 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
     const taskData: Omit<Task, "id" | "createdAt" | "updatedAt"> = {
       ...formData,
       userId,
       workspaceId: Number(formData.workspaceId),
       dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
     };
-    onSubmit(taskData);
+
+    try {
+      await onSubmit(taskData);
+    } catch (error) {
+      console.error("Error submitting task:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -174,9 +206,16 @@ export const CreateTaskForm: React.FC<CreateTaskFormProps> = ({
       <div className="mt-6">
         <button
           type="submit"
-          className="w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300"
+          disabled={isSubmitting}
+          className={`w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300 ${
+            isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
-          Create Task
+          {isSubmitting
+            ? "Submitting..."
+            : isEditing
+            ? "Update Task"
+            : "Create Task"}
         </button>
       </div>
     </form>
