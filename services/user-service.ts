@@ -28,9 +28,5 @@ export async function syncUser(userId: string, clerkUser: { email: string }) {
     },
   });
 
-  await clerkClient().users.updateUserMetadata(userId, {
-    publicMetadata: { dbUserId: user.id },
-  });
-
   return user;
 }

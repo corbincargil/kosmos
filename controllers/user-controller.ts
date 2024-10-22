@@ -1,6 +1,7 @@
 import * as userService from "@/services/user-service";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export async function getUsers(request: NextRequest) {
   try {
@@ -37,6 +38,13 @@ export async function syncClerkUser(request: NextRequest) {
   try {
     const clerkUser = await request.json();
     const user = await userService.syncUser(userId, clerkUser);
+
+    await clerkClient.users.updateUserMetadata(userId, {
+      publicMetadata: {
+        dbUserId: user.id,
+      },
+    });
+
     return NextResponse.json(user);
   } catch (error) {
     console.error("Error syncing user:", error);
