@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { CreateTaskForm } from "./create-task-form";
-import { Task, TaskStatus } from "@/types/task";
+import { TaskStatus } from "@/types/task";
 import { useToast } from "@/hooks/use-toast";
 import { TaskListProps } from "./types";
 import { sortTasks } from "./utils";
@@ -8,13 +7,9 @@ import { SwipeableTaskCard } from "./swipeable-task-card";
 
 const TaskList: React.FC<TaskListProps> = ({
   tasks: initialTasks,
-  userId,
-  workspaceId,
   workspaces,
-  onTaskCreated,
 }) => {
   const [tasks, setTasks] = useState(initialTasks);
-  const [showCreateForm, setShowCreateForm] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -22,51 +17,6 @@ const TaskList: React.FC<TaskListProps> = ({
   }, [initialTasks]);
 
   const sortedTasks = useMemo(() => sortTasks([...tasks]), [tasks]);
-
-  const handleCreateTask = async (newTaskData: Task) => {
-    const tempId = Date.now();
-    try {
-      const optimisticTask = { ...newTaskData, id: tempId };
-      setTasks((prevTasks) => sortTasks([...prevTasks, optimisticTask]));
-
-      const response = await fetch("/api/tasks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newTaskData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create task");
-      }
-
-      const createdTask = await response.json();
-
-      setTasks((prevTasks) =>
-        sortTasks(
-          prevTasks.map((task) => (task.id === tempId ? createdTask : task))
-        )
-      );
-
-      setShowCreateForm(false);
-      toast({
-        title: "Success",
-        description: "Task created successfully",
-      });
-      onTaskCreated(createdTask);
-    } catch (error) {
-      console.error("Error creating task:", error);
-      setTasks((prevTasks) =>
-        sortTasks(prevTasks.filter((task) => task.id !== tempId))
-      );
-      toast({
-        title: "Error",
-        description: "Failed to create task. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleUpdateStatus = useCallback(
     async (taskId: number, newStatus: TaskStatus) => {
@@ -119,17 +69,6 @@ const TaskList: React.FC<TaskListProps> = ({
 
   return (
     <div>
-      <button onClick={() => setShowCreateForm(!showCreateForm)}>
-        {showCreateForm ? "Cancel" : "Create New Task"}
-      </button>
-      {showCreateForm && (
-        <CreateTaskForm
-          onSubmit={handleCreateTask}
-          userId={userId}
-          workspaceId={workspaceId}
-          workspaces={workspaces}
-        />
-      )}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mt-4">
         {sortedTasks.map((task) => {
           const taskWorkspace = workspaces.find(

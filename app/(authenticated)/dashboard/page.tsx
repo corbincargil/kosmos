@@ -9,14 +9,25 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Task } from "@/types/task";
-import TaskList from "@/components/tasks/task-list";
+import TaskList from "@/components/tasks/task-list/task-list";
 import { useWorkspace } from "@/contexts/workspace-context";
+import { CreateTaskForm } from "@/components/tasks/task-forms/create-task-form";
 
 export default function Dashboard() {
   const { user } = useUser();
   const { selectedWorkspace, workspaces } = useWorkspace();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const fetchTasks = useCallback(async () => {
     if (user) {
@@ -38,6 +49,23 @@ export default function Dashboard() {
     fetchTasks();
   }, [user, selectedWorkspace, fetchTasks]);
 
+  const handleTaskCreated = async (
+    data: Omit<Task, "id" | "createdAt" | "updatedAt">
+  ) => {
+    const response = await fetch("/api/tasks", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      fetchTasks();
+      setIsDialogOpen(false);
+    }
+  };
+
   return (
     <>
       <Card className="mb-6">
@@ -50,8 +78,36 @@ export default function Dashboard() {
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Your Tasks</CardTitle>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-blue-500 hover:bg-blue-600">
+                Create New Task
+              </Button>
+            </DialogTrigger>
+            <DialogContent
+              className="sm:max-w-[425px] max-w-[90vw] p-4"
+              aria-describedby="task-dialog"
+            >
+              <DialogHeader>
+                <DialogTitle>Create New Task</DialogTitle>
+              </DialogHeader>
+              <DialogDescription></DialogDescription>
+              <div className="max-h-[80vh] overflow-y-auto pr-6">
+                <CreateTaskForm
+                  onSubmit={handleTaskCreated}
+                  userId={user?.publicMetadata.dbUserId as number}
+                  workspaceId={
+                    selectedWorkspace === "all"
+                      ? undefined
+                      : Number(selectedWorkspace)
+                  }
+                  workspaces={workspaces}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
         </CardHeader>
         <CardContent>
           <TaskList
