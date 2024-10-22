@@ -12,10 +12,9 @@ export const sortTasks = (tasks: Task[]): Task[] => {
     if (statusComparison !== 0) return statusComparison;
 
     // Then, sort by priority
-    const priorityOrder = { HIGH: 0, MEDIUM: 1, LOW: 2 };
+    const priorityOrder = { HIGH: 0, MEDIUM: 1, LOW: 2, "": 3 };
     const priorityComparison =
-      (a.priority ? priorityOrder[a.priority] : 0) -
-      (b.priority ? priorityOrder[b.priority] : 0);
+      priorityOrder[a.priority || ""] - priorityOrder[b.priority || ""];
     if (priorityComparison !== 0) return priorityComparison;
 
     // Finally, sort by due date

@@ -53,9 +53,9 @@ export const TaskService = {
     id: number,
     title?: string,
     description?: string,
-    dueDate?: Date,
+    dueDate?: Date | null,
     status?: TaskStatus,
-    priority?: TaskPriority
+    priority?: TaskPriority | null
   ): Promise<Task> => {
     const updateData: any = {};
     if (title !== undefined) updateData.title = title;

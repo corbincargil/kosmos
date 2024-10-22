@@ -108,7 +108,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
   return (
     <div
       {...handlers}
-      className="relative w-full rounded-md overflow-hidden max-w-sm mx-auto hover:shadow-lg hover:scale-[1.02] transition-all duration-200 ease-in-out"
+      className="relative w-full rounded-md overflow-hidden mx-auto hover:shadow-lg hover:scale-[1.02] transition-all duration-200 ease-in-out"
       onClick={onEdit}
       style={{
         touchAction: "pan-y",

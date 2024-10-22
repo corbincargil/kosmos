@@ -9,7 +9,7 @@ export const TaskSchema = z.object({
     .optional()
     .transform((val) => (val ? new Date(val) : undefined)),
   status: z.enum(["TODO", "IN_PROGRESS", "COMPLETED"]).default("TODO"),
-  priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH"]).nullable(),
   userId: z.number().int().positive(),
   workspaceId: z.number().int().positive(),
   createdAt: z.date().optional(),
@@ -17,6 +17,6 @@ export const TaskSchema = z.object({
 });
 
 export type TaskStatus = "TODO" | "IN_PROGRESS" | "COMPLETED";
-export type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH" | null;
 
 export type Task = z.infer<typeof TaskSchema>;

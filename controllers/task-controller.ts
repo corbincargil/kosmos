@@ -71,7 +71,7 @@ export const TaskController = {
         validatedData.description,
         validatedData.dueDate,
         validatedData.status,
-        validatedData.priority
+        validatedData.priority ?? undefined
       );
       return NextResponse.json(task, { status: 201 });
     } catch (error) {
@@ -88,11 +88,15 @@ export const TaskController = {
       const taskData = await req.json();
       const validatedData = TaskSchema.partial().parse(taskData);
 
+      if (validatedData.priority == null) {
+        validatedData.priority = null;
+      }
+
       const task = await TaskService.editTask(
         taskId,
         validatedData.title,
         validatedData.description,
-        validatedData.dueDate,
+        validatedData.dueDate ?? undefined,
         validatedData.status,
         validatedData.priority
       );

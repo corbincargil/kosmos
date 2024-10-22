@@ -46,8 +46,8 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
             <div
               className={`absolute right-0 top-0 bottom-0 w-1 ${statusColor}`}
             />
-            <AccordionContent className="pr-4">
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <AccordionContent className="pr-4 pl-2">
+              <div className="grid gap-2">
                 {statusTasks.map((task) => {
                   const taskWorkspace = workspaces.find(
                     (w) => w.id === task.workspaceId
