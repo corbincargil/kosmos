@@ -40,28 +40,30 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
         const statusColor = getStatusAccordionColors(status);
         return (
           <AccordionItem value={status} key={status} className="relative">
-            <AccordionTrigger className="text-lg font-semibold pr-4">
+            <AccordionTrigger className="text-lg font-semibold pr-4 py-2">
               {status.replace("_", " ")} ({statusTasks.length})
             </AccordionTrigger>
             <div
               className={`absolute right-0 top-0 bottom-0 w-1 ${statusColor}`}
             />
-            <AccordionContent className="pr-4 pl-2">
-              <div className="grid gap-2">
-                {statusTasks.map((task) => {
-                  const taskWorkspace = workspaces.find(
-                    (w) => w.id === task.workspaceId
-                  );
-                  return (
-                    <SwipeableTaskCard
-                      key={task.id}
-                      task={task}
-                      workspace={taskWorkspace!}
-                      onUpdateStatus={onUpdateStatus}
-                      onEdit={() => onEdit(task)}
-                    />
-                  );
-                })}
+            <AccordionContent>
+              <div className="max-h-[380px] overflow-y-auto overflow-x-hidden px-2">
+                <div className="grid gap-2">
+                  {statusTasks.map((task) => {
+                    const taskWorkspace = workspaces.find(
+                      (w) => w.id === task.workspaceId
+                    );
+                    return (
+                      <SwipeableTaskCard
+                        key={task.id}
+                        task={task}
+                        workspace={taskWorkspace!}
+                        onUpdateStatus={onUpdateStatus}
+                        onEdit={() => onEdit(task)}
+                      />
+                    );
+                  })}
+                </div>
               </div>
             </AccordionContent>
           </AccordionItem>

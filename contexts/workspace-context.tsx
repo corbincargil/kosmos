@@ -24,7 +24,12 @@ const WorkspaceContext = createContext<WorkspaceContextType | undefined>(
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<string>("all");
+  const [selectedWorkspace, setSelectedWorkspace] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("selectedWorkspace") || "all";
+    }
+    return "all";
+  });
   const [selectedWorkspaceColor, setSelectedWorkspaceColor] =
     useState<string>("#3B82F6");
   const { user, isLoaded } = useUser();
@@ -61,6 +66,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, [isLoaded, user]);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedWorkspace", selectedWorkspace);
+    }
+
     if (selectedWorkspace === "all") {
       setSelectedWorkspaceColor("#000000");
     } else {

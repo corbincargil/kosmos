@@ -68,7 +68,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <Card className="mb-6">
+      <Card className="mb-4">
         <CardHeader>
           <CardTitle>Welcome, {user?.firstName || user?.username}!</CardTitle>
           <CardDescription>
@@ -78,7 +78,7 @@ export default function Dashboard() {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row items-center justify-between p-4 py-2">
           <CardTitle>Your Tasks</CardTitle>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
@@ -109,7 +109,7 @@ export default function Dashboard() {
             </DialogContent>
           </Dialog>
         </CardHeader>
-        <CardContent className="p-2 sm:p-4">
+        <CardContent className="p-2 sm:p-4 sm:pt-0">
           <TaskList
             tasks={tasks}
             userId={user?.publicMetadata.dbUserId as number}
