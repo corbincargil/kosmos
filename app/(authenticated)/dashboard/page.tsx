@@ -87,7 +87,7 @@ export default function Dashboard() {
               </Button>
             </DialogTrigger>
             <DialogContent
-              className="sm:max-w-[425px] max-w-[90vw] p-4"
+              className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2"
               aria-describedby="task-dialog"
             >
               <DialogHeader>
