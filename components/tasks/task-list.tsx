@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { CreateTaskForm } from "./create-task-form";
 import { Task } from "@/types/task";
 import { Workspace } from "@/types/workspace";
@@ -11,6 +11,7 @@ interface TaskListProps {
   userId: number;
   workspaceId?: number;
   workspaces: Workspace[];
+  onTaskCreated: (task: Task) => void;
 }
 
 const TaskList: React.FC<TaskListProps> = ({
@@ -18,9 +19,9 @@ const TaskList: React.FC<TaskListProps> = ({
   userId,
   workspaceId,
   workspaces,
+  onTaskCreated,
 }) => {
   const [tasks, setTasks] = useState(initialTasks);
-  console.log(tasks);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const { toast } = useToast();
 
@@ -28,11 +29,40 @@ const TaskList: React.FC<TaskListProps> = ({
     setTasks(initialTasks);
   }, [initialTasks]);
 
+  // Sorting function
+  const sortTasks = useCallback((tasksToSort: Task[]) => {
+    return tasksToSort.sort((a, b) => {
+      // First, sort by status
+      const statusOrder = { TODO: 0, IN_PROGRESS: 1, COMPLETED: 2 };
+      const statusDiff = statusOrder[a.status] - statusOrder[b.status];
+      if (statusDiff !== 0) return statusDiff;
+
+      // If status is the same, sort by priority
+      const priorityOrder = { HIGH: 0, MEDIUM: 1, LOW: 2 };
+      const priorityDiff =
+        (priorityOrder[a.priority || "LOW"] || 2) -
+        (priorityOrder[b.priority || "LOW"] || 2);
+      if (priorityDiff !== 0) return priorityDiff;
+
+      // If priority is the same, sort by due date
+      const dateA = a.dueDate
+        ? new Date(a.dueDate)
+        : new Date(8640000000000000);
+      const dateB = b.dueDate
+        ? new Date(b.dueDate)
+        : new Date(8640000000000000);
+      return dateA.getTime() - dateB.getTime();
+    });
+  }, []);
+
+  // Memoized sorted tasks
+  const sortedTasks = useMemo(() => sortTasks([...tasks]), [tasks, sortTasks]);
+
   const handleCreateTask = async (newTaskData: Task) => {
-    const tempId = Date.now(); // Temporary ID for the new task
+    const tempId = Date.now();
     try {
       const optimisticTask = { ...newTaskData, id: tempId };
-      setTasks((prevTasks) => [...prevTasks, optimisticTask]);
+      setTasks((prevTasks) => sortTasks([...prevTasks, optimisticTask]));
 
       const response = await fetch("/api/tasks", {
         method: "POST",
@@ -48,9 +78,10 @@ const TaskList: React.FC<TaskListProps> = ({
 
       const createdTask = await response.json();
 
-      // Update the task with the real ID from the server
       setTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === tempId ? createdTask : task))
+        sortTasks(
+          prevTasks.map((task) => (task.id === tempId ? createdTask : task))
+        )
       );
 
       setShowCreateForm(false);
@@ -58,10 +89,12 @@ const TaskList: React.FC<TaskListProps> = ({
         title: "Success",
         description: "Task created successfully",
       });
+      onTaskCreated(createdTask);
     } catch (error) {
       console.error("Error creating task:", error);
-      // Revert the optimistic update
-      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== tempId));
+      setTasks((prevTasks) =>
+        sortTasks(prevTasks.filter((task) => task.id !== tempId))
+      );
       toast({
         title: "Error",
         description: "Failed to create task. Please try again.",
@@ -70,13 +103,18 @@ const TaskList: React.FC<TaskListProps> = ({
     }
   };
 
-  const handleCompleteTask = useCallback(
-    async (taskId: number) => {
+  const handleUpdateStatus = useCallback(
+    async (taskId: number, newStatus: string) => {
       try {
         // Optimistic update
         setTasks((prevTasks) =>
           prevTasks.map((task) =>
-            task.id === taskId ? { ...task, status: "COMPLETED" } : task
+            task.id === taskId
+              ? {
+                  ...task,
+                  status: newStatus as "TODO" | "IN_PROGRESS" | "COMPLETED",
+                }
+              : task
           )
         );
 
@@ -85,52 +123,36 @@ const TaskList: React.FC<TaskListProps> = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ status: "COMPLETED" }),
+          body: JSON.stringify({ status: newStatus }),
         });
 
         if (!response.ok) {
-          throw new Error("Failed to update task");
+          throw new Error("Failed to update task status");
         }
 
         toast({
           title: "Success",
-          description: "Task marked as completed",
+          description: `Task marked as ${newStatus
+            .toLowerCase()
+            .replace("_", " ")}`,
         });
       } catch (error) {
-        console.error("Error completing task:", error);
+        console.error("Error updating task status:", error);
         // Revert the optimistic update
         setTasks((prevTasks) =>
           prevTasks.map((task) =>
-            task.id === taskId ? { ...task, status: "TODO" } : task
+            task.id === taskId ? { ...task, status: task.status } : task
           )
         );
         toast({
           title: "Error",
-          description: "Failed to complete task. Please try again.",
+          description: "Failed to update task status. Please try again.",
           variant: "destructive",
         });
       }
     },
     [toast]
   );
-
-  const getPriorityEmoji = (priority: string | undefined) => {
-    switch (priority) {
-      case "HIGH":
-        return "🔴";
-      case "MEDIUM":
-        return "🟡";
-      case "LOW":
-        return "🟢";
-      default:
-        return "⚪️";
-    }
-  };
-
-  const getWorkspaceColor = (workspaceId: number) => {
-    const workspace = workspaces.find((w) => w.id === workspaceId);
-    return workspace ? workspace.color : "#3B82F6"; // default color if not found
-  };
 
   return (
     <div>
@@ -146,15 +168,19 @@ const TaskList: React.FC<TaskListProps> = ({
         />
       )}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mt-4">
-        {tasks.map((task) => (
-          <SwipeableTaskCard
-            key={task.id}
-            task={task}
-            getWorkspaceColor={getWorkspaceColor}
-            getPriorityEmoji={getPriorityEmoji}
-            onComplete={handleCompleteTask}
-          />
-        ))}
+        {sortedTasks.map((task) => {
+          const taskWorkspace = workspaces.find(
+            (w) => w.id === task.workspaceId
+          );
+          return (
+            <SwipeableTaskCard
+              key={task.id}
+              task={task}
+              workspace={taskWorkspace!}
+              onUpdateStatus={handleUpdateStatus}
+            />
+          );
+        })}
       </div>
     </div>
   );
@@ -162,86 +188,126 @@ const TaskList: React.FC<TaskListProps> = ({
 
 interface SwipeableTaskCardProps {
   task: Task;
-  getWorkspaceColor: (workspaceId: number) => string;
-  getPriorityEmoji: (priority: string | undefined) => string;
-  onComplete: (taskId: number) => void;
+  workspace: Workspace;
+  onUpdateStatus: (taskId: number, newStatus: string) => void;
 }
 
 const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
   task,
-  getWorkspaceColor,
-  getPriorityEmoji,
-  onComplete,
+  workspace,
+  onUpdateStatus,
 }) => {
   const [offset, setOffset] = useState(0);
 
   const handlers = useSwipeable({
     onSwiping: (eventData) => {
-      if (eventData.deltaX > 0) {
+      if (task.status !== "COMPLETED" && eventData.deltaX > 0) {
         setOffset(Math.min(eventData.deltaX, 200));
       }
     },
     onSwiped: (eventData) => {
-      if (eventData.deltaX > 150) {
-        onComplete(task.id!);
+      if (task.status !== "COMPLETED" && eventData.deltaX > 150) {
+        const newStatus = task.status === "TODO" ? "IN_PROGRESS" : "COMPLETED";
+        onUpdateStatus(task.id!, newStatus);
       }
       setOffset(0);
     },
   });
 
+  const isCompleted = task.status === "COMPLETED";
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "COMPLETED":
+        return "bg-green-500";
+      case "IN_PROGRESS":
+        return "bg-blue-500";
+      default:
+        return "bg-yellow-500";
+    }
+  };
+
+  const getSwipeText = (status: string) => {
+    switch (status) {
+      case "TODO":
+        return "In-Progress";
+      case "IN_PROGRESS":
+        return "Completed";
+      default:
+        return "";
+    }
+  };
+
   return (
     <div
       {...handlers}
-      className="relative overflow-hidden rounded-md"
+      className="relative w-full pb-[45%] rounded-md overflow-hidden"
       style={{ touchAction: "pan-y" }}
     >
-      <div className="absolute inset-0 bg-green-500 flex items-center justify-end pr-4 text-white">
-        Completed
+      <div
+        className={`absolute inset-0 flex flex-col items-left justify-center px-4 text-white ${
+          task.status === "TODO" ? "bg-blue-500" : "bg-green-500"
+        }`}
+      >
+        <p>Mark</p>
+        {getSwipeText(task.status)}
       </div>
       <div
-        className="relative bg-white border rounded-md shadow-sm transition-all hover:shadow-md"
+        className="absolute inset-0 bg-white border rounded-md shadow-sm transition-all hover:shadow-md overflow-hidden"
         style={{
           transform: `translateX(${offset}px)`,
           transition: offset === 0 ? "transform 0.2s ease-out" : "none",
         }}
       >
         <div
-          className="p-3"
-          style={{
-            backgroundColor: `${getWorkspaceColor(task.workspaceId)}25`,
-          }}
-        >
+          className={`absolute left-0 top-0 bottom-0 w-1 ${getStatusColor(
+            task.status
+          )}`}
+        ></div>
+        <div className="absolute inset-0 p-3 pl-4 flex flex-col">
           <div className="flex justify-between items-start mb-1">
             <div className="flex-grow min-w-0 mr-2">
               <div className="flex items-center space-x-2">
-                <h3 className="text-base font-semibold truncate">
-                  {task.title}
-                </h3>
-                <span
-                  className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ${
-                    task.status === "COMPLETED"
-                      ? "bg-green-100 text-green-800"
-                      : task.status === "IN_PROGRESS"
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-gray-100 text-gray-800"
+                <h3
+                  className={`text-base font-semibold truncate ${
+                    isCompleted ? "line-through text-gray-500" : ""
                   }`}
                 >
-                  {task.status.replace("_", " ")}
-                </span>
+                  {task.title}
+                </h3>
               </div>
             </div>
-            <span className="text-lg leading-none flex-shrink-0">
-              {getPriorityEmoji(task.priority)}
+            <span className={`text-xs font-medium text-gray-500`}>
+              {task.priority}
             </span>
           </div>
-          <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+          <p
+            className={`text-sm text-gray-600 mb-2 line-clamp-4 ${
+              isCompleted ? "line-through" : ""
+            }`}
+          >
             {task.description}
           </p>
-          {task.dueDate && (
-            <p className="text-xs text-gray-500 mt-auto">
-              Due: {dayjs(task.dueDate).format("MMM D")}
+          <div className="flex-grow"></div>
+          <div className="flex justify-between items-center mt-2">
+            <div className="flex-grow">
+              {task.dueDate && (
+                <p
+                  className={`text-xs text-gray-500 ${
+                    isCompleted ? "line-through" : ""
+                  }`}
+                >
+                  Due: {dayjs(task.dueDate).format("MMM D")}
+                </p>
+              )}
+            </div>
+            <p
+              className="text-xs font-medium ml-2 flex-shrink-0"
+              style={{ color: workspace.color }}
+            >
+              {workspace.name}
             </p>
-          )}
+          </div>
         </div>
       </div>
     </div>
