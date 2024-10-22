@@ -85,8 +85,11 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
   return (
     <div
       {...handlers}
-      className="relative w-full pb-[45%] rounded-md overflow-hidden"
-      style={{ touchAction: "pan-y" }}
+      className="relative w-full rounded-md overflow-hidden max-w-sm mx-auto"
+      style={{
+        touchAction: "pan-y",
+        height: "clamp(60px, 45vw, 130px)",
+      }}
     >
       {/* Left swipe action */}
       <div
@@ -124,7 +127,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
         }}
       >
         <div
-          className={`absolute left-0 top-0 bottom-0 w-1 ${getStatusColor(
+          className={`absolute left-0 top-0 bottom-0 w-1 bg-${getStatusColor(
             task.status
           )}`}
         ></div>
@@ -133,7 +136,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
             <div className="flex-grow min-w-0 mr-2">
               <div className="flex items-center space-x-2">
                 <h3
-                  className={`text-base font-semibold truncate ${
+                  className={`text-base font-semibold sm:line-clamp-2 line-clamp-1 ${
                     isCompleted ? "line-through text-gray-500" : ""
                   }`}
                 >
@@ -141,7 +144,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
                 </h3>
               </div>
             </div>
-            <span className={`text-xs font-medium text-gray-500`}>
+            <span className={`text-xs font-medium text-gray-500 flex-shrink-0`}>
               {task.priority}
             </span>
           </div>
@@ -167,9 +170,9 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
             </div>
             <p
               className="text-xs font-medium ml-2 flex-shrink-0"
-              style={{ color: workspace.color }}
+              style={{ color: workspace?.color }}
             >
-              {workspace.name}
+              {workspace?.name}
             </p>
           </div>
         </div>

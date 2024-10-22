@@ -21,11 +21,11 @@ export const sortTasks = (tasksToSort: Task[]) => {
 export const getStatusColor = (status: string) => {
   switch (status) {
     case "COMPLETED":
-      return "bg-green-500";
+      return "green-500";
     case "IN_PROGRESS":
-      return "bg-blue-500";
+      return "blue-500";
     default:
-      return "bg-yellow-500";
+      return "yellow-500";
   }
 };
 
