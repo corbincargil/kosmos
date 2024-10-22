@@ -15,7 +15,6 @@ type TaskAccordionProps = {
   workspaces: Workspace[];
   onUpdateStatus: (taskId: number, newStatus: string) => void;
   onEdit: (task: Task) => void;
-  onDelete: (taskId: number) => void;
 };
 
 export const TaskAccordion: React.FC<TaskAccordionProps> = ({
@@ -23,7 +22,6 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
   workspaces,
   onUpdateStatus,
   onEdit,
-  onDelete,
 }) => {
   const groupedTasks = tasks.reduce((acc, task) => {
     if (!acc[task.status]) {
@@ -48,8 +46,8 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
             <div
               className={`absolute right-0 top-0 bottom-0 w-1 ${statusColor}`}
             />
-            <AccordionContent>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mt-4">
+            <AccordionContent className="pr-4">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {statusTasks.map((task) => {
                   const taskWorkspace = workspaces.find(
                     (w) => w.id === task.workspaceId
@@ -61,7 +59,6 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
                       workspace={taskWorkspace!}
                       onUpdateStatus={onUpdateStatus}
                       onEdit={() => onEdit(task)}
-                      onDelete={() => onDelete(task.id!)}
                     />
                   );
                 })}

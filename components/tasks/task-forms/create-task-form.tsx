@@ -1,7 +1,7 @@
 import { Task, TaskPriority, TaskStatus } from "@/types/task";
 import { Workspace } from "@/types/workspace";
 import React, { useState, useEffect } from "react";
-import { Text, Calendar, Loader, Flag } from "lucide-react";
+import { Text, Calendar, Loader, Flag, Trash2 } from "lucide-react";
 
 type TaskFormProps = {
   onSubmit: (
@@ -11,6 +11,7 @@ type TaskFormProps = {
   workspaceId?: number;
   workspaces: Workspace[];
   task?: Task;
+  onDelete?: () => void;
   isEditing?: boolean;
 };
 
@@ -20,6 +21,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   workspaceId,
   workspaces,
   task,
+  onDelete,
   isEditing = false,
 }) => {
   const [formData, setFormData] = useState({
@@ -82,7 +84,10 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-3xl mx-auto">
+    <form
+      onSubmit={handleSubmit}
+      className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2 space-y-2"
+    >
       <div>
         <label
           htmlFor="title"
@@ -219,7 +224,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         </select>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 flex justify-between items-center">
         <button
           type="submit"
           disabled={isSubmitting}
@@ -233,6 +238,16 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             ? "Update Task"
             : "Create Task"}
         </button>
+
+        {isEditing && onDelete && (
+          <button
+            type="button"
+            onClick={onDelete}
+            className="px-4 py-2 text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-300"
+          >
+            <Trash2 size={20} />
+          </button>
+        )}
       </div>
     </form>
   );

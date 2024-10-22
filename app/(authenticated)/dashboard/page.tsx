@@ -109,7 +109,7 @@ export default function Dashboard() {
             </DialogContent>
           </Dialog>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-2 sm:p-4">
           <TaskList
             tasks={tasks}
             userId={user?.publicMetadata.dbUserId as number}

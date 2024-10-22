@@ -3,6 +3,7 @@ import { useSwipeable } from "react-swipeable";
 import { Task } from "@/types/task";
 import { Workspace } from "@/types/workspace";
 import dayjs from "dayjs";
+import { Flag } from "lucide-react";
 import {
   getStatusColor,
   getSwipeText,
@@ -16,7 +17,6 @@ type SwipeableTaskCardProps = {
   workspace: Workspace;
   onUpdateStatus: (taskId: number, newStatus: string) => void;
   onEdit: () => void;
-  onDelete: () => void;
 };
 
 export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
@@ -24,7 +24,6 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
   workspace,
   onUpdateStatus,
   onEdit,
-  onDelete,
 }) => {
   const [offset, setOffset] = useState(0);
 
@@ -93,6 +92,19 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
     }
   };
 
+  const getPriorityColor = (priority: string | undefined) => {
+    switch (priority?.toLowerCase()) {
+      case "low":
+        return "text-blue-500";
+      case "medium":
+        return "text-orange-500";
+      case "high":
+        return "text-red-500";
+      default:
+        return "";
+    }
+  };
+
   return (
     <div
       {...handlers}
@@ -100,7 +112,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
       onClick={onEdit}
       style={{
         touchAction: "pan-y",
-        height: "clamp(60px, 45vw, 130px)",
+        minHeight: task.description ? "100px" : "72px",
       }}
     >
       {/* Left swipe action */}
@@ -136,6 +148,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
         style={{
           transform: `translateX(${offset}px)`,
           transition: offset === 0 ? "transform 0.2s ease-out" : "none",
+          minHeight: task.description ? "100px" : "72px",
         }}
       >
         <div
@@ -143,33 +156,36 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
             task.status
           )}`}
         ></div>
-        <div className="absolute inset-0 p-3 pl-4 flex flex-col">
+        <div className="absolute inset-0 p-3 pl-4 flex flex-col h-full">
           <div className="flex justify-between items-start mb-1">
             <div className="flex-grow min-w-0 mr-2">
-              <div className="flex items-center space-x-2">
+              <div className="flex justify-between items-center">
                 <h3
-                  className={`text-base font-semibold sm:line-clamp-2 line-clamp-1 ${
+                  className={`w-full text-base font-semibold line-clamp-1 ${
                     isCompleted ? "line-through text-gray-500" : ""
                   }`}
-                  style={{ maxWidth: "calc(100% - 90px)" }}
                 >
                   {task.title}
                 </h3>
-                <span
-                  className={`text-xs font-medium text-gray-500 flex-shrink-0`}
-                >
-                  {task.priority}
-                </span>
+                {task.priority && (
+                  <Flag
+                    size={16}
+                    className={`ml-2 ${getPriorityColor(task.priority)}`}
+                    fill="currentColor"
+                  />
+                )}
               </div>
             </div>
           </div>
-          <p
-            className={`text-sm text-gray-600 mb-2 line-clamp-4 ${
-              isCompleted ? "line-through" : ""
-            }`}
-          >
-            {task.description}
-          </p>
+          {task.description && (
+            <p
+              className={`text-sm text-gray-600 line-clamp-1 ${
+                isCompleted ? "line-through" : ""
+              }`}
+            >
+              {task.description}
+            </p>
+          )}
           <div className="flex-grow"></div>
           <div className="flex justify-between items-center mt-2">
             <div className="flex-grow">
@@ -190,30 +206,6 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
               {workspace?.name}
             </p>
           </div>
-        </div>
-        <div className="absolute top-2 right-2 flex space-x-2">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
-            className="p-1 text-red-500 hover:text-red-700 focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="w-4 h-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
-          </button>
         </div>
       </div>
     </div>

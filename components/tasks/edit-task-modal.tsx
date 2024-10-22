@@ -1,8 +1,7 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -15,7 +14,10 @@ type EditTaskModalProps = {
   onClose: () => void;
   task: Task;
   workspaces: Workspace[];
-  onSubmit: (data: Omit<Task, "id" | "createdAt" | "updatedAt">) => void;
+  onSubmit: (
+    data: Omit<Task, "id" | "createdAt" | "updatedAt">
+  ) => Promise<void>;
+  onDelete: (taskId: number) => Promise<void>;
 };
 
 export const EditTaskModal: React.FC<EditTaskModalProps> = ({
@@ -24,38 +26,27 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({
   task,
   workspaces,
   onSubmit,
+  onDelete,
 }) => {
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        contentRef.current?.focus();
-      }, 0);
-    }
-  }, [isOpen]);
+  const handleDelete = async () => {
+    await onDelete(task.id!);
+    onClose();
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent
-        className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2"
-        ref={contentRef}
-        tabIndex={-1}
-      >
+      <DialogContent className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2">
         <DialogHeader>
           <DialogTitle>Edit Task</DialogTitle>
         </DialogHeader>
-        <DialogDescription></DialogDescription>
-        <div className="sm:max-h[80vh] overflow-y-auto pr-6">
-          <TaskForm
-            onSubmit={(data) => Promise.resolve(onSubmit(data))}
-            userId={task.userId}
-            workspaceId={task.workspaceId}
-            workspaces={workspaces}
-            task={task}
-            isEditing={true}
-          />
-        </div>
+        <TaskForm
+          onSubmit={onSubmit}
+          userId={task.userId}
+          workspaces={workspaces}
+          task={task}
+          isEditing={true}
+          onDelete={handleDelete}
+        />
       </DialogContent>
     </Dialog>
   );

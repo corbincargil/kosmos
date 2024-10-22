@@ -151,7 +151,6 @@ const TaskList: React.FC<TaskListProps> = ({
           handleUpdateStatus(taskId, newStatus as TaskStatus)
         }
         onEdit={setEditingTask}
-        onDelete={handleDeleteTask}
       />
       {editingTask && (
         <EditTaskModal
@@ -160,6 +159,7 @@ const TaskList: React.FC<TaskListProps> = ({
           task={editingTask}
           workspaces={workspaces}
           onSubmit={handleEditTask}
+          onDelete={handleDeleteTask}
         />
       )}
     </div>
