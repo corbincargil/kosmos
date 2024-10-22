@@ -113,6 +113,35 @@ const TaskList: React.FC<TaskListProps> = ({
     [editingTask, toast]
   );
 
+  const handleDeleteTask = useCallback(
+    async (taskId: number) => {
+      try {
+        const response = await fetch(`/api/tasks/${taskId}`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to delete task");
+        }
+
+        setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+
+        toast({
+          title: "Success",
+          description: "Task deleted successfully",
+        });
+      } catch (error) {
+        console.error("Error deleting task:", error);
+        toast({
+          title: "Error",
+          description: "Failed to delete task. Please try again.",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast]
+  );
+
   return (
     <div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mt-4">
@@ -129,6 +158,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 handleUpdateStatus(taskId, newStatus as TaskStatus)
               }
               onEdit={() => setEditingTask(task)}
+              onDelete={() => handleDeleteTask(task.id!)}
             />
           );
         })}
