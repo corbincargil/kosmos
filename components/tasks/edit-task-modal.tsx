@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,9 +25,23 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({
   workspaces,
   onSubmit,
 }) => {
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        contentRef.current?.focus();
+      }, 0);
+    }
+  }, [isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] max-w-[90vw] p-4">
+      <DialogContent
+        className="sm:max-w-[425px] max-w-[90vw] p-4"
+        ref={contentRef}
+        tabIndex={-1}
+      >
         <DialogHeader>
           <DialogTitle>Edit Task</DialogTitle>
         </DialogHeader>

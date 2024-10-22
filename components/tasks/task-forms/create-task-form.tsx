@@ -96,11 +96,11 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           onChange={handleChange}
           required
           maxLength={100}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
 
-      {!workspaceId && (
+      {!workspaceId || isEditing ? (
         <div>
           <label
             htmlFor="workspaceId"
@@ -114,7 +114,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             value={formData.workspaceId}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select a workspace</option>
             {workspaces.map((workspace) => (
@@ -124,7 +124,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             ))}
           </select>
         </div>
-      )}
+      ) : null}
 
       <div>
         <label
@@ -140,7 +140,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           onChange={handleChange}
           maxLength={255}
           rows={window.innerWidth <= 640 ? 2 : 3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
 
@@ -158,7 +158,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             name="dueDate"
             value={formData.dueDate}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
@@ -174,7 +174,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="TODO">To Do</option>
             <option value="IN_PROGRESS">In Progress</option>
@@ -195,7 +195,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           name="priority"
           value={formData.priority}
           onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none  focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="LOW">Low</option>
           <option value="MEDIUM">Medium</option>
@@ -207,7 +207,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300 ${
+          className={`w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none  focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300 ${
             isSubmitting ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >

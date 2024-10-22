@@ -1,20 +1,28 @@
 import { Task, TaskStatus } from "@/types/task";
 
-export const sortTasks = (tasksToSort: Task[]) => {
-  return tasksToSort.sort((a, b) => {
-    const statusOrder = { TODO: 0, IN_PROGRESS: 1, COMPLETED: 2 };
-    const statusDiff = statusOrder[a.status] - statusOrder[b.status];
-    if (statusDiff !== 0) return statusDiff;
+export const sortStatuses = (a: string, b: string) => {
+  const order = ["TODO", "IN_PROGRESS", "COMPLETED"];
+  return order.indexOf(a) - order.indexOf(b);
+};
 
+export const sortTasks = (tasks: Task[]): Task[] => {
+  return tasks.sort((a, b) => {
+    // First, sort by status
+    const statusComparison = sortStatuses(a.status, b.status);
+    if (statusComparison !== 0) return statusComparison;
+
+    // Then, sort by priority
     const priorityOrder = { HIGH: 0, MEDIUM: 1, LOW: 2 };
-    const priorityDiff =
-      (priorityOrder[a.priority || "LOW"] || 2) -
-      (priorityOrder[b.priority || "LOW"] || 2);
-    if (priorityDiff !== 0) return priorityDiff;
+    const priorityComparison =
+      (a.priority ? priorityOrder[a.priority] : 0) -
+      (b.priority ? priorityOrder[b.priority] : 0);
+    if (priorityComparison !== 0) return priorityComparison;
 
-    const dateA = a.dueDate ? new Date(a.dueDate) : new Date(8640000000000000);
-    const dateB = b.dueDate ? new Date(b.dueDate) : new Date(8640000000000000);
-    return dateA.getTime() - dateB.getTime();
+    // Finally, sort by due date
+    if (a.dueDate && b.dueDate) {
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    }
+    return 0;
   });
 };
 
@@ -24,8 +32,23 @@ export const getStatusColor = (status: string) => {
       return "green-500";
     case "IN_PROGRESS":
       return "blue-500";
-    default:
+    case "TODO":
       return "yellow-500";
+    default:
+      return "gray-500";
+  }
+};
+
+export const getStatusAccordionColors = (status: string) => {
+  switch (status) {
+    case "COMPLETED":
+      return "bg-green-600 text-green-700";
+    case "IN_PROGRESS":
+      return "bg-blue-500 text-blue-700";
+    case "TODO":
+      return "bg-yellow-500 text-yellow-700";
+    default:
+      return "bg-gray-500 text-gray-700";
   }
 };
 

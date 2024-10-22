@@ -3,8 +3,8 @@ import { TaskStatus, Task } from "@/types/task";
 import { useToast } from "@/hooks/use-toast";
 import { TaskListProps } from "./types";
 import { sortTasks } from "./utils";
-import { SwipeableTaskCard } from "./swipeable-task-card";
 import { EditTaskModal } from "../edit-task-modal";
+import { TaskAccordion } from "../task-accordion";
 
 const TaskList: React.FC<TaskListProps> = ({
   tasks: initialTasks,
@@ -144,25 +144,15 @@ const TaskList: React.FC<TaskListProps> = ({
 
   return (
     <div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mt-4">
-        {sortedTasks.map((task) => {
-          const taskWorkspace = workspaces.find(
-            (w) => w.id === task.workspaceId
-          );
-          return (
-            <SwipeableTaskCard
-              key={task.id}
-              task={task}
-              workspace={taskWorkspace!}
-              onUpdateStatus={(taskId: number, newStatus: string) =>
-                handleUpdateStatus(taskId, newStatus as TaskStatus)
-              }
-              onEdit={() => setEditingTask(task)}
-              onDelete={() => handleDeleteTask(task.id!)}
-            />
-          );
-        })}
-      </div>
+      <TaskAccordion
+        tasks={sortedTasks}
+        workspaces={workspaces}
+        onUpdateStatus={(taskId: number, newStatus: string) =>
+          handleUpdateStatus(taskId, newStatus as TaskStatus)
+        }
+        onEdit={setEditingTask}
+        onDelete={handleDeleteTask}
+      />
       {editingTask && (
         <EditTaskModal
           isOpen={!!editingTask}
