@@ -8,18 +8,26 @@ export function ThemeManager() {
 
   useEffect(() => {
     document.documentElement.style.setProperty(
-      "--accent-color",
+      "--workspace-color",
       selectedWorkspaceColor
     );
 
-    // Derive other colors from the accent color
-    const darkerAccent = adjustColor(selectedWorkspaceColor, -20);
-    const lighterAccent = adjustColor(selectedWorkspaceColor, 20);
+    // Derive other colors from the workspace color
+    const darkerWorkspace = adjustColor(selectedWorkspaceColor, -20);
+    const lighterWorkspace = adjustColor(selectedWorkspaceColor, 20);
+    const lighterWorkspace2 = adjustColor(selectedWorkspaceColor, 40);
 
-    document.documentElement.style.setProperty("--accent-darker", darkerAccent);
     document.documentElement.style.setProperty(
-      "--accent-lighter",
-      lighterAccent
+      "--workspace-darker",
+      darkerWorkspace
+    );
+    document.documentElement.style.setProperty(
+      "--workspace-lighter",
+      lighterWorkspace
+    );
+    document.documentElement.style.setProperty(
+      "--workspace-lighter2",
+      lighterWorkspace2
     );
   }, [selectedWorkspaceColor]);
 

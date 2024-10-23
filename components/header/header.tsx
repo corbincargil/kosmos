@@ -32,10 +32,10 @@ export default function Header({ title }: HeaderProps) {
   )?.name;
 
   return (
-    <header className="bg-white shadow-md shadow-[color:var(--accent-lighter)]">
+    <header className="bg-white shadow-md shadow-workspace-lighter sticky top-0 z-50">
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         <Select value={selectedWorkspace} onValueChange={setSelectedWorkspace}>
-          <SelectTrigger className="font-bold text-[color:var(--accent-darker)] border-none p-0 focus:ring-0 min-w-[100px] max-w-[250px] truncate">
+          <SelectTrigger className="font-bold text-workspace-darker border-none p-0 focus:ring-0 min-w-[100px] max-w-[250px] truncate">
             <SelectValue>
               <span className="text-lg md:text-2xl lg:text-3xl truncate">
                 {selectedWorkspace === "all"
@@ -45,18 +45,14 @@ export default function Header({ title }: HeaderProps) {
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem
-              value="all"
-              className="text-[color:var(--accent-darker)]"
-              style={{ color: "#000000" }}
-            >
+            <SelectItem value="all" className="text-black">
               All
             </SelectItem>
             {workspaces.map((workspace) => (
               <SelectItem
                 key={workspace.id}
                 value={workspace.id.toString()}
-                className="text-[color:var(--accent-darker)]"
+                className="text-workspace-darker"
                 style={{ color: workspace.color }}
               >
                 {workspace.name}
@@ -71,9 +67,8 @@ export default function Header({ title }: HeaderProps) {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "text-[color:var(--accent-color)] hover:text-[color:var(--accent-darker)]",
-                  title.includes(link.label) &&
-                    "text-[color:var(--accent-darker)]"
+                  "text-workspace hover:text-workspace-darker",
+                  title.includes(link.label) && "text-workspace-darker"
                 )}
               >
                 {link.label}
@@ -82,7 +77,7 @@ export default function Header({ title }: HeaderProps) {
           </div>
           <UserButton />
           <button
-            className="md:hidden text-gray-600 hover:text-gray-900"
+            className="md:hidden text-workspace hover:text-workspace-darker"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <svg
@@ -109,9 +104,9 @@ export default function Header({ title }: HeaderProps) {
               key={link.href}
               href={link.href}
               className={cn(
-                "block px-4 py-2 text-[color:var(--accent-color)] hover:text-[color:var(--accent-darker)] hover:bg-gray-100",
+                "block px-4 py-2 text-workspace hover:text-workspace-darker hover:bg-gray-100",
                 title.includes(link.label) &&
-                  "text-[color:var(--accent-darker)] bg-gray-100"
+                  "text-workspace-darker bg-gray-100"
               )}
               onClick={() => setIsMenuOpen(false)}
             >

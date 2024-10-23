@@ -41,13 +41,13 @@ export const getStatusColor = (status: string) => {
 export const getStatusAccordionColors = (status: string) => {
   switch (status) {
     case "COMPLETED":
-      return "bg-green-600 text-green-700";
+      return "bg-green-600/50 text-green-700";
     case "IN_PROGRESS":
-      return "bg-blue-500 text-blue-700";
+      return "bg-blue-500/50 text-blue-700";
     case "TODO":
-      return "bg-yellow-500 text-yellow-700";
+      return "bg-yellow-500/50 text-yellow-700";
     default:
-      return "bg-gray-500 text-gray-700";
+      return "bg-gray-500/50 text-gray-700";
   }
 };
 

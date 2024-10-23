@@ -81,9 +81,7 @@ export default function Dashboard() {
           <CardTitle>Your Tasks</CardTitle>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-blue-500 hover:bg-blue-600">
-                Create New Task
-              </Button>
+              <Button variant="glow">Create New Task</Button>
             </DialogTrigger>
             <DialogContent
               className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2"

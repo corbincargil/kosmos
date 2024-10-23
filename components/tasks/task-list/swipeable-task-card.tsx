@@ -4,12 +4,7 @@ import { Task } from "@/types/task";
 import { Workspace } from "@/types/workspace";
 import dayjs from "dayjs";
 import { Flag } from "lucide-react";
-import {
-  getStatusColor,
-  getSwipeText,
-  getNextStatus,
-  getPreviousStatus,
-} from "./utils";
+import { getSwipeText, getNextStatus, getPreviousStatus } from "./utils";
 import { TaskStatus } from "@/types/task";
 
 type SwipeableTaskCardProps = {
@@ -151,11 +146,11 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
           minHeight: task.description ? "100px" : "72px",
         }}
       >
-        <div
-          className={`absolute left-0 top-0 bottom-0 w-1 bg-${getStatusColor(
+        {/* <div
+          className={`absolute left-0 top-0 bottom-0 w-[2px] bg-${getStatusColor(
             task.status
           )}`}
-        ></div>
+        ></div> */}
         <div className="absolute inset-0 p-3 pl-4 flex flex-col h-full">
           <div className="flex justify-between items-start mb-1">
             <div className="flex-grow min-w-0 mr-2">

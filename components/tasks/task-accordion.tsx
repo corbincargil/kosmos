@@ -7,11 +7,12 @@ import {
 } from "@/components/ui/accordion";
 import { Task, TaskStatus } from "@/types/task";
 import { SwipeableTaskCard } from "./task-list/swipeable-task-card";
-import { getStatusAccordionColors, sortStatuses } from "./task-list/utils";
+import { sortStatuses } from "./task-list/utils";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { InlineTaskForm } from "./inline-task-form";
 import { useWorkspace } from "@/contexts/workspace-context";
+import styles from "./task-accordion.module.css";
 
 type TaskAccordionProps = {
   tasks: Task[];
@@ -82,33 +83,29 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
     >
       {sortedStatuses.map((status) => {
         const statusTasks = groupedTasks[status];
-        const statusColor = getStatusAccordionColors(status);
+        // const statusColor = getStatusAccordionColors(status);
         return (
           <AccordionItem value={status} key={status} className="relative">
-            <AccordionTrigger className="text-lg font-semibold pr-4 py-2">
+            <AccordionTrigger className="text-lg font-semibold pr-4 py-2 mb-2">
               {status.replace("_", " ")} ({statusTasks.length})
             </AccordionTrigger>
-            <div
-              className={`absolute right-0 top-0 bottom-0 w-1 ${statusColor}`}
-            />
             <AccordionContent>
-              <div className="flex flex-col">
-                <div className="max-h-[380px] overflow-y-auto overflow-x-hidden px-2 mb-2">
-                  <div className="grid gap-2">
-                    {statusTasks.map((task) => {
-                      const taskWorkspace = workspaces.find(
-                        (w) => w.id === task.workspaceId
-                      );
-                      return (
-                        <SwipeableTaskCard
-                          key={task.id}
-                          task={task}
-                          workspace={taskWorkspace!}
-                          onUpdateStatus={onUpdateStatus}
-                          onEdit={() => onEdit(task)}
-                        />
-                      );
-                    })}
+              <div className="flex flex-col relative">
+                <div
+                  className={`${styles.scrollContainer} max-h-[380px] overflow-y-auto overflow-x-hidden mb-2`}
+                >
+                  <div className="grid gap-2 p-2">
+                    {statusTasks.map((task) => (
+                      <SwipeableTaskCard
+                        key={task.id}
+                        task={task}
+                        workspace={
+                          workspaces.find((w) => w.id === task.workspaceId)!
+                        }
+                        onUpdateStatus={onUpdateStatus}
+                        onEdit={() => onEdit(task)}
+                      />
+                    ))}
                   </div>
                 </div>
                 {newTaskStatus === status && (
@@ -124,11 +121,11 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
                 {newTaskStatus !== status && (
                   <Button
                     onClick={() => handleAddTask(status as TaskStatus)}
-                    className="w-full mt-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-300 shadow-sm transition-colors duration-200"
-                    variant="ghost"
+                    className="w-[97%] self-center mt-2 shadow-sm transition-colors duration-200"
+                    variant="glow"
                     autoFocus
                   >
-                    <Plus className="mr-2 h-4 w-4 text-gray-500" /> Add Task
+                    <Plus className="mr-2 h-4 w-4" /> Add Task
                   </Button>
                 )}
               </div>
