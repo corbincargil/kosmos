@@ -1,6 +1,7 @@
 import { Task, TaskPriority, TaskStatus } from "@/types/task";
 import { Workspace } from "@/types/workspace";
 import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Pencil,
   Text,
@@ -98,16 +99,16 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2 space-y-2 bg-white rounded-md shadow-sm"
+      className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2 space-y-2 bg-white dark:bg-gray-800 rounded-md shadow-sm"
     >
       <div className="md:flex md:space-x-4">
         <div className="md:w-2/3 space-y-2">
           <div>
             <div className="flex items-center gap-2">
-              <Pencil size={16} />
+              <Pencil size={16} className="text-gray-600 dark:text-gray-400" />
               <label
                 htmlFor="title"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Title
               </label>
@@ -120,16 +121,16 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               onChange={handleChange}
               required
               maxLength={100}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
           </div>
 
           <div>
             <div className="flex items-center gap-2">
-              <Text size={16} />
+              <Text size={16} className="text-gray-600 dark:text-gray-400" />
               <label
                 htmlFor="description"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Description
               </label>
@@ -141,7 +142,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               onChange={handleChange}
               maxLength={400}
               rows={window.innerWidth <= 640 ? 6 : 10}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
           </div>
         </div>
@@ -150,10 +151,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           {!workspaceId || isEditing ? (
             <div>
               <div className="flex items-center gap-2">
-                <Warehouse size={16} />
+                <Warehouse
+                  size={16}
+                  className="text-gray-600 dark:text-gray-400"
+                />
                 <label
                   htmlFor="workspaceId"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   Workspace
                 </label>
@@ -164,7 +168,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 value={formData.workspaceId}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="">Select a workspace</option>
                 {workspaces.map((workspace) => (
@@ -177,10 +181,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           ) : null}
           <div>
             <div className="flex items-center gap-2">
-              <Calendar size={16} />
+              <Calendar
+                size={16}
+                className="text-gray-600 dark:text-gray-400"
+              />
               <label
                 htmlFor="dueDate"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Due Date
               </label>
@@ -192,16 +199,16 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               placeholder="Due Date"
               value={formData.dueDate}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
           </div>
 
           <div>
             <div className="flex items-center gap-2">
-              <Loader size={16} />
+              <Loader size={16} className="text-gray-600 dark:text-gray-400" />
               <label
                 htmlFor="status"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Status
               </label>
@@ -211,7 +218,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
               <option value="TODO">To Do</option>
               <option value="IN_PROGRESS">In Progress</option>
@@ -221,10 +228,10 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
           <div>
             <div className="flex items-center gap-2">
-              <Flag size={16} />
+              <Flag size={16} className="text-gray-600 dark:text-gray-400" />
               <label
                 htmlFor="priority"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Priority
               </label>
@@ -234,7 +241,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               name="priority"
               value={formData.priority || ""}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
               <option value="HIGH">High</option>
               <option value="MEDIUM">Medium</option>
@@ -246,10 +253,11 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       </div>
 
       <div className="mt-6 flex justify-between items-center">
-        <button
+        <Button
           type="submit"
+          variant="glow"
           disabled={isSubmitting}
-          className={`px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300 ${
+          className={`px-6 py-2 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300 ${
             isSubmitting ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
@@ -258,26 +266,18 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             : isEditing
             ? "Update Task"
             : "Create Task"}
-        </button>
+        </Button>
 
         {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-6 py-2 bg-gray-200 text-gray-800 font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-300"
-          >
+          <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
-          </button>
+          </Button>
         )}
 
         {isEditing && onDelete && (
-          <button
-            type="button"
-            onClick={onDelete}
-            className="px-4 py-2 text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-300"
-          >
+          <Button type="button" variant="destructive" onClick={onDelete}>
             <Trash2 size={20} />
-          </button>
+          </Button>
         )}
       </div>
     </form>

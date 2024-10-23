@@ -3,10 +3,10 @@
 import Header from "@/components/header/header";
 import FallbackHeader from "@/components/header/fallback-header";
 import { redirect, usePathname } from "next/navigation";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { WorkspaceProvider } from "@/contexts/workspace-context";
-import { ThemeManager } from "@/components/theme-manager";
 import { useUser } from "@clerk/nextjs";
+import { useThemeManager } from "@/components/theme-manager";
 
 function FallbackLayout() {
   return (
@@ -37,6 +37,30 @@ export default function AuthenticatedLayout({
   const { isLoaded, user } = useUser();
   const pathname = usePathname();
   const title = pathname === "/dashboard" ? "Dashboard" : "Admin";
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    // Check for saved theme preference or system preference
+    const savedTheme = localStorage.getItem("theme");
+    const systemPrefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+
+    if (savedTheme) {
+      setTheme(savedTheme as "light" | "dark");
+    } else if (systemPrefersDark) {
+      setTheme("dark");
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save theme preference
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  };
 
   useEffect(() => {
     if (!isLoaded) {
@@ -57,16 +81,28 @@ export default function AuthenticatedLayout({
   }
 
   return (
-    <WorkspaceProvider>
-      <ThemeManager />
-      <div className="min-h-screen bg-gray-100">
-        <Header title={title} />
-        <main>
-          <div className="max-w-7xl mx-auto py-4 sm:px-6 lg:px-8">
-            <div className="p-2 sm:p-4 sm:px-0">{children}</div>
-          </div>
-        </main>
-      </div>
+    <WorkspaceProvider theme={theme}>
+      <ThemeManagerWrapper theme={theme}>
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+          <Header title={title} theme={theme} toggleTheme={toggleTheme} />
+          <main>
+            <div className="max-w-7xl mx-auto py-4 sm:px-6 lg:px-8">
+              <div className="p-2 sm:p-4 sm:px-0">{children}</div>
+            </div>
+          </main>
+        </div>
+      </ThemeManagerWrapper>
     </WorkspaceProvider>
   );
+}
+
+function ThemeManagerWrapper({
+  children,
+  theme,
+}: {
+  children: ReactNode;
+  theme: "light" | "dark";
+}) {
+  useThemeManager(theme);
+  return <>{children}</>;
 }

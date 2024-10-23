@@ -53,21 +53,21 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
       const nextStatus = getNextStatus(task.status as TaskStatus);
       switch (nextStatus) {
         case "IN_PROGRESS":
-          return "bg-blue-500";
+          return "bg-blue-500 dark:bg-blue-600";
         case "COMPLETED":
-          return "bg-green-500";
+          return "bg-green-500 dark:bg-green-600";
         default:
-          return "bg-gray-500";
+          return "bg-gray-500 dark:bg-gray-600";
       }
     } else {
       const prevStatus = getPreviousStatus(task.status as TaskStatus);
       switch (prevStatus) {
         case "TODO":
-          return "bg-yellow-500";
+          return "bg-yellow-500 dark:bg-yellow-600";
         case "IN_PROGRESS":
-          return "bg-blue-500";
+          return "bg-blue-500 dark:bg-blue-600";
         default:
-          return "bg-gray-500";
+          return "bg-gray-500 dark:bg-gray-600";
       }
     }
   };
@@ -90,11 +90,11 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
   const getPriorityColor = (priority: string | undefined) => {
     switch (priority?.toLowerCase()) {
       case "low":
-        return "text-blue-500";
+        return "text-blue-500 dark:text-blue-400";
       case "medium":
-        return "text-orange-500";
+        return "text-orange-500 dark:text-orange-400";
       case "high":
-        return "text-red-500";
+        return "text-red-500 dark:text-red-400";
       default:
         return "";
     }
@@ -139,25 +139,22 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
       </div>
 
       <div
-        className="absolute inset-0 bg-white border rounded-md shadow-sm transition-all hover:shadow-md overflow-hidden"
+        className="absolute inset-0 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-sm transition-all hover:shadow-md overflow-hidden"
         style={{
           transform: `translateX(${offset}px)`,
           transition: offset === 0 ? "transform 0.2s ease-out" : "none",
           minHeight: task.description ? "100px" : "72px",
         }}
       >
-        {/* <div
-          className={`absolute left-0 top-0 bottom-0 w-[2px] bg-${getStatusColor(
-            task.status
-          )}`}
-        ></div> */}
         <div className="absolute inset-0 p-3 pl-4 flex flex-col h-full">
           <div className="flex justify-between items-start mb-1">
             <div className="flex-grow min-w-0 mr-2">
               <div className="flex justify-between items-center">
                 <h3
                   className={`w-full text-base font-semibold line-clamp-1 ${
-                    isCompleted ? "line-through text-gray-500" : ""
+                    isCompleted
+                      ? "line-through text-gray-500 dark:text-gray-400"
+                      : "text-gray-900 dark:text-gray-100"
                   }`}
                 >
                   {task.title}
@@ -174,7 +171,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
           </div>
           {task.description && (
             <p
-              className={`text-sm text-gray-600 line-clamp-1 ${
+              className={`text-sm text-gray-600 dark:text-gray-300 line-clamp-1 ${
                 isCompleted ? "line-through" : ""
               }`}
             >
@@ -186,7 +183,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
             <div className="flex-grow">
               {task.dueDate && (
                 <p
-                  className={`text-xs text-gray-500 ${
+                  className={`text-xs text-gray-500 dark:text-gray-400 ${
                     isCompleted ? "line-through" : ""
                   }`}
                 >

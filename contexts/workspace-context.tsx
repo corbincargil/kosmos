@@ -22,7 +22,12 @@ const WorkspaceContext = createContext<WorkspaceContextType | undefined>(
   undefined
 );
 
-export function WorkspaceProvider({ children }: { children: ReactNode }) {
+interface WorkspaceProviderProps {
+  children: ReactNode;
+  theme: "light" | "dark";
+}
+
+export function WorkspaceProvider({ children, theme }: WorkspaceProviderProps) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [selectedWorkspace, setSelectedWorkspace] = useState<string>(() => {
     if (typeof window !== "undefined") {
@@ -71,7 +76,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     }
 
     if (selectedWorkspace === "all") {
-      setSelectedWorkspaceColor("#000000");
+      setSelectedWorkspaceColor(theme === "dark" ? "#FFFFFF" : "#000000");
     } else {
       const workspace = workspaces.find(
         (w) => w.id.toString() === selectedWorkspace
@@ -80,7 +85,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         setSelectedWorkspaceColor(workspace.color);
       }
     }
-  }, [selectedWorkspace, workspaces]);
+  }, [selectedWorkspace, workspaces, theme]);
 
   return (
     <WorkspaceContext.Provider

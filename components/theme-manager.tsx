@@ -3,10 +3,18 @@
 import { useWorkspace } from "@/contexts/workspace-context";
 import { useEffect } from "react";
 
-export function ThemeManager() {
+export function useThemeManager(theme: "light" | "dark") {
   const { selectedWorkspaceColor } = useWorkspace();
 
   useEffect(() => {
+    // Apply theme
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+
+    // Set workspace colors
     document.documentElement.style.setProperty(
       "--workspace-color",
       selectedWorkspaceColor
@@ -29,9 +37,7 @@ export function ThemeManager() {
       "--workspace-lighter2",
       lighterWorkspace2
     );
-  }, [selectedWorkspaceColor]);
-
-  return null;
+  }, [selectedWorkspaceColor, theme]);
 }
 
 // Helper function to darken/lighten a color
