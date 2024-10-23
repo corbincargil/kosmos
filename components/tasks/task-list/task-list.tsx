@@ -5,14 +5,13 @@ import { TaskListProps } from "./types";
 import { sortTasks } from "./utils";
 import { EditTaskModal } from "../edit-task-modal";
 import { TaskAccordion } from "../task-accordion";
+import { useWorkspace } from "@/contexts/workspace-context";
 
-const TaskList: React.FC<TaskListProps> = ({
-  tasks: initialTasks,
-  workspaces,
-}) => {
+const TaskList: React.FC<TaskListProps> = ({ tasks: initialTasks, userId }) => {
   const [tasks, setTasks] = useState(initialTasks);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const { toast } = useToast();
+  const { workspaces } = useWorkspace();
 
   useEffect(() => {
     setTasks(initialTasks);
@@ -142,15 +141,50 @@ const TaskList: React.FC<TaskListProps> = ({
     [toast]
   );
 
+  const handleAddTask = useCallback(
+    async (taskData: Omit<Task, "id" | "createdAt" | "updatedAt">) => {
+      try {
+        const response = await fetch("/api/tasks", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(taskData),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to create task");
+        }
+
+        const newTask = await response.json();
+        setTasks((prevTasks) => [...prevTasks, newTask]);
+
+        toast({
+          title: "Success",
+          description: "Task created successfully",
+        });
+      } catch (error) {
+        console.error("Error creating task:", error);
+        toast({
+          title: "Error",
+          description: "Failed to create task. Please try again.",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast]
+  );
+
   return (
     <div>
       <TaskAccordion
         tasks={sortedTasks}
-        workspaces={workspaces}
         onUpdateStatus={(taskId: number, newStatus: string) =>
           handleUpdateStatus(taskId, newStatus as TaskStatus)
         }
         onEdit={setEditingTask}
+        onAddTask={handleAddTask}
+        userId={userId}
       />
       {editingTask && (
         <EditTaskModal

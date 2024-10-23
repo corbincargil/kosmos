@@ -76,7 +76,6 @@ export default function Dashboard() {
           </CardDescription>
         </CardHeader>
       </Card>
-
       <Card>
         <CardHeader className="flex flex-row items-center justify-between p-4 py-2">
           <CardTitle>Your Tasks</CardTitle>

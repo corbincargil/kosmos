@@ -15,28 +15,32 @@ type TaskFormProps = {
   onSubmit: (
     data: Omit<Task, "id" | "createdAt" | "updatedAt">
   ) => Promise<void>;
+  onCancel?: () => void;
   userId: number;
   workspaceId?: number;
   workspaces: Workspace[];
   task?: Task;
   onDelete?: () => void;
   isEditing?: boolean;
+  initialStatus?: TaskStatus;
 };
 
 export const TaskForm: React.FC<TaskFormProps> = ({
   onSubmit,
+  onCancel,
   userId,
   workspaceId,
   workspaces,
   task,
   onDelete,
   isEditing = false,
+  initialStatus,
 }) => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     dueDate: "",
-    status: "TODO" as TaskStatus,
+    status: initialStatus || ("TODO" as TaskStatus),
     priority: "" as TaskPriority | "",
     workspaceId: workspaceId || "",
   });
@@ -94,7 +98,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2 space-y-2"
+      className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2 space-y-2 bg-white rounded-md shadow-sm"
     >
       <div className="md:flex md:space-x-4">
         <div className="md:w-2/3 space-y-2">
@@ -245,7 +249,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full md:w-auto px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300 ${
+          className={`px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300 ${
             isSubmitting ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
@@ -255,6 +259,16 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             ? "Update Task"
             : "Create Task"}
         </button>
+
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-6 py-2 bg-gray-200 text-gray-800 font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-300"
+          >
+            Cancel
+          </button>
+        )}
 
         {isEditing && onDelete && (
           <button
