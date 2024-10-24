@@ -29,6 +29,9 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const Greeting =
+    '“I am the vine; you are the branches. If you remain in me and I in you, you will bear much fruit; apart from me you can do nothing." - John 15:5 - ';
+
   const fetchTasks = useCallback(async () => {
     if (user) {
       const userId = user.publicMetadata.dbUserId as number;
@@ -71,53 +74,55 @@ export default function Dashboard() {
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>Welcome, {user?.firstName || user?.username}!</CardTitle>
-          <CardDescription>
-            This is your dashboard. You can see all your tasks below.
-          </CardDescription>
+          <CardDescription>{Greeting}</CardDescription>
         </CardHeader>
       </Card>
+      <CardHeader className="flex flex-row items-center justify-between p-4 py-2">
+        <CardTitle>Tasks</CardTitle>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="glow">Create New Task</Button>
+          </DialogTrigger>
+          <DialogContent
+            className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2"
+            aria-describedby="task-dialog"
+          >
+            <DialogHeader>
+              <DialogTitle>Create New Task</DialogTitle>
+            </DialogHeader>
+            <DialogDescription></DialogDescription>
+            <div className="max-h-[80vh] overflow-y-auto pr-6">
+              <TaskForm
+                onSubmit={handleTaskCreated}
+                userId={user?.publicMetadata.dbUserId as number}
+                workspaceId={
+                  selectedWorkspace === "all"
+                    ? undefined
+                    : Number(selectedWorkspace)
+                }
+                workspaces={workspaces}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      </CardHeader>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between p-4 py-2">
-          <CardTitle>Your Tasks</CardTitle>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="glow">Create New Task</Button>
-            </DialogTrigger>
-            <DialogContent
-              className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2"
-              aria-describedby="task-dialog"
-            >
-              <DialogHeader>
-                <DialogTitle>Create New Task</DialogTitle>
-              </DialogHeader>
-              <DialogDescription></DialogDescription>
-              <div className="max-h-[80vh] overflow-y-auto pr-6">
-                <TaskForm
-                  onSubmit={handleTaskCreated}
-                  userId={user?.publicMetadata.dbUserId as number}
-                  workspaceId={
-                    selectedWorkspace === "all"
-                      ? undefined
-                      : Number(selectedWorkspace)
-                  }
-                  workspaces={workspaces}
-                />
-              </div>
-            </DialogContent>
-          </Dialog>
-        </CardHeader>
-        <CardContent className="p-2 sm:p-4 sm:pt-0">
-          <TaskList
-            tasks={tasks}
-            userId={user?.publicMetadata.dbUserId as number}
-            workspaceId={
-              selectedWorkspace === "all"
-                ? undefined
-                : Number(selectedWorkspace)
-            }
-            workspaces={workspaces}
-            onTaskCreated={fetchTasks}
-          />
+        <CardContent className="p-2">
+          {tasks.length ? (
+            <TaskList
+              tasks={tasks}
+              userId={user?.publicMetadata.dbUserId as number}
+              workspaceId={
+                selectedWorkspace === "all"
+                  ? undefined
+                  : Number(selectedWorkspace)
+              }
+              workspaces={workspaces}
+              onTaskCreated={fetchTasks}
+            />
+          ) : (
+            <p>You have no tasks yet.</p>
+          )}
         </CardContent>
       </Card>
     </>
