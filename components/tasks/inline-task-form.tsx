@@ -57,7 +57,7 @@ export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
         userId,
         priority: formData.priority || null,
         workspaceId: Number(formData.workspaceId),
-        dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
+        dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
       };
       await onSubmit(taskData);
     },
