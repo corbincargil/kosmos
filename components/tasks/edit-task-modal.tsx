@@ -35,7 +35,10 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2">
+      <DialogContent
+        className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Edit Task</DialogTitle>
         </DialogHeader>
@@ -46,6 +49,7 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({
           task={task}
           isEditing={true}
           onDelete={handleDelete}
+          onCancel={onClose}
         />
       </DialogContent>
     </Dialog>

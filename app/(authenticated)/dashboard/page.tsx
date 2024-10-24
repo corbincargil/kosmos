@@ -30,7 +30,7 @@ export default function Dashboard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const Greeting =
-    '“I am the vine; you are the branches. If you remain in me and I in you, you will bear much fruit; apart from me you can do nothing." - John 15:5 - ';
+    '“I am the vine; you are the branches. If you remain in me and I in you, you will bear much fruit; apart from me you can do nothing." - John 15:5';
 
   const fetchTasks = useCallback(async () => {
     if (user) {
