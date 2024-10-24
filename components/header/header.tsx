@@ -39,7 +39,7 @@ export default function Header({ title, theme, toggleTheme }: HeaderProps) {
     <header className="bg-white dark:bg-gray-800 shadow-md shadow-workspace-lighter sticky top-0 z-50">
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         <Select value={selectedWorkspace} onValueChange={setSelectedWorkspace}>
-          <SelectTrigger className="font-bold text-workspace-darker border-none p-0 focus:ring-0 min-w-[100px] max-w-[250px] truncate">
+          <SelectTrigger className="font-bold text-workspace-darker border-none p-0 min-w-[100px] max-w-[250px] truncate">
             <SelectValue>
               <span className="text-lg md:text-2xl lg:text-3xl truncate">
                 {selectedWorkspace === "all"

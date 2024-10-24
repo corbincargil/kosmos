@@ -98,6 +98,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks: initialTasks, userId }) => {
         toast({
           title: "Success",
           description: "Task updated successfully",
+          variant: "success",
         });
       } catch (error) {
         console.error("Error updating task:", error);
@@ -106,7 +107,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks: initialTasks, userId }) => {
           description: "Failed to update task. Please try again.",
           variant: "destructive",
         });
-        throw error; // Re-throw the error so the form knows the submission failed
+        throw error;
       }
     },
     [editingTask, toast]
@@ -128,6 +129,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks: initialTasks, userId }) => {
         toast({
           title: "Success",
           description: "Task deleted successfully",
+          variant: "success",
         });
       } catch (error) {
         console.error("Error deleting task:", error);
@@ -162,6 +164,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks: initialTasks, userId }) => {
         toast({
           title: "Success",
           description: "Task created successfully",
+          variant: "success",
         });
       } catch (error) {
         console.error("Error creating task:", error);

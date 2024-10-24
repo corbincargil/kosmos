@@ -46,6 +46,28 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     workspaceId: workspaceId || "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = React.useRef<HTMLFormElement>(null);
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      const form = document.querySelector("form");
+      if (form) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (formRef.current) {
+      formRef.current.focus();
+    }
+  }, []);
 
   useEffect(() => {
     if (task && isEditing) {
@@ -98,8 +120,10 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
       className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2 space-y-2 bg-white dark:bg-gray-800 rounded-md shadow-sm"
+      tabIndex={-1}
     >
       <div className="md:flex md:space-x-4">
         <div className="md:w-2/3 space-y-2">
