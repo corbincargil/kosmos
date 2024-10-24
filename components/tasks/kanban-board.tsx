@@ -54,7 +54,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
             {status.replace("_", " ")}
           </h3>
           <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg min-h-[200px]">
-            <div className="space-y-2">
+            <div className="space-y-2 overflow-y-auto max-h-[420px]">
               {tasks
                 .filter((task) => task.status === status)
                 .map((task) => (
