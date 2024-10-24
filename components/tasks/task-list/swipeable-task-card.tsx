@@ -67,11 +67,20 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
     },
   });
 
-  const handleStatusClick = (e: React.MouseEvent, newStatus: TaskStatus) => {
+  const handleStatusUpdate = (e: React.MouseEvent, newStatus: TaskStatus) => {
     e.stopPropagation();
-    if (isRightSwiped) {
+    if (isLeftSwiped || isRightSwiped) {
+      try {
+        if (window.navigator.vibrate) {
+          window.navigator.vibrate(100);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
       onUpdateStatus(task.id!, newStatus);
       setOffset(0);
+      setIsLeftSwiped(false);
       setIsRightSwiped(false);
     }
   };
@@ -149,6 +158,14 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
   const handleLeftSwipeClick = (e: React.MouseEvent, newStatus: TaskStatus) => {
     e.stopPropagation();
     if (isLeftSwiped) {
+      try {
+        if (window.navigator.vibrate) {
+          window.navigator.vibrate(100); // 100ms vibration
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
       onUpdateStatus(task.id!, newStatus);
       setOffset(0);
       setIsLeftSwiped(false);
@@ -223,7 +240,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
                 "right",
                 "IN_PROGRESS"
               )}`}
-              onClick={(e) => handleStatusClick(e, "IN_PROGRESS")}
+              onClick={(e) => handleStatusUpdate(e, "IN_PROGRESS")}
             >
               <p className="text-sm">Mark</p>
               <p className="text-sm whitespace-nowrap">In Progress</p>
@@ -235,7 +252,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
                 "right",
                 "COMPLETED"
               )}`}
-              onClick={(e) => handleStatusClick(e, "COMPLETED")}
+              onClick={(e) => handleStatusUpdate(e, "COMPLETED")}
             >
               <p className="text-sm">Mark</p>
               <p className="text-sm">Completed</p>
@@ -248,7 +265,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
               "right",
               "COMPLETED"
             )}`}
-            onClick={(e) => handleStatusClick(e, "COMPLETED")}
+            onClick={(e) => handleStatusUpdate(e, "COMPLETED")}
           >
             <p className="text-sm"> Mark</p>
             <p className="text-sm">Completed</p>
