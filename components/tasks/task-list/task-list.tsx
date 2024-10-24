@@ -4,14 +4,18 @@ import { useToast } from "@/hooks/use-toast";
 import { TaskListProps } from "./types";
 import { sortTasks } from "./utils";
 import { EditTaskModal } from "../edit-task-modal";
-import { TaskAccordion } from "../task-accordion";
+import { KanbanBoard } from "../kanban-board";
 import { useWorkspace } from "@/contexts/workspace-context";
+import { LayoutGrid, List } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { TaskAccordion } from "../task-accordion";
 
 const TaskList: React.FC<TaskListProps> = ({ tasks: initialTasks, userId }) => {
   const [tasks, setTasks] = useState(initialTasks);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const { toast } = useToast();
   const { workspaces } = useWorkspace();
+  const [viewMode, setViewMode] = useState<"kanban" | "list">("list");
 
   useEffect(() => {
     setTasks(initialTasks);
@@ -180,15 +184,45 @@ const TaskList: React.FC<TaskListProps> = ({ tasks: initialTasks, userId }) => {
 
   return (
     <div>
-      <TaskAccordion
-        tasks={sortedTasks}
-        onUpdateStatus={(taskId: number, newStatus: string) =>
-          handleUpdateStatus(taskId, newStatus as TaskStatus)
-        }
-        onEdit={setEditingTask}
-        onAddTask={handleAddTask}
-        userId={userId}
-      />
+      <div className="flex justify-end mb-4">
+        <div className="flex gap-2">
+          <Button
+            variant={viewMode === "list" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("list")}
+          >
+            <List className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={viewMode === "kanban" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setViewMode("kanban")}
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {viewMode === "kanban" ? (
+        <KanbanBoard
+          tasks={sortedTasks}
+          onUpdateStatus={handleUpdateStatus}
+          onEdit={setEditingTask}
+          onAddTask={handleAddTask}
+          userId={userId}
+        />
+      ) : (
+        <TaskAccordion
+          tasks={sortedTasks}
+          onUpdateStatus={(taskId, newStatus) =>
+            handleUpdateStatus(taskId, newStatus as TaskStatus)
+          }
+          onEdit={setEditingTask}
+          onAddTask={handleAddTask}
+          userId={userId}
+        />
+      )}
+
       {editingTask && (
         <EditTaskModal
           isOpen={!!editingTask}

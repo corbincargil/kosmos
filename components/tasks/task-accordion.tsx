@@ -86,8 +86,13 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
         // const statusColor = getStatusAccordionColors(status);
         return (
           <AccordionItem value={status} key={status} className="relative">
-            <AccordionTrigger className="text-lg font-semibold pr-4 py-2 mb-2">
-              {status.replace("_", " ")} ({statusTasks.length})
+            <AccordionTrigger className="text-md font-thin pl-1 pr-4 py-2 mb-1">
+              <div className="flex items-center">
+                <span>{status.replace(/_/g, " ")}</span>
+                <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                  ({statusTasks.length})
+                </span>
+              </div>
             </AccordionTrigger>
             <AccordionContent>
               <div className="flex flex-col relative">
