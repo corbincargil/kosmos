@@ -32,7 +32,7 @@ export const TaskService = {
     userId: number,
     workspaceId: number,
     description?: string,
-    dueDate?: Date,
+    dueDate?: Date | null,
     status?: TaskStatus,
     priority?: TaskPriority
   ): Promise<Task> => {
@@ -55,7 +55,8 @@ export const TaskService = {
     description?: string,
     dueDate?: Date | null,
     status?: TaskStatus,
-    priority?: TaskPriority | null
+    priority?: TaskPriority | null,
+    workspaceId?: number
   ): Promise<Task> => {
     const updateData: any = {};
     if (title !== undefined) updateData.title = title;
@@ -63,6 +64,7 @@ export const TaskService = {
     if (dueDate !== undefined) updateData.dueDate = dueDate;
     if (status !== undefined) updateData.status = status;
     if (priority !== undefined) updateData.priority = priority;
+    if (workspaceId !== undefined) updateData.workspaceId = workspaceId;
 
     return prisma.task.update({
       where: { id },

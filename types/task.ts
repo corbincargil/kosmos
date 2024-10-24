@@ -6,8 +6,8 @@ export const TaskSchema = z.object({
   description: z.string().max(255).optional(),
   dueDate: z
     .union([z.date(), z.string()])
-    .optional()
-    .transform((val) => (val ? new Date(val) : undefined)),
+    .nullable()
+    .transform((val) => (val ? new Date(val) : null)),
   status: z.enum(["TODO", "IN_PROGRESS", "COMPLETED"]).default("TODO"),
   priority: z.enum(["LOW", "MEDIUM", "HIGH"]).nullable(),
   userId: z.number().int().positive(),

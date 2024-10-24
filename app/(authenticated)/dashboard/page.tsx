@@ -91,7 +91,7 @@ export default function Dashboard() {
               <DialogTitle>Create New Task</DialogTitle>
             </DialogHeader>
             <DialogDescription></DialogDescription>
-            <div className="max-h-[80vh] overflow-y-auto pr-6">
+            <div className="max-h-[80vh] overflow-y-auto">
               <TaskForm
                 onSubmit={handleTaskCreated}
                 userId={user?.publicMetadata.dbUserId as number}

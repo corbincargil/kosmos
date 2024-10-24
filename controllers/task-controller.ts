@@ -96,9 +96,10 @@ export const TaskController = {
         taskId,
         validatedData.title,
         validatedData.description,
-        validatedData.dueDate ?? undefined,
+        validatedData.dueDate,
         validatedData.status,
-        validatedData.priority
+        validatedData.priority,
+        validatedData.workspaceId
       );
       return NextResponse.json(task);
     } catch (error) {

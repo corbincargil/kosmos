@@ -44,6 +44,7 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({
           userId={task.userId}
           workspaces={workspaces}
           task={task}
+          workspaceId={task.workspaceId}
           isEditing={true}
           onDelete={handleDelete}
           onCancel={onClose}
