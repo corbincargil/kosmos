@@ -12,6 +12,7 @@ import {
 import { Task } from "@/types/task";
 import { TaskView } from "@/components/tasks/task-view";
 import { useWorkspace } from "@/contexts/workspace-context";
+import Link from "next/link";
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -49,6 +50,7 @@ export default function Dashboard() {
           <CardDescription>{Greeting}</CardDescription>
         </CardHeader>
       </Card>
+      <Link href="/notes/0">Notes</Link>
       <CardHeader>
         <CardTitle>Tasks</CardTitle>
       </CardHeader>

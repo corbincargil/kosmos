@@ -11,11 +11,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 
 interface NoteViewProps {
   notes: Note[];
-  userId: number;
-  onNotesChanged?: () => Promise<void>;
 }
 
-export const NoteView: React.FC<NoteViewProps> = ({ notes }) => {
+export function NoteView({ notes }: NoteViewProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const defaultView = (searchParams.get("view") as "grid" | "list") || "grid";
@@ -49,4 +47,4 @@ export const NoteView: React.FC<NoteViewProps> = ({ notes }) => {
       )}
     </div>
   );
-};
+}

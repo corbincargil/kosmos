@@ -1,13 +1,10 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { NoteView } from "@/components/notes/note-view";
 import { dummyNotes } from "@/dummyNotes";
 
 export default function Notes() {
-  const { user } = useUser();
-
   return (
     <>
       <CardHeader className="p-2">
@@ -18,7 +15,7 @@ export default function Notes() {
           No notes found
         </div>
       ) : (
-        <NoteView notes={dummyNotes} userId={parseInt(user?.id ?? "0")} />
+        <NoteView notes={dummyNotes} />
       )}
     </>
   );

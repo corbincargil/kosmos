@@ -31,8 +31,10 @@ function FallbackLayout() {
 
 export default function AuthenticatedLayout({
   children,
+  modal,
 }: {
   children: ReactNode;
+  modal?: ReactNode;
 }) {
   const { isLoaded, user } = useUser();
   const pathname = usePathname();
@@ -84,7 +86,10 @@ export default function AuthenticatedLayout({
           <Header title={title} theme={theme} toggleTheme={toggleTheme} />
           <main>
             <div className="max-w-7xl mx-auto py-4 sm:px-6 lg:px-8">
-              <div className="p-2 sm:p-4 sm:px-0">{children}</div>
+              <div className="p-2 sm:p-4 sm:px-0">
+                {children}
+                {modal}
+              </div>
             </div>
           </main>
         </div>
