@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Workspace } from "@/types/workspace";
+import { useLocalStorage } from "@/hooks/use-local-storage";
 
 interface WorkspaceContextType {
   workspaces: Workspace[];
@@ -29,40 +30,35 @@ interface WorkspaceProviderProps {
 
 export function WorkspaceProvider({ children, theme }: WorkspaceProviderProps) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("selectedWorkspace") || "all";
-    }
-    return "all";
-  });
-  const [selectedWorkspaceColor, setSelectedWorkspaceColor] =
-    useState<string>("#3B82F6");
+  const [selectedWorkspace, setSelectedWorkspace] = useLocalStorage<string>(
+    "selectedWorkspace",
+    "all"
+  );
+  const [selectedWorkspaceColor, setSelectedWorkspaceColor] = useState<string>(
+    theme === "dark" ? "#FFFFFF" : "#000000"
+  );
   const { user, isLoaded } = useUser();
 
   const fetchWorkspaces = async (userId: number) => {
-    const response = await fetch(`/api/workspaces?userId=${userId}`);
-    if (response.ok) {
-      const data = await response.json();
-      setWorkspaces(
-        data.sort((a: Workspace, b: Workspace) =>
-          a.createdAt < b.createdAt ? -1 : 1
-        )
-      );
-      if (data.length > 0 && !selectedWorkspace) {
-        setSelectedWorkspace(data[0].id.toString());
-        setSelectedWorkspaceColor(data[0].color);
+    try {
+      const response = await fetch(`/api/workspaces?userId=${userId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch workspaces");
       }
-    } else {
-      console.error("Failed to fetch workspaces");
+      const data = await response.json();
+      const sortedWorkspaces = data.sort((a: Workspace, b: Workspace) =>
+        a.createdAt < b.createdAt ? -1 : 1
+      );
+      setWorkspaces(sortedWorkspaces);
+    } catch (error) {
+      console.error("Error fetching workspaces:", error);
     }
   };
 
   const refreshWorkspaces = async () => {
-    if (isLoaded && user) {
-      const storedDbUserId = user.publicMetadata.dbUserId as number;
-      if (storedDbUserId) {
-        await fetchWorkspaces(storedDbUserId);
-      }
+    const dbUserId = user?.publicMetadata.dbUserId as number;
+    if (isLoaded && dbUserId) {
+      await fetchWorkspaces(dbUserId);
     }
   };
 
@@ -71,20 +67,15 @@ export function WorkspaceProvider({ children, theme }: WorkspaceProviderProps) {
   }, [isLoaded, user]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("selectedWorkspace", selectedWorkspace);
-    }
+    const newColor =
+      selectedWorkspace === "all"
+        ? theme === "dark"
+          ? "#FFFFFF"
+          : "#000000"
+        : workspaces.find((w) => w.id.toString() === selectedWorkspace)
+            ?.color ?? (theme === "dark" ? "#FFFFFF" : "#000000");
 
-    if (selectedWorkspace === "all") {
-      setSelectedWorkspaceColor(theme === "dark" ? "#FFFFFF" : "#000000");
-    } else {
-      const workspace = workspaces.find(
-        (w) => w.id.toString() === selectedWorkspace
-      );
-      if (workspace) {
-        setSelectedWorkspaceColor(workspace.color);
-      }
-    }
+    setSelectedWorkspaceColor(newColor);
   }, [selectedWorkspace, workspaces, theme]);
 
   return (

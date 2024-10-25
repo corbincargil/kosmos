@@ -18,6 +18,7 @@ import {
 import { TaskForm } from "./task-forms/create-task-form";
 import { EditTaskModal } from "./task-forms/edit-task-modal";
 import { TaskAccordion } from "./task-list/task-accordion";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface TaskViewProps {
   tasks: Task[];
@@ -32,7 +33,10 @@ export const TaskView: React.FC<TaskViewProps> = ({
   userId,
   onTasksChanged,
 }) => {
-  const [viewMode, setViewMode] = useState<"list" | "board">("list");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const defaultView = (searchParams.get("view") as "list" | "board") || "list";
+  const [viewMode, setViewMode] = useState<"list" | "board">(defaultView);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const { toast } = useToast();
@@ -159,10 +163,17 @@ export const TaskView: React.FC<TaskViewProps> = ({
     }
   };
 
+  const handleViewChange = (newView: "list" | "board") => {
+    const params = new URLSearchParams(searchParams);
+    params.set("view", newView);
+    router.push(`?${params.toString()}`);
+    setViewMode(newView);
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <TaskViewToggle viewMode={viewMode} onToggle={setViewMode} />
+        <TaskViewToggle viewMode={viewMode} onToggle={handleViewChange} />
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button variant="glow">Create New Task</Button>
