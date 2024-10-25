@@ -28,6 +28,7 @@ export default function Header({ title, theme, toggleTheme }: HeaderProps) {
 
   const links = [
     { href: "/dashboard", label: "Dashboard" },
+    { href: "/notes", label: "Notes" },
     { href: "/admin", label: "Admin" },
   ];
 
@@ -39,9 +40,9 @@ export default function Header({ title, theme, toggleTheme }: HeaderProps) {
     <header className="bg-white dark:bg-gray-800 shadow-md shadow-workspace-lighter sticky top-0 z-50">
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         <Select value={selectedWorkspace} onValueChange={setSelectedWorkspace}>
-          <SelectTrigger className="font-bold text-workspace-darker border-none px-2 min-w-[100px] max-w-[250px] truncate">
+          <SelectTrigger className="font-bold text-workspace-darker border-none px-2 min-w-[100px] max-w-[200px] lg:max-w-[280px] overflow-hidden break-all">
             <SelectValue>
-              <span className="text-lg md:text-2xl lg:text-3xl truncate">
+              <span className="text-lg md:text-2xl lg:text-3xl">
                 {selectedWorkspace === "all"
                   ? "All Workspaces"
                   : selectedWorkspaceName}
