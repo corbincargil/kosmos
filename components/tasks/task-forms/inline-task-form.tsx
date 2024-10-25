@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Task, TaskPriority, TaskStatus } from "@/types/task";
 import { X, Check } from "lucide-react";
 import { useWorkspace } from "@/contexts/workspace-context";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 type InlineTaskFormProps = {
   onSubmit: (

@@ -1,31 +1,34 @@
+"use client";
+
 import React, { useState } from "react";
 import { Task, TaskStatus } from "@/types/task";
-import { SwipeableTaskCard } from "./task-list/swipeable-task-card";
-import { useWorkspace } from "@/contexts/workspace-context";
-import { InlineTaskForm } from "./inline-task-form";
+import { Workspace } from "@/types/workspace";
+import { SwipeableTaskCard } from "../task-list/swipeable-task-card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { InlineTaskForm } from "../task-forms/inline-task-form";
 
-type KanbanBoardProps = {
+interface KanbanBoardProps {
   tasks: Task[];
-  onUpdateStatus: (taskId: number, newStatus: TaskStatus) => void;
-  onEdit: (task: Task) => void;
+  workspaces: Workspace[];
+  userId: number;
+  onUpdateStatus: (taskId: number, newStatus: TaskStatus) => Promise<void>;
+  onEditTask: (task: Task) => void;
   onAddTask: (
     task: Omit<Task, "id" | "createdAt" | "updatedAt">
   ) => Promise<void>;
-  userId: number;
-};
+}
 
 const columns: TaskStatus[] = ["TODO", "IN_PROGRESS", "COMPLETED"];
 
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   tasks,
-  onUpdateStatus,
-  onEdit,
-  onAddTask,
+  workspaces,
   userId,
+  onUpdateStatus,
+  onEditTask,
+  onAddTask,
 }) => {
-  const { workspaces } = useWorkspace();
   const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus | null>(null);
 
   const handleAddTask = (status: TaskStatus) => {
@@ -67,7 +70,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     onUpdateStatus={(taskId, newStatus) =>
                       onUpdateStatus(taskId, newStatus as TaskStatus)
                     }
-                    onEdit={() => onEdit(task)}
+                    onEdit={() => onEditTask(task)}
                   />
                 ))}
             </div>

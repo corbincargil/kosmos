@@ -6,26 +6,30 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Task, TaskStatus } from "@/types/task";
-import { SwipeableTaskCard } from "./task-list/swipeable-task-card";
-import { sortStatuses } from "./task-list/utils";
+import { SwipeableTaskCard } from "./swipeable-task-card";
+import { sortStatuses } from "./utils";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { InlineTaskForm } from "./inline-task-form";
-import { useWorkspace } from "@/contexts/workspace-context";
 import styles from "./task-accordion.module.css";
+import { ALL_STATUSES } from "@/types/task";
+import { Workspace } from "@/types/workspace";
+import { InlineTaskForm } from "../task-forms/inline-task-form";
 
 type TaskAccordionProps = {
   tasks: Task[];
-  onUpdateStatus: (taskId: number, newStatus: string) => void;
+  workspaces: Workspace[];
+  onUpdateStatus: (taskId: number, newStatus: TaskStatus) => Promise<void>;
   onEdit: (task: Task) => void;
   onAddTask: (
     task: Omit<Task, "id" | "createdAt" | "updatedAt">
   ) => Promise<void>;
   userId: number;
+  onDeleteTask: (taskId: number) => Promise<void>;
 };
 
 export const TaskAccordion: React.FC<TaskAccordionProps> = ({
   tasks,
+  workspaces,
   onUpdateStatus,
   onEdit,
   onAddTask,
@@ -34,7 +38,6 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
   const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus | null>(null);
   const [openItems, setOpenItems] = useState<string[]>([]);
   const newTaskFormRef = useRef<HTMLDivElement>(null);
-  const { workspaces } = useWorkspace();
 
   const groupedTasks = tasks.reduce((acc, task) => {
     if (!acc[task.status]) {
@@ -44,7 +47,7 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
     return acc;
   }, {} as Record<string, Task[]>);
 
-  const sortedStatuses = Object.keys(groupedTasks).sort(sortStatuses);
+  const sortedStatuses = ALL_STATUSES.sort(sortStatuses);
 
   const handleAddTask = (status: TaskStatus) => {
     setNewTaskStatus(status);
@@ -82,8 +85,7 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
       onValueChange={handleAccordionChange}
     >
       {sortedStatuses.map((status) => {
-        const statusTasks = groupedTasks[status];
-        // const statusColor = getStatusAccordionColors(status);
+        const statusTasks = groupedTasks[status] || [];
         return (
           <AccordionItem value={status} key={status} className="relative">
             <AccordionTrigger className="text-md font-thin pl-1 pr-4 py-2 mb-1">
@@ -107,7 +109,9 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
                         workspace={
                           workspaces.find((w) => w.id === task.workspaceId)!
                         }
-                        onUpdateStatus={onUpdateStatus}
+                        onUpdateStatus={(taskId, newStatus) =>
+                          onUpdateStatus(taskId, newStatus as TaskStatus)
+                        }
                         onEdit={() => onEdit(task)}
                       />
                     ))}

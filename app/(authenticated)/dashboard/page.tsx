@@ -9,28 +9,17 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Task } from "@/types/task";
-import TaskList from "@/components/tasks/task-list/task-list";
+import { TaskView } from "@/components/tasks/task-view";
 import { useWorkspace } from "@/contexts/workspace-context";
-import { TaskForm } from "@/components/tasks/task-forms/create-task-form";
 
 export default function Dashboard() {
   const { user } = useUser();
   const { selectedWorkspace, workspaces } = useWorkspace();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const Greeting =
-    '“I am the vine; you are the branches. If you remain in me and I in you, you will bear much fruit; apart from me you can do nothing." - John 15:5';
+    '"I am the vine; you are the branches. If you remain in me and I in you, you will bear much fruit; apart from me you can do nothing." - John 15:5';
 
   const fetchTasks = useCallback(async () => {
     if (user) {
@@ -52,23 +41,6 @@ export default function Dashboard() {
     fetchTasks();
   }, [user, selectedWorkspace, fetchTasks]);
 
-  const handleTaskCreated = async (
-    data: Omit<Task, "id" | "createdAt" | "updatedAt">
-  ) => {
-    const response = await fetch("/api/tasks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (response.ok) {
-      fetchTasks();
-      setIsDialogOpen(false);
-    }
-  };
-
   return (
     <>
       <Card className="mb-4">
@@ -77,48 +49,17 @@ export default function Dashboard() {
           <CardDescription>{Greeting}</CardDescription>
         </CardHeader>
       </Card>
-      <CardHeader className="flex flex-row items-center justify-between p-4 py-2">
+      <CardHeader>
         <CardTitle>Tasks</CardTitle>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="glow">Create New Task</Button>
-          </DialogTrigger>
-          <DialogContent
-            className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2"
-            aria-describedby="task-dialog"
-          >
-            <DialogHeader>
-              <DialogTitle>Create New Task</DialogTitle>
-            </DialogHeader>
-            <DialogDescription></DialogDescription>
-            <div className="max-h-[80vh] overflow-y-auto">
-              <TaskForm
-                onSubmit={handleTaskCreated}
-                userId={user?.publicMetadata.dbUserId as number}
-                workspaceId={
-                  selectedWorkspace === "all"
-                    ? undefined
-                    : Number(selectedWorkspace)
-                }
-                workspaces={workspaces}
-              />
-            </div>
-          </DialogContent>
-        </Dialog>
       </CardHeader>
       <Card>
         <CardContent className="p-2">
           {tasks.length ? (
-            <TaskList
+            <TaskView
               tasks={tasks}
-              userId={user?.publicMetadata.dbUserId as number}
-              workspaceId={
-                selectedWorkspace === "all"
-                  ? undefined
-                  : Number(selectedWorkspace)
-              }
               workspaces={workspaces}
-              onTaskCreated={fetchTasks}
+              userId={user?.publicMetadata.dbUserId as number}
+              onTasksChanged={fetchTasks}
             />
           ) : (
             <p>You have no tasks yet.</p>
