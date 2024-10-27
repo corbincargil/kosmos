@@ -25,6 +25,12 @@ interface NoteCardProps {
 export function NoteCard({ note, className }: NoteCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsExpanded(!isExpanded);
+  };
+
   return (
     <Card
       className={cn(
@@ -79,28 +85,28 @@ export function NoteCard({ note, className }: NoteCardProps) {
               {note.content}
             </ReactMarkdown>
           </div>
-          {isExpanded ? (
-            <Button
-              onClick={() => setIsExpanded(false)}
-              variant="glow"
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-950"
-            >
-              Hide
-            </Button>
-          ) : (
-            <>
-              <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white dark:from-gray-950 to-transparent pointer-events-none shadow-lg" />
-              <Button
-                onClick={() => setIsExpanded(true)}
-                variant="outline"
-                className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-950"
-              >
-                View more
-              </Button>
-            </>
-          )}
         </CardContent>
       </Link>
+      {isExpanded ? (
+        <Button
+          onClick={handleButtonClick}
+          variant="glow"
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-950"
+        >
+          Hide
+        </Button>
+      ) : (
+        <>
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white dark:from-gray-950 to-transparent pointer-events-none shadow-lg" />
+          <Button
+            onClick={handleButtonClick}
+            variant="outline"
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-950"
+          >
+            View more
+          </Button>
+        </>
+      )}
     </Card>
   );
 }
