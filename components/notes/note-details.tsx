@@ -22,7 +22,7 @@ interface NoteDetailsProps {
 
 export default function NoteDetails({ params }: NoteDetailsProps) {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState(true);
   const [note, setNote] = useState<Note | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");

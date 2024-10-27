@@ -17,7 +17,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { X } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useWorkspace } from "@/contexts/workspace-context";
 
