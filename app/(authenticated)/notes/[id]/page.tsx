@@ -23,7 +23,6 @@ export default function NoteDetailsPage({ params }: NoteDetailsProps) {
         </Link>
       </div>
       <NoteDetails params={params} />
-      );
     </>
   );
 }

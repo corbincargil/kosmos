@@ -1,18 +1,16 @@
 "use client";
 
-import { dummyNotes } from "@/dummyNotes";
-import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { Note } from "@/types/note";
+import { useToast } from "@/hooks/use-toast";
 
 dayjs.extend(relativeTime);
 
@@ -23,26 +21,91 @@ interface NoteDetailsProps {
 }
 
 export default function NoteDetails({ params }: NoteDetailsProps) {
-  const note = dummyNotes.find((n) => n.id === parseInt(params.id, 10));
-  const [title, setTitle] = useState(note?.title || "");
-  const [content, setContent] = useState(note?.content || "");
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [note, setNote] = useState<Note | null>(null);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  if (!note) {
-    notFound();
+  useEffect(() => {
+    const fetchNote = async () => {
+      const response = await fetch(`/api/notes/${params.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setNote(data);
+        setTitle(data.title);
+        setContent(data.content);
+      } else {
+        setNote(null);
+      }
+    };
+
+    fetchNote();
+  }, [params.id]);
+
+  const handleSave = async () => {
+    if (!note) return;
+
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/notes/${note.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          content,
+        }),
+      });
+
+      if (response.ok) {
+        const updatedNote = await response.json();
+        setNote(updatedNote);
+        toast({
+          title: "Success",
+          variant: "success",
+          description: "Note updated successfully",
+        });
+      } else {
+        throw new Error("Failed to update note");
+      }
+    } catch (error) {
+      console.error("Error updating note:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update note",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (!note && !loading) {
+    return <p>Note not found</p>;
+  }
+
+  if (!note && loading) {
+    return <p>Loading...</p>;
   }
 
   return (
     <div className="container mx-auto p-2">
       <div className="max-w-4xl mx-auto">
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="text-3xl font-bold mb-2 border-none px-0 focus-visible:ring-0"
-        />
+        <div className="flex items-center justify-between mb-4">
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="text-3xl font-bold border-none px-0 focus-visible:ring-0"
+          />
+        </div>
+
         <div className="flex items-center justify-between mb-2">
           <p className="text-muted-foreground">
-            Last updated {dayjs(note.updatedAt).fromNow()}
+            Last updated {dayjs(note?.updatedAt).fromNow()}
           </p>
           <Button
             variant="ghost"
@@ -53,18 +116,18 @@ export default function NoteDetails({ params }: NoteDetailsProps) {
           </Button>
         </div>
 
-        <div className="relative min-h-[500px]">
+        <div className="relative h-[402px] md:h-[702px] lg:h-[902px] overflow-y-auto border border-gray-400 rounded-lg">
           <Textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className={cn(
-              "min-h-[500px] font-mono absolute inset-0 resize-none",
+              "h-[400px] md:h-[700px] lg:h-[900px] font-mono absolute inset-0 resize-none overflow-y-auto bg-secondary border border-workspace-lighter",
               isEditing ? "opacity-100 z-10" : "opacity-0 -z-10"
             )}
           />
           <div
             className={cn(
-              "prose dark:prose-invert max-w-none absolute inset-0",
+              "m-2 prose dark:prose-invert max-w-none absolute inset-0 overflow-y-auto",
               !isEditing ? "opacity-100 z-10" : "opacity-0 -z-10"
             )}
             onClick={() => setIsEditing(true)}
@@ -102,6 +165,12 @@ export default function NoteDetails({ params }: NoteDetailsProps) {
               {content}
             </ReactMarkdown>
           </div>
+        </div>
+
+        <div className="flex justify-end mt-4">
+          <Button onClick={handleSave} disabled={isSaving} variant="default">
+            {isSaving ? "Saving..." : "Save"}
+          </Button>
         </div>
       </div>
     </div>

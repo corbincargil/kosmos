@@ -5,8 +5,6 @@ import { Note } from "@/types/note";
 import { NotesViewToggle } from "@/components/notes/notes-view-toggle";
 import { NoteGrid } from "@/components/notes/note-grid";
 import { NoteList } from "@/components/notes/note-list";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 interface NoteViewProps {
@@ -30,13 +28,7 @@ export function NoteView({ notes }: NoteViewProps) {
     <div>
       <div className="flex justify-between items-center">
         <div className="w-full p-2 md:p-4">
-          <div className="flex justify-between items-center">
-            <NotesViewToggle view={view} onViewChange={handleViewChange} />
-            <Button size="sm" variant="glow">
-              <Plus className="h-4 w-4 mr-2" />
-              New Note
-            </Button>
-          </div>
+          <NotesViewToggle view={view} onViewChange={handleViewChange} />
         </div>
       </div>
 

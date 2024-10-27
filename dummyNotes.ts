@@ -2,7 +2,8 @@ import { Note } from "@/types/note";
 
 export const dummyNotes: Note[] = [
   {
-    id: 6,
+    id: 9876543210,
+    uuid: "e7b9c1f0-5c3e-4c1b-8c3e-1f3e4b5c6d7e",
     title: "System Architecture Documentation",
     content: `# Complete System Architecture Overview
       
@@ -130,7 +131,8 @@ interface SecurityConfig {
     userId: 1,
   },
   {
-    id: 0,
+    id: 9876543211,
+    uuid: "f8a1c2d3-4b5e-6f7g-8h9i-0j1k2l3m4n5o",
     title: "🚀 New Notes Feature",
     content: `# Notes notes
 ## To-do's
@@ -147,7 +149,8 @@ interface SecurityConfig {
     userId: 1,
   },
   {
-    id: 1,
+    id: 9876543212,
+    uuid: "a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6",
     title: "Meeting Notes",
     content: `# Project Meeting
   ## Action Items
@@ -164,7 +167,8 @@ interface SecurityConfig {
     userId: 1,
   },
   {
-    id: 2,
+    id: 9876543213,
+    uuid: "b2c3d4e5-f6g7-h8i9-j0k1-l2m3n4o5p6q7",
     title: "Ideas for New Features",
     content: `### Feature Roadmap
   
@@ -188,7 +192,8 @@ interface SecurityConfig {
     userId: 1,
   },
   {
-    id: 3,
+    id: 9876543214,
+    uuid: "c3d4e5f6-g7h8-i9j0-k1l2-m3n4o5p6q7r8",
     title: "Daily Reflections",
     content: `#### Today's Achievements
   
@@ -206,7 +211,8 @@ interface SecurityConfig {
     userId: 1,
   },
   {
-    id: 4,
+    id: 9876543215,
+    uuid: "d4e5f6g7-h8i9-j0k1-l2m3-n4o5p6q7r8s9",
     title: "Research: AI Implementation Strategies",
     content: `# Artificial Intelligence Integration Research
   
@@ -270,7 +276,8 @@ interface SecurityConfig {
     userId: 1,
   },
   {
-    id: 5,
+    id: 9876543216,
+    uuid: "e5f6g7h8-i9j0-k1l2-m3n4-o5p6q7r8s9t0",
     title: "Quick Task List",
     content: `### Today's Tasks
   - [x] Code review

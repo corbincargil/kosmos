@@ -10,8 +10,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { X } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+import { useWorkspace } from "@/contexts/workspace-context";
 
 dayjs.extend(relativeTime);
 
@@ -19,37 +27,71 @@ interface NoteModalProps {
   note: Note | null;
   isOpen: boolean;
   onClose: () => void;
+  onSave: () => void;
 }
 
-export function NoteModal({ note, isOpen, onClose }: NoteModalProps) {
+export function NoteModal({ note, isOpen, onClose, onSave }: NoteModalProps) {
+  const { user } = useUser();
+  const { selectedWorkspace } = useWorkspace();
   const [title, setTitle] = useState(note?.title || "");
   const [content, setContent] = useState(note?.content || "");
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-  if (!note) return null;
+  const handleSave = async () => {
+    if (!user || selectedWorkspace === "all") return;
+
+    setIsSaving(true);
+    try {
+      const response = await fetch("/api/notes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          content,
+          workspaceId: selectedWorkspace,
+          userId: user.publicMetadata.dbUserId,
+        }),
+      });
+
+      if (response.ok) {
+        onSave();
+        onClose();
+        setTitle("");
+        setContent("");
+      }
+    } catch (error) {
+      console.error("Failed to save note:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
-        <DialogHeader className="flex flex-row items-center justify-between">
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="text-3xl font-bold border-none px-0 focus-visible:ring-0"
-          />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={onClose}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+      <DialogContent
+        className="max-w-4xl h-[90vh] flex flex-col"
+        aria-describedby="note-dialog-description"
+      >
+        <DialogHeader className="mt-6 flex flex-row items-center justify-between">
+          <div className="flex flex-col">
+            <DialogTitle>New Note</DialogTitle>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="text-3xl font-bold border-none px-2 focus-visible:ring-0"
+              placeholder="Note title"
+            />
+          </div>
         </DialogHeader>
-
+        <DialogDescription> </DialogDescription>
         <div className="flex items-center justify-between mb-4">
           <p className="text-muted-foreground">
-            Last updated {dayjs(note.updatedAt).fromNow()}
+            {note
+              ? `Last updated ${dayjs(note.updatedAt).fromNow()}`
+              : "New note"}
           </p>
           <Button
             variant="ghost"
@@ -109,6 +151,12 @@ export function NoteModal({ note, isOpen, onClose }: NoteModalProps) {
               {content}
             </ReactMarkdown>
           </div>
+        </div>
+
+        <div className="flex justify-end mt-4">
+          <Button onClick={handleSave} disabled={isSaving || !title.trim()}>
+            {isSaving ? "Saving..." : "Save"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
