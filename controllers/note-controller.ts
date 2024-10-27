@@ -53,13 +53,10 @@ export const NoteController = {
 
   getNoteByIdentifier: async (identifier: string) => {
     try {
-      console.log("identifier", identifier);
       let note;
-      // Check if the identifier is a UUID
       if (identifier.includes("-")) {
         note = await NoteService.getNoteByUuid(identifier);
       } else {
-        // Try to parse as numeric ID
         const id = parseInt(identifier, 10);
         if (isNaN(id)) {
           return NextResponse.json(

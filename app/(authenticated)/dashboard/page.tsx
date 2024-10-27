@@ -13,6 +13,7 @@ import { Task } from "@/types/task";
 import { TaskView } from "@/components/tasks/task-view";
 import { useWorkspace } from "@/contexts/workspace-context";
 import Link from "next/link";
+import { sortTasks } from "@/components/tasks/task-list/utils";
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -33,7 +34,7 @@ export default function Dashboard() {
       const response = await fetch(`/api/tasks?${queryParam}`);
       if (response.ok) {
         const tasksData = await response.json();
-        setTasks(tasksData);
+        setTasks(sortTasks(tasksData));
       }
     }
   }, [user, selectedWorkspace]);

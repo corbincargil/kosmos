@@ -28,8 +28,6 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({
   onDelete,
 }) => {
   const handleSubmit = async (data: Omit<Task, "createdAt">) => {
-    console.log("task", task.id);
-    console.log("data", data);
     await onSubmit(data);
     onClose();
   };

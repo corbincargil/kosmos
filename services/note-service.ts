@@ -9,6 +9,9 @@ export const NoteService = {
       where: {
         workspaceId,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
   },
 
@@ -25,6 +28,9 @@ export const NoteService = {
             name: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
   },

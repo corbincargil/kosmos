@@ -13,13 +13,13 @@ import { NoteModal } from "@/components/notes/note-modal";
 export default function Notes() {
   const { user } = useUser();
   const { selectedWorkspace } = useWorkspace();
+  const [loading, setLoading] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log(notes);
-
   const fetchNotes = useCallback(async () => {
     if (user) {
+      setLoading(true);
       const userId = user.publicMetadata.dbUserId as number;
       const queryParam =
         selectedWorkspace === "all"
@@ -27,6 +27,7 @@ export default function Notes() {
           : `workspaceId=${selectedWorkspace}`;
 
       const response = await fetch(`/api/notes?${queryParam}`);
+      setLoading(false);
       if (response.ok) {
         const notesData = await response.json();
         setNotes(notesData);
@@ -49,7 +50,11 @@ export default function Notes() {
           </Button>
         </div>
       </CardHeader>
-      {notes.length === 0 ? (
+      {loading ? (
+        <div className="p-4 text-center text-muted-foreground">
+          Loading notes...
+        </div>
+      ) : notes.length === 0 ? (
         <div className="p-4 text-center text-muted-foreground">
           No notes found
         </div>
