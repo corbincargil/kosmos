@@ -90,7 +90,6 @@ export default function Dashboard() {
                 <TaskPreview
                   tasks={tasks}
                   workspaces={workspaces}
-                  userId={user?.publicMetadata.dbUserId as number}
                   onTasksChanged={fetchTasks}
                 />
               ) : (

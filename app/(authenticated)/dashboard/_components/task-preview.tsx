@@ -5,14 +5,12 @@ import { SwipeableTaskCard } from "../../../../components/tasks/task-list/swipea
 interface TaskPreviewProps {
   tasks: Task[];
   workspaces: Workspace[];
-  userId: number;
   onTasksChanged: () => Promise<void>;
 }
 
 export function TaskPreview({
   tasks,
   workspaces,
-  userId,
   onTasksChanged,
 }: TaskPreviewProps) {
   const handleUpdateStatus = async (taskId: number, newStatus: string) => {

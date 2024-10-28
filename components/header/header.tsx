@@ -17,12 +17,11 @@ import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 
 interface HeaderProps {
-  title: string;
   theme: "light" | "dark";
   toggleTheme: () => void;
 }
 
-export default function Header({ title, theme, toggleTheme }: HeaderProps) {
+export default function Header({ theme, toggleTheme }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
   const { workspaces, selectedWorkspace, setSelectedWorkspace } =

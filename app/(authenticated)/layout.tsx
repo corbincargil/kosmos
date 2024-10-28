@@ -2,7 +2,7 @@
 
 import Header from "@/components/header/header";
 import FallbackHeader from "@/components/header/fallback-header";
-import { redirect, usePathname } from "next/navigation";
+import { redirect } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { WorkspaceProvider } from "@/contexts/workspace-context";
 import { useUser } from "@clerk/nextjs";
@@ -37,12 +37,9 @@ export default function AuthenticatedLayout({
   modal?: ReactNode;
 }) {
   const { isLoaded, user } = useUser();
-  const pathname = usePathname();
-  const title = pathname === "/dashboard" ? "Dashboard" : "Admin";
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
-    // Check for saved theme preference or system preference
     const savedTheme = localStorage.getItem("theme");
     const systemPrefersDark = window.matchMedia(
       "(prefers-color-scheme: dark)"
@@ -83,7 +80,7 @@ export default function AuthenticatedLayout({
     <WorkspaceProvider theme={theme}>
       <ThemeManagerWrapper theme={theme}>
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-          <Header title={title} theme={theme} toggleTheme={toggleTheme} />
+          <Header theme={theme} toggleTheme={toggleTheme} />
           <main>
             <div className="max-w-7xl mx-auto py-4 sm:px-6 lg:px-8">
               <div className="p-2 sm:p-4 sm:px-0">
