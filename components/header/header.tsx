@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { usePathname } from "next/navigation";
 
 interface HeaderProps {
   title: string;
@@ -23,11 +24,13 @@ interface HeaderProps {
 
 export default function Header({ title, theme, toggleTheme }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
   const { workspaces, selectedWorkspace, setSelectedWorkspace } =
     useWorkspace();
 
   const links = [
     { href: "/dashboard", label: "Dashboard" },
+    { href: "/tasks", label: "Tasks" },
     { href: "/notes", label: "Notes" },
     { href: "/admin", label: "Admin" },
   ];
@@ -71,8 +74,8 @@ export default function Header({ title, theme, toggleTheme }: HeaderProps) {
                 href={link.href}
                 className={cn(
                   "px-2 py-1 text-workspace rounded-md hover:text-workspace-darker hover:bg-gray-100 dark:text-workspace-lighter dark:hover:text-workspace-lighter2 dark:hover:bg-gray-700",
-                  title.includes(link.label) &&
-                    "text-workspace-darker dark:text-workspace-lighter2"
+                  pathname === link.href &&
+                    "text-workspace-darker dark:text-workspace-lighter2 font-bold bg-gray-100 dark:bg-gray-700"
                 )}
               >
                 {link.label}
@@ -117,7 +120,7 @@ export default function Header({ title, theme, toggleTheme }: HeaderProps) {
               href={link.href}
               className={cn(
                 "block px-4 py-2 text-workspace hover:text-workspace-darker dark:text-workspace-lighter dark:hover:text-workspace-lighter2 hover:bg-gray-100 dark:hover:bg-gray-700",
-                title.includes(link.label) &&
+                pathname === link.href &&
                   "text-workspace-darker dark:text-workspace-lighter2 bg-gray-100 dark:bg-gray-700"
               )}
               onClick={() => setIsMenuOpen(false)}

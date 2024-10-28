@@ -12,6 +12,7 @@ type SwipeableTaskCardProps = {
   workspace: Workspace;
   onUpdateStatus: (taskId: number, newStatus: string) => void;
   onEdit: () => void;
+  showStatus?: boolean;
 };
 
 export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
@@ -19,6 +20,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
   workspace,
   onUpdateStatus,
   onEdit,
+  showStatus = true,
 }) => {
   const [offset, setOffset] = useState(0);
   const [isRightSwiped, setIsRightSwiped] = useState(false);
@@ -294,13 +296,35 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
                 >
                   {task.title}
                 </h3>
-                {task.priority && (
-                  <Flag
-                    size={16}
-                    className={`ml-2 ${getPriorityColor(task.priority)}`}
-                    fill="currentColor"
-                  />
-                )}
+                <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+                  {showStatus && (
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-full font-medium"
+                      style={{
+                        backgroundColor:
+                          task.status === "TODO"
+                            ? "rgb(234 179 8)"
+                            : task.status === "IN_PROGRESS"
+                            ? "rgb(59 130 246)"
+                            : "rgb(34 197 94)",
+                        color: "white",
+                      }}
+                    >
+                      {task.status === "TODO"
+                        ? "Todo"
+                        : task.status === "IN_PROGRESS"
+                        ? "In Progress"
+                        : "Completed"}
+                    </span>
+                  )}
+                  {task.priority && (
+                    <Flag
+                      size={16}
+                      className={`${getPriorityColor(task.priority)}`}
+                      fill="currentColor"
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -326,12 +350,14 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
                 </p>
               )}
             </div>
-            <p
-              className="text-xs font-medium ml-2 flex-shrink-0"
-              style={{ color: workspace?.color }}
-            >
-              {workspace?.name}
-            </p>
+            <div className="flex items-center gap-2">
+              <p
+                className="text-xs font-medium flex-shrink-0"
+                style={{ color: workspace?.color }}
+              >
+                {workspace?.name}
+              </p>
+            </div>
           </div>
         </div>
       </div>

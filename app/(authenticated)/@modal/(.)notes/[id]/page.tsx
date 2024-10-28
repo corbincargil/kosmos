@@ -17,7 +17,7 @@ export default function InterceptedNotePage({
 
   return (
     <Dialog open={true} onOpenChange={() => router.back()}>
-      <DialogContent className="max-w-6xl h-[90vh] flex flex-col">
+      <DialogContent className="max-w-6xl h-[96vh] flex flex-col">
         <NoteDetails params={{ id: noteId }} />
       </DialogContent>
     </Dialog>

@@ -3,15 +3,22 @@ import { PrismaClient, Task, TaskStatus, TaskPriority } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const TaskService = {
-  getTasksByWorkspaceId: async (workspaceId: number): Promise<Task[]> => {
+  getTasksByWorkspaceId: async (
+    workspaceId: number,
+    limit?: number
+  ): Promise<Task[]> => {
     return prisma.task.findMany({
       where: {
         workspaceId,
       },
+      take: limit,
+      orderBy: {
+        createdAt: "desc",
+      },
     });
   },
 
-  getTasksByUserId: async (userId: number): Promise<Task[]> => {
+  getTasksByUserId: async (userId: number, limit?: number): Promise<Task[]> => {
     return prisma.task.findMany({
       where: {
         workspace: {
@@ -24,6 +31,10 @@ export const TaskService = {
             name: true,
           },
         },
+      },
+      take: limit,
+      orderBy: {
+        createdAt: "desc",
       },
     });
   },

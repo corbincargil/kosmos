@@ -4,18 +4,22 @@ import type { Note } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const NoteService = {
-  getNotesByWorkspaceId: async (workspaceId: number): Promise<Note[]> => {
+  getNotesByWorkspaceId: async (
+    workspaceId: number,
+    limit?: number
+  ): Promise<Note[]> => {
     return prisma.note.findMany({
       where: {
         workspaceId,
       },
+      take: limit,
       orderBy: {
         createdAt: "desc",
       },
     });
   },
 
-  getNotesByUserId: async (userId: number): Promise<Note[]> => {
+  getNotesByUserId: async (userId: number, limit?: number): Promise<Note[]> => {
     return prisma.note.findMany({
       where: {
         workspace: {
@@ -29,6 +33,7 @@ export const NoteService = {
           },
         },
       },
+      take: limit,
       orderBy: {
         createdAt: "desc",
       },

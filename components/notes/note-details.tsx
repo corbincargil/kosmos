@@ -93,8 +93,8 @@ export default function NoteDetails({ params }: NoteDetailsProps) {
   }
 
   return (
-    <div className="container mx-auto p-2">
-      <div className="max-w-4xl mx-auto">
+    <div className="h-full flex flex-col flex-1">
+      <div className="flex flex-col">
         <div className="flex items-center justify-between mb-4">
           <Input
             value={title}
@@ -103,7 +103,7 @@ export default function NoteDetails({ params }: NoteDetailsProps) {
           />
         </div>
 
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-4">
           <p className="text-muted-foreground">
             Last updated {dayjs(note?.updatedAt).fromNow()}
           </p>
@@ -116,12 +116,12 @@ export default function NoteDetails({ params }: NoteDetailsProps) {
           </Button>
         </div>
 
-        <div className="relative h-[402px] md:h-[702px] lg:h-[902px] overflow-y-auto border border-gray-400 rounded-lg">
+        <div className="relative h-[calc(100vh-250px)] border border-gray-400 rounded-lg">
           <Textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className={cn(
-              "h-[400px] md:h-[700px] lg:h-[900px] font-mono absolute inset-0 resize-none overflow-y-auto bg-secondary border border-workspace-lighter",
+              "h-full font-mono absolute inset-0 resize-none overflow-y-auto bg-secondary border border-workspace-lighter",
               isEditing ? "opacity-100 z-10" : "opacity-0 -z-10"
             )}
           />

@@ -7,6 +7,7 @@ export const NoteController = {
     try {
       const { searchParams } = new URL(req.url);
       const workspaceId = searchParams.get("workspaceId");
+      const limit = searchParams.get("limit");
 
       if (!workspaceId) {
         return NextResponse.json(
@@ -16,7 +17,8 @@ export const NoteController = {
       }
 
       const notes = await NoteService.getNotesByWorkspaceId(
-        Number(workspaceId)
+        Number(workspaceId),
+        limit ? Number(limit) : undefined
       );
       return NextResponse.json(notes);
     } catch (error) {
@@ -32,6 +34,7 @@ export const NoteController = {
     try {
       const { searchParams } = new URL(req.url);
       const userId = searchParams.get("userId");
+      const limit = searchParams.get("limit");
 
       if (!userId) {
         return NextResponse.json(
@@ -40,7 +43,10 @@ export const NoteController = {
         );
       }
 
-      const notes = await NoteService.getNotesByUserId(Number(userId));
+      const notes = await NoteService.getNotesByUserId(
+        Number(userId),
+        limit ? Number(limit) : undefined
+      );
       return NextResponse.json(notes);
     } catch (error) {
       console.error("Error fetching notes for user:", error);
