@@ -10,6 +10,7 @@ import React, {
 import { useUser } from "@clerk/nextjs";
 import { Workspace } from "@/types/workspace";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useTheme } from "@/components/theme-manager";
 
 interface WorkspaceContextType {
   workspaces: Workspace[];
@@ -23,21 +24,22 @@ const WorkspaceContext = createContext<WorkspaceContextType | undefined>(
   undefined
 );
 
-interface WorkspaceProviderProps {
-  children: ReactNode;
-  theme: "light" | "dark";
-}
-
-export function WorkspaceProvider({ children, theme }: WorkspaceProviderProps) {
+export function WorkspaceProvider({ children }: { children: ReactNode }) {
+  const [isClient, setIsClient] = useState(false);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [selectedWorkspace, setSelectedWorkspace] = useLocalStorage<string>(
     "selectedWorkspace",
     "all"
   );
+  const { theme } = useTheme();
   const [selectedWorkspaceColor, setSelectedWorkspaceColor] = useState<string>(
     theme === "dark" ? "#FFFFFF" : "#000000"
   );
   const { user, isLoaded } = useUser();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const fetchWorkspaces = async (userId: number) => {
     try {
@@ -76,7 +78,26 @@ export function WorkspaceProvider({ children, theme }: WorkspaceProviderProps) {
             ?.color ?? (theme === "dark" ? "#FFFFFF" : "#000000");
 
     setSelectedWorkspaceColor(newColor);
+
+    // Set CSS variables for workspace colors
+    document.documentElement.style.setProperty("--workspace-color", newColor);
+    document.documentElement.style.setProperty(
+      "--workspace-darker",
+      adjustColor(newColor, -20)
+    );
+    document.documentElement.style.setProperty(
+      "--workspace-lighter",
+      adjustColor(newColor, 20)
+    );
+    document.documentElement.style.setProperty(
+      "--workspace-lighter2",
+      adjustColor(newColor, 40)
+    );
   }, [selectedWorkspace, workspaces, theme]);
+
+  if (!isClient) {
+    return null; // or return a loading state
+  }
 
   return (
     <WorkspaceContext.Provider
@@ -90,6 +111,21 @@ export function WorkspaceProvider({ children, theme }: WorkspaceProviderProps) {
     >
       {children}
     </WorkspaceContext.Provider>
+  );
+}
+
+// Move adjustColor helper function here since it's only used for workspace colors
+function adjustColor(color: string, amount: number) {
+  return (
+    "#" +
+    color
+      .replace(/^#/, "")
+      .replace(/../g, (color) =>
+        (
+          "0" +
+          Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)
+        ).substr(-2)
+      )
   );
 }
 
