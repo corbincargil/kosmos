@@ -1,56 +1,63 @@
 "use client";
 
-import { useWorkspace } from "@/contexts/workspace-context";
-import { useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 
-export function useThemeManager(theme: "light" | "dark") {
-  const { selectedWorkspaceColor } = useWorkspace();
+type Theme = "light" | "dark";
+
+interface ThemeContextType {
+  theme: Theme;
+  toggleTheme: () => void;
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    // Apply theme
+    const savedTheme = localStorage.getItem("theme") as Theme;
+    const systemPrefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else if (systemPrefersDark) {
+      setTheme("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+  };
+
+  useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
+  }, [theme]);
 
-    // Set workspace colors
-    document.documentElement.style.setProperty(
-      "--workspace-color",
-      selectedWorkspaceColor
-    );
-
-    // Derive other colors from the workspace color
-    const darkerWorkspace = adjustColor(selectedWorkspaceColor, -20);
-    const lighterWorkspace = adjustColor(selectedWorkspaceColor, 20);
-    const lighterWorkspace2 = adjustColor(selectedWorkspaceColor, 40);
-
-    document.documentElement.style.setProperty(
-      "--workspace-darker",
-      darkerWorkspace
-    );
-    document.documentElement.style.setProperty(
-      "--workspace-lighter",
-      lighterWorkspace
-    );
-    document.documentElement.style.setProperty(
-      "--workspace-lighter2",
-      lighterWorkspace2
-    );
-  }, [selectedWorkspaceColor, theme]);
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }
 
-// Helper function to darken/lighten a color
-function adjustColor(color: string, amount: number) {
-  return (
-    "#" +
-    color
-      .replace(/^#/, "")
-      .replace(/../g, (color) =>
-        (
-          "0" +
-          Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)
-        ).substr(-2)
-      )
-  );
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  return context;
 }
