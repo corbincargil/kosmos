@@ -3,7 +3,7 @@
 import { UserButton } from "@clerk/nextjs";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 interface HeaderProps {
   theme: "light" | "dark";

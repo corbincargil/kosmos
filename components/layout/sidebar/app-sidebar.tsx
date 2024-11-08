@@ -18,7 +18,26 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { useWorkspace } from "@/contexts/workspace-context";
-import { Croissant, Home, List, FileText, Settings } from "lucide-react";
+import {
+  LucideIcon,
+  Croissant,
+  Home,
+  List,
+  FileText,
+  Settings,
+  Coffee,
+  Pizza,
+  Cookie,
+  Cake,
+  Cross,
+  Users,
+  BicepsFlexed,
+  BriefcaseBusiness,
+  Anchor,
+  House,
+  Binary,
+  DollarSign,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -34,6 +53,22 @@ const generalLinks = [
 ];
 
 const workspaceLinks = [{ href: "/admin", label: "Settings", icon: Settings }];
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  Croissant,
+  Coffee,
+  Pizza,
+  Cookie,
+  Cake,
+  Cross,
+  Users,
+  BicepsFlexed,
+  BriefcaseBusiness,
+  Anchor,
+  House,
+  Binary,
+  DollarSign,
+};
 
 export function AppSidebar() {
   const { workspaces, selectedWorkspace, setSelectedWorkspace } =
@@ -126,33 +161,77 @@ export function AppSidebar() {
     <Sidebar className="z-100" collapsible="icon">
       <SidebarHeader>
         <Select value={selectedWorkspace} onValueChange={setSelectedWorkspace}>
-          <SelectTrigger className="font-bold text-workspace-darker border-none overflow-hidden break-all">
-            <SelectValue>
-              <div className="flex items-center space-x-4">
-                <Croissant size={36} className="text-workspace-darker" />
-                <span className="text-lg md:text-2xl whitespace-nowrap">
-                  {selectedWorkspace === "all"
-                    ? "All"
-                    : workspaces.find(
-                        (workspace) =>
-                          workspace.id.toString() === selectedWorkspace
-                      )?.name}
-                </span>
-              </div>
+          <SelectTrigger className="flex items-center w-full font-bold text-workspace-darker focus:ring-1 focus:border-none focus:ring-workspace-lighter px-0">
+            {selectedWorkspace === "all" ? (
+              <Croissant
+                size={28}
+                className="text-workspace-darker shrink-0 mr-2"
+                data-sidebar-component="icon"
+              />
+            ) : (
+              (() => {
+                const workspace = workspaces.find(
+                  (w) => w.id.toString() === selectedWorkspace
+                );
+                const IconComponent = workspace?.icon
+                  ? ICON_MAP[workspace.icon]
+                  : Croissant;
+                return (
+                  <IconComponent
+                    size={28}
+                    className="text-workspace-darker shrink-0 mr-2"
+                    data-sidebar-component="icon"
+                    style={{ color: workspace?.color }}
+                  />
+                );
+              })()
+            )}
+            <SelectValue className="pl-4">
+              <span
+                className="text-lg md:text-2xl whitespace-nowrap"
+                data-sidebar-component="content"
+              >
+                {selectedWorkspace === "all"
+                  ? "All"
+                  : workspaces.find(
+                      (workspace) =>
+                        workspace.id.toString() === selectedWorkspace
+                    )?.name}
+              </span>
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            {workspaces.map((workspace) => (
-              <SelectItem
-                key={workspace.id}
-                value={workspace.id.toString()}
-                className="text-workspace-darker"
-                style={{ color: workspace.color }}
-              >
-                {workspace.name}
-              </SelectItem>
-            ))}
+            <SelectItem value="all">
+              <div className="flex items-center">
+                <Croissant
+                  size={20}
+                  className="text-black dark:text-white mr-2"
+                />
+                All
+              </div>
+            </SelectItem>
+            {workspaces.map((workspace) => {
+              const IconComponent = workspace.icon
+                ? ICON_MAP[workspace.icon]
+                : Croissant;
+              return (
+                <SelectItem
+                  key={workspace.id}
+                  value={workspace.id.toString()}
+                  className="text-workspace-darker"
+                  style={{ color: workspace.color }}
+                >
+                  <div className="flex items-center">
+                    <IconComponent
+                      size={20}
+                      className="mr-2"
+                      style={{ color: workspace.color }}
+                    />
+                    {workspace.name}
+                  </div>
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </SidebarHeader>
