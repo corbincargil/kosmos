@@ -19,6 +19,8 @@ import { TaskForm } from "./task-forms/create-task-form";
 import { EditTaskModal } from "./task-forms/edit-task-modal";
 import { TaskAccordion } from "./task-list/task-accordion";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useWorkspace } from "@/contexts/workspace-context";
+import { useTheme } from "@/components/theme-manager";
 
 interface TaskViewProps {
   tasks: Task[];
@@ -40,6 +42,34 @@ export const TaskView: React.FC<TaskViewProps> = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const { toast } = useToast();
+  const { selectedWorkspace } = useWorkspace();
+  const [activeFilters, setActiveFilters] = useState<Set<number>>(new Set());
+  const [showAll, setShowAll] = useState(true);
+  const { theme } = useTheme();
+
+  const filteredTasks = tasks.filter((task) => {
+    if (selectedWorkspace !== "all") return true;
+    if (showAll) return true;
+    return activeFilters.has(task.workspaceId);
+  });
+
+  const toggleFilter = (workspaceId: number) => {
+    setShowAll(false);
+    setActiveFilters((prev) => {
+      const newFilters = new Set(prev);
+      if (newFilters.has(workspaceId)) {
+        newFilters.delete(workspaceId);
+      } else {
+        newFilters.add(workspaceId);
+      }
+      return newFilters;
+    });
+  };
+
+  const handleShowAll = () => {
+    setShowAll(true);
+    setActiveFilters(new Set());
+  };
 
   const handleAddTask = async (
     data: Omit<Task, "id" | "createdAt" | "updatedAt">
@@ -179,7 +209,50 @@ export const TaskView: React.FC<TaskViewProps> = ({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <TaskViewToggle viewMode={viewMode} onToggle={handleViewChange} />
+        <div className="flex gap-2 items-center">
+          <TaskViewToggle viewMode={viewMode} onToggle={handleViewChange} />
+          {selectedWorkspace === "all" && (
+            <div className="flex gap-2 ml-4">
+              <Button
+                variant="outline"
+                size="sm"
+                style={{
+                  borderColor: "currentColor",
+                  backgroundColor: showAll
+                    ? "hsl(var(--primary))"
+                    : "transparent",
+                  color: showAll
+                    ? theme === "dark"
+                      ? "black"
+                      : "white"
+                    : "hsl(var(--primary))",
+                }}
+                onClick={handleShowAll}
+              >
+                All
+              </Button>
+              {workspaces.map((workspace) => (
+                <Button
+                  key={workspace.id}
+                  variant="outline"
+                  size="sm"
+                  style={{
+                    borderColor: workspace.color,
+                    backgroundColor: activeFilters.has(workspace.id)
+                      ? workspace.color
+                      : "transparent",
+                    color: activeFilters.has(workspace.id)
+                      ? "white"
+                      : workspace.color,
+                  }}
+                  onClick={() => toggleFilter(workspace.id)}
+                >
+                  {workspace.name}
+                </Button>
+              ))}
+            </div>
+          )}
+        </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button variant="glow">Create New Task</Button>
@@ -202,10 +275,10 @@ export const TaskView: React.FC<TaskViewProps> = ({
           </DialogContent>
         </Dialog>
       </div>
-      {tasks.length === 0 && <p>You have no tasks yet.</p>}
-      {tasks.length > 0 && viewMode === "list" && (
+      {filteredTasks.length === 0 && <p>You have no tasks yet.</p>}
+      {filteredTasks.length > 0 && viewMode === "list" && (
         <TaskAccordion
-          tasks={tasks}
+          tasks={filteredTasks}
           workspaces={workspaces}
           userId={userId}
           onUpdateStatus={handleUpdateStatus}
@@ -214,9 +287,9 @@ export const TaskView: React.FC<TaskViewProps> = ({
           onDeleteTask={handleDeleteTask}
         />
       )}
-      {tasks.length > 0 && viewMode === "board" && (
+      {filteredTasks.length > 0 && viewMode === "board" && (
         <KanbanBoard
-          tasks={tasks}
+          tasks={filteredTasks}
           workspaces={workspaces}
           userId={userId}
           onUpdateStatus={handleUpdateStatus}
