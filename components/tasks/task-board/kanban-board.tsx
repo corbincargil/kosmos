@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Task, TaskStatus } from "@/types/task";
 import { Workspace } from "@/types/workspace";
 import { SwipeableTaskCard } from "../task-list/swipeable-task-card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { InlineTaskForm } from "../task-forms/inline-task-form";
+import { toast } from "@/hooks/use-toast";
 
 interface KanbanBoardProps {
   tasks: Task[];
@@ -21,8 +22,18 @@ interface KanbanBoardProps {
 
 const columns: TaskStatus[] = ["TODO", "IN_PROGRESS", "COMPLETED"];
 
+const getNextStatus = (currentStatus: TaskStatus): TaskStatus | null => {
+  const currentIndex = columns.indexOf(currentStatus);
+  return currentIndex < columns.length - 1 ? columns[currentIndex + 1] : null;
+};
+
+const getPreviousStatus = (currentStatus: TaskStatus): TaskStatus | null => {
+  const currentIndex = columns.indexOf(currentStatus);
+  return currentIndex > 0 ? columns[currentIndex - 1] : null;
+};
+
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({
-  tasks,
+  tasks: initialTasks,
   workspaces,
   userId,
   onUpdateStatus,
@@ -30,6 +41,11 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onAddTask,
 }) => {
   const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus | null>(null);
+  const [tasks, setTasks] = useState(initialTasks);
+
+  useEffect(() => {
+    setTasks(initialTasks);
+  }, [initialTasks]);
 
   const handleAddTask = (status: TaskStatus) => {
     setNewTaskStatus(status);
@@ -44,6 +60,45 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   ) => {
     await onAddTask(taskData);
     setNewTaskStatus(null);
+  };
+
+  const handleStatusUpdate = async (taskId: number, newStatus: TaskStatus) => {
+    const taskToUpdate = tasks.find((t) => t.id === taskId);
+    if (!taskToUpdate) return;
+
+    const previousTasks = [...tasks];
+
+    setTasks(
+      tasks.map((task) =>
+        task.id === taskId ? { ...task, status: newStatus } : task
+      )
+    );
+
+    try {
+      await onUpdateStatus(taskId, newStatus);
+    } catch (error) {
+      console.error("Error updating task status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update task status",
+        variant: "destructive",
+      });
+      setTasks(previousTasks);
+    }
+  };
+
+  const handleQuickMoveToNext = async (task: Task) => {
+    const nextStatus = getNextStatus(task.status);
+    if (nextStatus) {
+      await handleStatusUpdate(task.id!, nextStatus);
+    }
+  };
+
+  const handleQuickMoveToPrevious = async (task: Task) => {
+    const previousStatus = getPreviousStatus(task.status);
+    if (previousStatus) {
+      await handleStatusUpdate(task.id!, previousStatus);
+    }
   };
 
   return (
@@ -67,10 +122,12 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     workspace={
                       workspaces.find((w) => w.id === task.workspaceId)!
                     }
-                    onUpdateStatus={(taskId, newStatus) =>
-                      onUpdateStatus(taskId, newStatus as TaskStatus)
-                    }
+                    onUpdateStatus={handleStatusUpdate}
                     onEdit={() => onEditTask(task)}
+                    onQuickMove={() => handleQuickMoveToNext(task)}
+                    onQuickMoveBack={() => handleQuickMoveToPrevious(task)}
+                    showQuickMove={getNextStatus(task.status) !== null}
+                    showQuickMoveBack={getPreviousStatus(task.status) !== null}
                   />
                 ))}
             </div>

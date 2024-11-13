@@ -114,10 +114,16 @@ export const TaskView: React.FC<TaskViewProps> = ({
   };
 
   const handleUpdateStatus = async (taskId: number, newStatus: TaskStatus) => {
+    const existingTask = tasks.find((task) => task.id === taskId);
+    if (!existingTask) return;
+
     const response = await fetch(`/api/tasks/${taskId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: newStatus }),
+      body: JSON.stringify({
+        ...existingTask,
+        status: newStatus,
+      }),
     });
 
     if (response.ok) {

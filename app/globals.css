@@ -150,3 +150,43 @@ body {
 .animate-fade-in-text {
   animation: fadeIn 1s ease-in-out;
 }
+
+/* ... existing styles ... */
+
+/* Webkit browsers (Chrome, Safari, newer Edge) */
+::-webkit-scrollbar {
+  width: 6px;  /* Reduced width */
+  height: 6px; /* For horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;  /* Tailwind slate-300 */
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;  /* Tailwind slate-400 */
+}
+
+/* Dark mode */
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;  /* Tailwind slate-600 */
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;  /* Tailwind slate-500 */
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.dark * {
+  scrollbar-color: #475569 transparent;
+}

@@ -3,24 +3,32 @@ import { useSwipeable } from "react-swipeable";
 import { Task } from "@/types/task";
 import { Workspace } from "@/types/workspace";
 import dayjs from "dayjs";
-import { Flag } from "lucide-react";
+import { Flag, ChevronRight, ChevronLeft } from "lucide-react";
 import { getPreviousStatus } from "./utils";
 import { TaskStatus } from "@/types/task";
 
 type SwipeableTaskCardProps = {
   task: Task;
   workspace: Workspace;
-  onUpdateStatus: (taskId: number, newStatus: string) => void;
+  onUpdateStatus: (taskId: number, newStatus: TaskStatus) => void;
   onEdit: () => void;
+  onQuickMove?: () => void;
   showStatus?: boolean;
+  showQuickMove?: boolean;
+  onQuickMoveBack?: () => void;
+  showQuickMoveBack?: boolean;
 };
 
 export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
   task,
   workspace,
+  onQuickMove,
   onUpdateStatus,
   onEdit,
   showStatus = true,
+  showQuickMove,
+  onQuickMoveBack,
+  showQuickMoveBack,
 }) => {
   const [offset, setOffset] = useState(0);
   const [isRightSwiped, setIsRightSwiped] = useState(false);
@@ -80,10 +88,13 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
         console.error(e);
       }
 
-      onUpdateStatus(task.id!, newStatus);
+      // Reset swipe state immediately for better UX
       setOffset(0);
       setIsLeftSwiped(false);
       setIsRightSwiped(false);
+
+      // Trigger the status update
+      onUpdateStatus(task.id!, newStatus);
     }
   };
 
@@ -162,26 +173,29 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
     if (isLeftSwiped) {
       try {
         if (window.navigator.vibrate) {
-          window.navigator.vibrate(100); // 100ms vibration
+          window.navigator.vibrate(100);
         }
       } catch (e) {
         console.error(e);
       }
 
-      onUpdateStatus(task.id!, newStatus);
+      // Reset swipe state immediately for better UX
       setOffset(0);
       setIsLeftSwiped(false);
+
+      // Trigger the status update
+      onUpdateStatus(task.id!, newStatus);
     }
   };
 
   return (
     <div
       {...handlers}
-      className="relative w-full rounded-md overflow-hidden mx-auto hover:shadow-lg hover:scale-[1.02] transition-all duration-200 ease-in-out"
+      className="relative w-full rounded-lg overflow-hidden mx-auto hover:shadow-md hover:scale-[1.01] transition-all duration-200 ease-in-out group"
       onClick={isRightSwiped || isLeftSwiped ? undefined : onEdit}
       style={{
         touchAction: "pan-y",
-        minHeight: task.description ? "100px" : "72px",
+        minHeight: task.description ? "96px" : "68px",
       }}
     >
       {/* Left swipe action */}
@@ -276,87 +290,120 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
       </div>
 
       <div
-        className="absolute inset-0 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-sm transition-all hover:shadow-md overflow-hidden"
+        className="absolute inset-0 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-sm transition-all overflow-hidden"
         style={{
           transform: `translateX(${offset}px)`,
           transition: offset === 0 ? "transform 0.2s ease-out" : "none",
-          minHeight: task.description ? "100px" : "72px",
+          minHeight: task.description ? "96px" : "68px",
         }}
       >
-        <div className="absolute inset-0 p-3 pl-4 flex flex-col h-full">
-          <div className="flex justify-between items-start mb-1">
-            <div className="flex-grow min-w-0 mr-2">
-              <div className="flex justify-between items-center">
+        <div className="absolute inset-0 p-3 flex flex-col h-full">
+          <div className="flex justify-between items-start gap-2">
+            <div className="flex-grow min-w-0">
+              <div className="flex items-start gap-2">
                 <h3
-                  className={`w-full text-base font-semibold line-clamp-1 ${
+                  className={`text-sm font-medium line-clamp-1 ${
                     isCompleted
-                      ? "line-through text-gray-500 dark:text-gray-400"
+                      ? "line-through text-gray-400 dark:text-gray-500"
                       : "text-gray-900 dark:text-gray-100"
                   }`}
                 >
                   {task.title}
                 </h3>
-                <div className="flex items-center gap-2 ml-2 flex-shrink-0">
-                  {showStatus && (
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full font-medium"
-                      style={{
-                        backgroundColor:
-                          task.status === "TODO"
-                            ? "rgb(234 179 8)"
-                            : task.status === "IN_PROGRESS"
-                            ? "rgb(59 130 246)"
-                            : "rgb(34 197 94)",
-                        color: "white",
-                      }}
-                    >
-                      {task.status === "TODO"
-                        ? "Todo"
-                        : task.status === "IN_PROGRESS"
-                        ? "In Progress"
-                        : "Completed"}
-                    </span>
-                  )}
-                  {task.priority && (
-                    <Flag
-                      size={16}
-                      className={`${getPriorityColor(task.priority)}`}
-                      fill="currentColor"
-                    />
-                  )}
-                </div>
+                {task.priority && (
+                  <Flag
+                    size={14}
+                    className={`flex-shrink-0 mt-0.5 ${getPriorityColor(
+                      task.priority
+                    )}`}
+                    fill="currentColor"
+                  />
+                )}
               </div>
-            </div>
-          </div>
-          {task.description && (
-            <p
-              className={`text-sm text-gray-600 dark:text-gray-300 line-clamp-1 ${
-                isCompleted ? "line-through" : ""
-              }`}
-            >
-              {task.description}
-            </p>
-          )}
-          <div className="flex-grow"></div>
-          <div className="flex justify-between items-center mt-2">
-            <div className="flex-grow">
-              {task.dueDate && (
+              {task.description && (
                 <p
-                  className={`text-xs text-gray-500 dark:text-gray-400 ${
+                  className={`mt-1 text-xs text-gray-500 dark:text-gray-400 line-clamp-1 ${
                     isCompleted ? "line-through" : ""
                   }`}
                 >
-                  Due: {dayjs(task.dueDate).format("MMM D")}
+                  {task.description}
                 </p>
               )}
             </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {showStatus && (
+                <span
+                  className="text-xs px-2 py-0.5 rounded-full font-medium"
+                  style={{
+                    backgroundColor:
+                      task.status === "TODO"
+                        ? "rgb(234 179 8 / 15%)"
+                        : task.status === "IN_PROGRESS"
+                        ? "rgb(59 130 246 / 15%)"
+                        : "rgb(34 197 94 / 15%)",
+                    color:
+                      task.status === "TODO"
+                        ? "rgb(234 179 8)"
+                        : task.status === "IN_PROGRESS"
+                        ? "rgb(59 130 246)"
+                        : "rgb(34 197 94)",
+                  }}
+                >
+                  {task.status === "TODO"
+                    ? "Todo"
+                    : task.status === "IN_PROGRESS"
+                    ? "In Progress"
+                    : "Completed"}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex-grow" />
+
+          <div className="flex justify-between items-center mt-2">
             <div className="flex items-center gap-2">
               <p
-                className="text-xs font-medium flex-shrink-0"
+                className="text-xs font-medium"
                 style={{ color: workspace?.color }}
               >
                 {workspace?.name}
               </p>
+              {task.dueDate && (
+                <p
+                  className={`text-xs text-gray-400 dark:text-gray-500 ${
+                    isCompleted ? "line-through" : ""
+                  }`}
+                >
+                  Due {dayjs(task.dueDate).format("MMM D")}
+                </p>
+              )}
+            </div>
+            <div className="hidden md:flex items-center gap-1">
+              {showQuickMoveBack && onQuickMoveBack && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onQuickMoveBack();
+                  }}
+                  className="flex items-center justify-center p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
+                  title="Move to previous status"
+                >
+                  <ChevronLeft className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                </button>
+              )}
+              {showQuickMove && onQuickMove && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onQuickMove();
+                  }}
+                  className="flex items-center justify-center p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
+                  title="Move to next status"
+                >
+                  <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                </button>
+              )}
             </div>
           </div>
         </div>
