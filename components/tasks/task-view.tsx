@@ -208,11 +208,11 @@ export const TaskView: React.FC<TaskViewProps> = ({
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex gap-2 items-center">
+      <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
+        <div className="flex gap-2 items-center w-full sm:w-auto">
           <TaskViewToggle viewMode={viewMode} onToggle={handleViewChange} />
           {selectedWorkspace === "all" && (
-            <div className="flex gap-2 ml-4">
+            <div className="flex gap-2 overflow-x-auto max-w-[calc(100vw-2rem)] sm:max-w-none">
               <Button
                 variant="outline"
                 size="sm"
@@ -236,6 +236,7 @@ export const TaskView: React.FC<TaskViewProps> = ({
                   key={workspace.id}
                   variant="outline"
                   size="sm"
+                  className="whitespace-nowrap"
                   style={{
                     borderColor: workspace.color,
                     backgroundColor: activeFilters.has(workspace.id)
