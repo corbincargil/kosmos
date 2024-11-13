@@ -196,7 +196,8 @@ export const TaskView: React.FC<TaskViewProps> = ({
           </DialogContent>
         </Dialog>
       </div>
-      {viewMode === "list" ? (
+      {tasks.length === 0 && <p>You have no tasks yet.</p>}
+      {tasks.length > 0 && viewMode === "list" && (
         <TaskAccordion
           tasks={tasks}
           workspaces={workspaces}
@@ -206,7 +207,8 @@ export const TaskView: React.FC<TaskViewProps> = ({
           onAddTask={handleAddTask}
           onDeleteTask={handleDeleteTask}
         />
-      ) : (
+      )}
+      {tasks.length > 0 && viewMode === "board" && (
         <KanbanBoard
           tasks={tasks}
           workspaces={workspaces}

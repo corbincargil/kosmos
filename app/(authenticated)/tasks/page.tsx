@@ -36,16 +36,12 @@ export default function TasksPage() {
   return (
     <Card>
       <CardContent className="p-2">
-        {tasks.length ? (
-          <TaskView
-            tasks={tasks}
-            workspaces={workspaces}
-            userId={user?.publicMetadata.dbUserId as number}
-            onTasksChanged={fetchTasks}
-          />
-        ) : (
-          <p>You have no tasks yet.</p>
-        )}
+        <TaskView
+          tasks={tasks}
+          workspaces={workspaces}
+          userId={user?.publicMetadata.dbUserId as number}
+          onTasksChanged={fetchTasks}
+        />
       </CardContent>
     </Card>
   );
