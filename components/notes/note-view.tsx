@@ -26,8 +26,8 @@ export function NoteView({ notes }: NoteViewProps) {
   const defaultView = (searchParams.get("view") as "grid" | "list") || "grid";
   const [view, setView] = useState<"grid" | "list">(defaultView);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc");
-  const [sortCriterion, setSortCriterion] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortCriterion, setSortCriterion] = useState("updatedAt");
 
   const handleViewChange = (newView: "grid" | "list") => {
     const params = new URLSearchParams(searchParams);
