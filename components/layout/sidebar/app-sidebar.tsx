@@ -71,8 +71,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 export function AppSidebar() {
-  const { workspaces, selectedWorkspace, setSelectedWorkspace } =
-    useWorkspace();
+  // const { workspaces, selectedWorkspace, setSelectedWorkspace } =
+  //   useWorkspace();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
@@ -160,7 +160,7 @@ export function AppSidebar() {
   return (
     <Sidebar className="z-100" collapsible="icon">
       <SidebarHeader>
-        <Select value={selectedWorkspace} onValueChange={setSelectedWorkspace}>
+        {/* <Select value={selectedWorkspace} onValueChange={setSelectedWorkspace}>
           <SelectTrigger className="flex items-center w-full font-bold text-workspace-darker focus:ring-1 focus:border-none focus:ring-workspace-lighter px-0">
             {selectedWorkspace === "all" ? (
               <Croissant
@@ -233,7 +233,7 @@ export function AppSidebar() {
               );
             })}
           </SelectContent>
-        </Select>
+        </Select> */}
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
