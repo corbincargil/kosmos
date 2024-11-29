@@ -10,29 +10,10 @@ import { sortTasks } from "@/components/tasks/task-list/utils";
 import { api } from "@/trpc/react";
 
 export default function TasksPage() {
-  // const fetchTasks = useCallback(async () => {
-  //   if (user) {
-  //     const userId = user.publicMetadata.dbUserId as number;
-  //     const queryParam =
-  //       selectedWorkspace === "all"
-  //         ? `userId=${userId}`
-  //         : `workspaceId=${selectedWorkspace}`;
+  const { data: taskData, isLoading } =
+    api.tasks.getCurrentUserTasks.useQuery();
 
-  //     const response = await fetch(`/api/tasks?${queryParam}`);
-  //     if (response.ok) {
-  //       const tasksData = await response.json();
-  //       setTasks(sortTasks(tasksData));
-  //     }
-  //   }
-  // }, [user, selectedWorkspace]);
-
-  // const { data: taskData, isLoading } = api.task.getCurrentUserTasks.useQuery();
-
-  // !isLoading && console.log(taskData);
-
-  // useEffect(() => {
-  //   fetchTasks();
-  // }, [user, selectedWorkspace, fetchTasks]);
+  !isLoading && console.log(taskData);
 
   return (
     <Card>

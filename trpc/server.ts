@@ -4,9 +4,9 @@ import { createHydrationHelpers } from "@trpc/react-query/rsc";
 import { headers } from "next/headers";
 import { cache } from "react";
 
-import { type AppRouter, createCaller } from "../server/index";
-import { createTRPCContext } from "../server/trpc";
-import { createQueryClient } from "./query-client";
+import { type AppRouter, createCaller } from "@/server/api/index";
+import { createTRPCContext } from "@/server/api/trpc";
+import { createQueryClient } from "@/trpc/query-client";
 
 export const createContext = cache(async () => {
   const heads = new Headers(await headers());

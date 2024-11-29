@@ -25,11 +25,13 @@ export default function AuthenticatedLayout({
 
   return (
     <ThemeProvider>
-      <SidebarProvider>
-        <AuthenticatedLayoutContent modal={modal}>
-          {children}
-        </AuthenticatedLayoutContent>
-      </SidebarProvider>
+      <WorkspaceProvider>
+        <SidebarProvider>
+          <AuthenticatedLayoutContent modal={modal}>
+            {children}
+          </AuthenticatedLayoutContent>
+        </SidebarProvider>
+      </WorkspaceProvider>
     </ThemeProvider>
   );
 }

@@ -1,8 +1,8 @@
-import { createCallerFactory, createTRPCRouter } from "./trpc";
-import { taskRouter } from "./routers/task-router";
+import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
+import { taskRouter } from "@/server/api/routers/task-router";
 
 export const appRouter = createTRPCRouter({
-  task: taskRouter,
+  tasks: taskRouter,
   // Add other routers here
 });
 

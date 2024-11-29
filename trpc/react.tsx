@@ -7,7 +7,7 @@ import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { useState } from "react";
 import SuperJSON from "superjson";
 
-import type { AppRouter } from "@/server/index";
+import type { AppRouter } from "@/server/api/index";
 import { createQueryClient } from "./query-client";
 
 let clientQueryClientSingleton: QueryClient | undefined = undefined;
@@ -48,6 +48,14 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
         }),
       ],
     })
+  );
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <api.Provider client={trpcClient} queryClient={queryClient}>
+        {props.children}
+      </api.Provider>
+    </QueryClientProvider>
   );
 }
 

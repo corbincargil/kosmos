@@ -6,9 +6,11 @@ import { ZodError } from "zod";
 
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const user = await currentUser();
+  console.log("user", user);
+
   return {
     db,
-    userId: user?.id,
+    userId: user?.publicMetadata.dbUserId,
     ...opts,
   };
 };
@@ -31,11 +33,28 @@ export const createCallerFactory = t.createCallerFactory;
 
 export const createTRPCRouter = t.router;
 
-const isAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.userId) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+const timingMiddleware = t.middleware(async ({ next, path }) => {
+  const start = Date.now();
+
+  if (t._config.isDev) {
+    const waitMs = Math.floor(Math.random() * 200) + 100;
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
   }
-  return next({ ctx: { ...ctx, userId: ctx.userId } });
+
+  const result = await next();
+
+  const end = Date.now();
+  console.log(`[TRPC] ${path} - took ${end - start}ms to execute`);
+
+  return result;
 });
 
-export const protectedProcedure = t.procedure.use(isAuthed);
+// const isAuthed = t.middleware(({ ctx, next }) => {
+//   if (!ctx.user?.id) {
+//     throw new TRPCError({ code: "UNAUTHORIZED" });
+//   }
+//   return next({ ctx: { user: ctx.user } });
+// });
+
+export const protectedProcedure = t.procedure.use(timingMiddleware);
+// .use(isAuthed);
