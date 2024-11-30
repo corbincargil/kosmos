@@ -9,8 +9,9 @@ import React, {
 } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Workspace } from "@/types/workspace";
-import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useTheme } from "@/components/theme-manager";
+import { api } from "@/trpc/react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface WorkspaceContextType {
   workspaces: Workspace[];
@@ -25,44 +26,17 @@ const WorkspaceContext = createContext<WorkspaceContextType | undefined>(
 );
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
-  const [isClient, setIsClient] = useState(false);
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [selectedWorkspace, setSelectedWorkspace] = useLocalStorage<string>(
-    "selectedWorkspace",
-    "all"
-  );
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedWorkspace = searchParams.get("workspace") || "all";
   const { theme } = useTheme();
   const [selectedWorkspaceColor, setSelectedWorkspaceColor] = useState<string>(
     theme === "dark" ? "#FFFFFF" : "#000000"
   );
   const { user, isLoaded } = useUser();
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  const fetchWorkspaces = async (userId: number) => {
-    try {
-      const response = await fetch(`/api/workspaces?userId=${userId}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch workspaces");
-      }
-      const data = await response.json();
-      const sortedWorkspaces = data.sort((a: Workspace, b: Workspace) =>
-        a.createdAt < b.createdAt ? -1 : 1
-      );
-      setWorkspaces(sortedWorkspaces);
-    } catch (error) {
-      console.error("Error fetching workspaces:", error);
-    }
-  };
-
-  const refreshWorkspaces = async () => {
-    const dbUserId = user?.publicMetadata.dbUserId as number;
-    if (isLoaded && dbUserId) {
-      await fetchWorkspaces(dbUserId);
-    }
-  };
+  const { data: workspaces, refetch: refreshWorkspaces } =
+    api.workspaces.getUserWorkspaces.useQuery();
 
   useEffect(() => {
     refreshWorkspaces();
@@ -74,7 +48,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         ? theme === "dark"
           ? "#FFFFFF"
           : "#000000"
-        : workspaces.find((w) => w.id.toString() === selectedWorkspace)
+        : workspaces?.find((w) => w.id.toString() === selectedWorkspace)
             ?.color ?? (theme === "dark" ? "#FFFFFF" : "#000000");
 
     setSelectedWorkspaceColor(newColor);
@@ -95,9 +69,17 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     );
   }, [selectedWorkspace, workspaces, theme]);
 
-  if (!isClient) {
-    return null; // or return a loading state
-  }
+  const setSelectedWorkspace = (id: string) => {
+    const params = new URLSearchParams(window.location.search);
+    if (id === "all") {
+      params.delete("workspace");
+    } else {
+      params.set("workspace", id);
+    }
+    router.push(`?${params.toString()}`);
+  };
+
+  if (!workspaces) return null;
 
   return (
     <WorkspaceContext.Provider
@@ -106,7 +88,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         selectedWorkspace,
         selectedWorkspaceColor,
         setSelectedWorkspace,
-        refreshWorkspaces,
+        refreshWorkspaces: () => refreshWorkspaces().then(),
       }}
     >
       {children}

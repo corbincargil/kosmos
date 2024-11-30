@@ -10,8 +10,11 @@ import { sortTasks } from "@/components/tasks/task-list/utils";
 import { api } from "@/trpc/react";
 
 export default function TasksPage() {
+  const { selectedWorkspace } = useWorkspace();
   const { data: taskData, isLoading } =
-    api.tasks.getCurrentUserTasks.useQuery();
+    api.tasks.getCurrentWorkspaceTasks.useQuery({
+      workspaceId: selectedWorkspace,
+    });
 
   !isLoading && console.log(taskData);
 

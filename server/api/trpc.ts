@@ -6,7 +6,6 @@ import { ZodError } from "zod";
 
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const user = await currentUser();
-  console.log("user", user);
 
   return {
     db,
