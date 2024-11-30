@@ -21,18 +21,16 @@ import { TaskAccordion } from "./task-list/task-accordion";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useWorkspace } from "@/contexts/workspace-context";
 import { useTheme } from "@/components/theme-manager";
+import { useUser } from "@clerk/nextjs";
+import { api } from "@/trpc/react";
 
 interface TaskViewProps {
   tasks: Task[];
-  workspaces: Workspace[];
-  userId: number;
-  onTasksChanged: () => Promise<void>;
+  onTasksChanged: () => void | Promise<void>;
 }
 
 export const TaskView: React.FC<TaskViewProps> = ({
   tasks,
-  workspaces,
-  userId,
   onTasksChanged,
 }) => {
   const router = useRouter();
@@ -46,6 +44,8 @@ export const TaskView: React.FC<TaskViewProps> = ({
   const [activeFilters, setActiveFilters] = useState<Set<number>>(new Set());
   const [showAll, setShowAll] = useState(true);
   const { theme } = useTheme();
+  const { workspaces } = useWorkspace();
+  const { user } = useUser();
 
   const filteredTasks = tasks.filter((task) => {
     if (selectedWorkspace !== "all") return true;
@@ -71,38 +71,24 @@ export const TaskView: React.FC<TaskViewProps> = ({
     setActiveFilters(new Set());
   };
 
-  const handleAddTask = async (
-    data: Omit<Task, "id" | "createdAt" | "updatedAt">
-  ) => {
-    try {
-      const response = await fetch("/api/tasks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+  const addTaskMutation = api.tasks.createTask.useMutation({
+    onSuccess: async () => {
+      await onTasksChanged();
+      setIsDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "Task created successfully",
+        variant: "success",
       });
-
-      if (response.ok) {
-        await onTasksChanged();
-        setIsDialogOpen(false);
-        toast({
-          title: "Success",
-          description: "Task created successfully",
-          variant: "success",
-        });
-      } else {
-        throw new Error("Failed to create task");
-      }
-    } catch (error) {
-      console.error("Error creating task:", error);
+    },
+    onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to create task",
+        description: error.message,
         variant: "destructive",
       });
-    }
-  };
+    },
+  });
 
   const handleEditTask = async (taskData: Partial<Task>) => {
     if (!editingTask) {
@@ -268,8 +254,8 @@ export const TaskView: React.FC<TaskViewProps> = ({
             <DialogDescription></DialogDescription>
             <div className="max-h-[80vh] overflow-y-auto">
               <TaskForm
-                onSubmit={handleAddTask}
-                userId={userId}
+                onSubmit={async (data) => await addTaskMutation.mutate(data)}
+                userId={user?.publicMetadata.dbUserId as number}
                 workspaces={workspaces}
               />
             </div>
@@ -281,10 +267,12 @@ export const TaskView: React.FC<TaskViewProps> = ({
         <TaskAccordion
           tasks={filteredTasks}
           workspaces={workspaces}
-          userId={userId}
+          userId={user?.publicMetadata.dbUserId as number}
           onUpdateStatus={handleUpdateStatus}
           onEdit={setEditingTask}
-          onAddTask={handleAddTask}
+          onAddTask={async (data) => {
+            await addTaskMutation.mutateAsync(data);
+          }}
           onDeleteTask={handleDeleteTask}
         />
       )}
@@ -292,10 +280,12 @@ export const TaskView: React.FC<TaskViewProps> = ({
         <KanbanBoard
           tasks={filteredTasks}
           workspaces={workspaces}
-          userId={userId}
+          userId={user?.publicMetadata.dbUserId as number}
           onUpdateStatus={handleUpdateStatus}
           onEditTask={setEditingTask}
-          onAddTask={handleAddTask}
+          onAddTask={async (data) => {
+            await addTaskMutation.mutateAsync(data);
+          }}
         />
       )}
       {editingTask && (

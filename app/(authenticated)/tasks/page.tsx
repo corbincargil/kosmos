@@ -11,22 +11,20 @@ import { api } from "@/trpc/react";
 
 export default function TasksPage() {
   const { selectedWorkspace } = useWorkspace();
-  const { data: taskData, isLoading } =
-    api.tasks.getCurrentWorkspaceTasks.useQuery({
-      workspaceId: selectedWorkspace,
-    });
+  const {
+    data: taskData,
+    isLoading,
+    refetch,
+  } = api.tasks.getCurrentWorkspaceTasks.useQuery({
+    workspaceId: selectedWorkspace,
+  });
 
-  !isLoading && console.log(taskData);
+  if (!taskData) return null;
 
   return (
     <Card>
       <CardContent className="p-2">
-        {/* <TaskView
-          tasks={tasks}
-          workspaces={workspaces}
-          userId={user?.publicMetadata.dbUserId as number}
-          onTasksChanged={fetchTasks}
-        /> */}
+        <TaskView tasks={taskData} onTasksChanged={() => void refetch()} />
       </CardContent>
     </Card>
   );
