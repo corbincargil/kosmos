@@ -13,7 +13,7 @@ interface KanbanBoardProps {
   tasks: Task[];
   workspaces: Workspace[];
   userId: number;
-  onUpdateStatus: (taskId: number, newStatus: TaskStatus) => Promise<void>;
+  onUpdateStatus: (taskId: number, newStatus: TaskStatus) => void;
   onEditTask: (task: Task) => void;
   onAddTask: (
     task: Omit<Task, "id" | "createdAt" | "updatedAt">
@@ -44,7 +44,12 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const [tasks, setTasks] = useState(initialTasks);
 
   useEffect(() => {
-    setTasks(initialTasks);
+    setTasks((currentTasks) => {
+      return initialTasks.map((newTask) => {
+        const existingTask = currentTasks.find((t) => t.id === newTask.id);
+        return existingTask || newTask;
+      });
+    });
   }, [initialTasks]);
 
   const handleAddTask = (status: TaskStatus) => {
@@ -75,7 +80,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     );
 
     try {
-      await onUpdateStatus(taskId, newStatus);
+      onUpdateStatus(taskToUpdate.id, newStatus);
     } catch (error) {
       console.error("Error updating task status:", error);
       toast({
@@ -122,7 +127,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     workspace={
                       workspaces.find((w) => w.id === task.workspaceId)!
                     }
-                    onUpdateStatus={handleStatusUpdate}
+                    onUpdateStatus={(taskId, newStatus) =>
+                      onUpdateStatus(taskId, newStatus)
+                    }
                     onEdit={() => onEditTask(task)}
                     onQuickMove={() => handleQuickMoveToNext(task)}
                     onQuickMoveBack={() => handleQuickMoveToPrevious(task)}

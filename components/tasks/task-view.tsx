@@ -129,34 +129,23 @@ export const TaskView: React.FC<TaskViewProps> = ({
     }
   };
 
-  const handleUpdateStatus = async (taskId: number, newStatus: TaskStatus) => {
-    const existingTask = tasks.find((task) => task.id === taskId);
-    if (!existingTask) return;
-
-    const response = await fetch(`/api/tasks/${taskId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...existingTask,
-        status: newStatus,
-      }),
-    });
-
-    if (response.ok) {
+  const updateStatusMutation = api.tasks.updateTaskStatus.useMutation({
+    onSuccess: async () => {
       await onTasksChanged();
       toast({
         title: "Success",
-        description: `Task status updated to ${newStatus}`,
+        description: "Task status updated successfully",
         variant: "success",
       });
-    } else {
+    },
+    onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to update task status",
+        description: error.message,
         variant: "destructive",
       });
-    }
-  };
+    },
+  });
 
   const handleDeleteTask = async (taskId: number) => {
     try {
@@ -254,7 +243,7 @@ export const TaskView: React.FC<TaskViewProps> = ({
             <DialogDescription></DialogDescription>
             <div className="max-h-[80vh] overflow-y-auto">
               <TaskForm
-                onSubmit={async (data) => await addTaskMutation.mutate(data)}
+                onSubmit={async (data) => addTaskMutation.mutate(data)}
                 userId={user?.publicMetadata.dbUserId as number}
                 workspaces={workspaces}
               />
@@ -268,7 +257,9 @@ export const TaskView: React.FC<TaskViewProps> = ({
           tasks={filteredTasks}
           workspaces={workspaces}
           userId={user?.publicMetadata.dbUserId as number}
-          onUpdateStatus={handleUpdateStatus}
+          onUpdateStatus={async (taskId, newStatus) =>
+            updateStatusMutation.mutate({ id: taskId, status: newStatus })
+          }
           onEdit={setEditingTask}
           onAddTask={async (data) => {
             await addTaskMutation.mutateAsync(data);
@@ -281,7 +272,9 @@ export const TaskView: React.FC<TaskViewProps> = ({
           tasks={filteredTasks}
           workspaces={workspaces}
           userId={user?.publicMetadata.dbUserId as number}
-          onUpdateStatus={handleUpdateStatus}
+          onUpdateStatus={async (taskId, newStatus) =>
+            updateStatusMutation.mutate({ id: taskId, status: newStatus })
+          }
           onEditTask={setEditingTask}
           onAddTask={async (data) => {
             await addTaskMutation.mutateAsync(data);

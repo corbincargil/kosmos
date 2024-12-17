@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { TaskSchema } from "@/types/task";
+import { TaskSchema, TaskStatus } from "@/types/task";
 
 export const taskRouter = createTRPCRouter({
   getCurrentWorkspaceTasks: protectedProcedure
@@ -28,6 +28,14 @@ export const taskRouter = createTRPCRouter({
       return ctx.db.task.update({
         where: { id: input.id },
         data: input,
+      });
+    }),
+  updateTaskStatus: protectedProcedure
+    .input(z.object({ id: z.number(), status: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.task.update({
+        where: { id: input.id },
+        data: { status: input.status as TaskStatus },
       });
     }),
 });
