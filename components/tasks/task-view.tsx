@@ -127,32 +127,24 @@ export const TaskView: React.FC<TaskViewProps> = ({
     },
   });
 
-  const handleDeleteTask = async (taskId: number) => {
-    try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: "DELETE",
+  const deleteTaskMutation = api.tasks.deleteTask.useMutation({
+    onSuccess: async () => {
+      await onTasksChanged();
+      setEditingTask(null);
+      toast({
+        title: "Success",
+        description: "Task deleted successfully",
+        variant: "success",
       });
-
-      if (response.ok) {
-        await onTasksChanged();
-        setEditingTask(null);
-        toast({
-          title: "Success",
-          description: "Task deleted successfully",
-          variant: "success",
-        });
-      } else {
-        throw new Error("Failed to delete task");
-      }
-    } catch (error) {
-      console.error("Error deleting task:", error);
+    },
+    onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to delete task",
+        description: error.message,
         variant: "destructive",
       });
-    }
-  };
+    },
+  });
 
   const handleViewChange = (newView: "list" | "board") => {
     const params = new URLSearchParams(searchParams);
@@ -244,7 +236,6 @@ export const TaskView: React.FC<TaskViewProps> = ({
           onAddTask={async (data) => {
             await addTaskMutation.mutateAsync(data);
           }}
-          onDeleteTask={handleDeleteTask}
         />
       )}
       {filteredTasks.length > 0 && viewMode === "board" && (
@@ -268,7 +259,7 @@ export const TaskView: React.FC<TaskViewProps> = ({
           task={editingTask}
           workspaces={workspaces}
           onSubmit={(data) => updateTaskMutation.mutate(data)}
-          onDelete={handleDeleteTask}
+          onDelete={(id) => deleteTaskMutation.mutate(id)}
         />
       )}
     </div>

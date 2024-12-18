@@ -24,7 +24,6 @@ type TaskAccordionProps = {
     task: Omit<Task, "id" | "createdAt" | "updatedAt">
   ) => Promise<void>;
   userId: number;
-  onDeleteTask: (taskId: number) => Promise<void>;
 };
 
 export const TaskAccordion: React.FC<TaskAccordionProps> = ({

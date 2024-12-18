@@ -31,11 +31,16 @@ export const taskRouter = createTRPCRouter({
       });
     }),
   updateTaskStatus: protectedProcedure
-    .input(z.object({ id: z.number(), status: z.string() }))
+    .input(z.object({ id: z.number(), status: z.string() })) //? update to include workspaceId and userId ?
     .mutation(async ({ ctx, input }) => {
       return ctx.db.task.update({
         where: { id: input.id },
         data: { status: input.status as TaskStatus },
       });
+    }),
+  deleteTask: protectedProcedure
+    .input(z.number()) //? update to include workspaceId and userId ?
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.task.delete({ where: { id: input } });
     }),
 });

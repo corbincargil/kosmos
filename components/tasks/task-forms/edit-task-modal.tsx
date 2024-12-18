@@ -35,7 +35,7 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({
   };
 
   const handleDelete = async () => {
-    onDelete(task.id!);
+    onDelete(task.id);
     onClose();
   };
 
