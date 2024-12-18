@@ -17,6 +17,11 @@ export const taskRouter = createTRPCRouter({
         },
       });
     }),
+  getCurrentUserTasks: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.task.findMany({
+      where: { userId: Number(ctx.userId) },
+    });
+  }),
   createTask: protectedProcedure
     .input(TaskSchema.omit({ id: true, createdAt: true, updatedAt: true }))
     .mutation(async ({ ctx, input }) => {
