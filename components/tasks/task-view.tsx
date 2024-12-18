@@ -90,27 +90,8 @@ export const TaskView: React.FC<TaskViewProps> = ({
     },
   });
 
-  const handleEditTask = async (taskData: Partial<Task>) => {
-    if (!editingTask) {
-      console.error("No task is currently being edited");
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/tasks/${editingTask.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...editingTask, ...taskData }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error response:", errorData);
-        throw new Error(
-          `Failed to update task: ${errorData.message || response.statusText}`
-        );
-      }
-
+  const updateTaskMutation = api.tasks.updateTask.useMutation({
+    onSuccess: async () => {
       await onTasksChanged();
       setEditingTask(null);
       toast({
@@ -118,16 +99,15 @@ export const TaskView: React.FC<TaskViewProps> = ({
         description: "Task updated successfully",
         variant: "success",
       });
-    } catch (error) {
-      console.error("Error updating task:", error);
+    },
+    onError: (error) => {
       toast({
         title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to update task",
+        description: error.message,
         variant: "destructive",
       });
-    }
-  };
+    },
+  });
 
   const updateStatusMutation = api.tasks.updateTaskStatus.useMutation({
     onSuccess: async () => {
@@ -287,7 +267,7 @@ export const TaskView: React.FC<TaskViewProps> = ({
           onClose={() => setEditingTask(null)}
           task={editingTask}
           workspaces={workspaces}
-          onSubmit={handleEditTask}
+          onSubmit={(data) => updateTaskMutation.mutate(data)}
           onDelete={handleDeleteTask}
         />
       )}

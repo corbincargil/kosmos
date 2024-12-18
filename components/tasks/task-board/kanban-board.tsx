@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Task, TaskStatus } from "@/types/task";
 import { Workspace } from "@/types/workspace";
 import { SwipeableTaskCard } from "../task-list/swipeable-task-card";
@@ -41,16 +41,6 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onAddTask,
 }) => {
   const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus | null>(null);
-  const [tasks, setTasks] = useState(initialTasks);
-
-  useEffect(() => {
-    setTasks((currentTasks) => {
-      return initialTasks.map((newTask) => {
-        const existingTask = currentTasks.find((t) => t.id === newTask.id);
-        return existingTask || newTask;
-      });
-    });
-  }, [initialTasks]);
 
   const handleAddTask = (status: TaskStatus) => {
     setNewTaskStatus(status);
@@ -68,19 +58,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   };
 
   const handleStatusUpdate = async (taskId: number, newStatus: TaskStatus) => {
-    const taskToUpdate = tasks.find((t) => t.id === taskId);
-    if (!taskToUpdate) return;
-
-    const previousTasks = [...tasks];
-
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, status: newStatus } : task
-      )
-    );
-
     try {
-      onUpdateStatus(taskToUpdate.id, newStatus);
+      await onUpdateStatus(taskId, newStatus);
     } catch (error) {
       console.error("Error updating task status:", error);
       toast({
@@ -88,7 +67,6 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
         description: "Failed to update task status",
         variant: "destructive",
       });
-      setTasks(previousTasks);
     }
   };
 
@@ -118,7 +96,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
           </h3>
           <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded-lg min-h-[200px]">
             <div className="space-y-2 p-1 overflow-y-auto max-h-[420px] md:max-h-[600px] lg:max-h-[800px]">
-              {tasks
+              {initialTasks
                 .filter((task) => task.status === status)
                 .map((task) => (
                   <SwipeableTaskCard
