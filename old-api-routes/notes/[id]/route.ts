@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { NoteController } from "../../../../controllers/note-controller";
+import { NoteController } from "../../../controllers/note-controller";
 
 export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;

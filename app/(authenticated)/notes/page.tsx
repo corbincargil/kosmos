@@ -2,42 +2,39 @@
 
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { NoteView } from "@/components/notes/note-view";
-import { useUser } from "@clerk/nextjs";
 import { useWorkspace } from "@/contexts/workspace-context";
-import { useCallback, useEffect, useState } from "react";
-import { Note } from "@/types/note";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { NoteModal } from "@/components/notes/note-modal";
+import { api } from "@/trpc/react";
 
 export default function Notes() {
-  const { user } = useUser();
   const { selectedWorkspace } = useWorkspace();
-  const [loading, setLoading] = useState(false);
-  const [notes, setNotes] = useState<Note[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const fetchNotes = useCallback(async () => {
-    if (user) {
-      setLoading(true);
-      const userId = user.publicMetadata.dbUserId as number;
-      const queryParam =
-        selectedWorkspace === "all"
-          ? `userId=${userId}`
-          : `workspaceId=${selectedWorkspace}`;
-
-      const response = await fetch(`/api/notes?${queryParam}`);
-      setLoading(false);
-      if (response.ok) {
-        const notesData = await response.json();
-        setNotes(notesData);
-      }
+  const {
+    data: notesData,
+    isLoading: workspaceNotesLoading,
+    refetch: workspaceNotesRefetch,
+  } = api.notes.getCurrentWorkspaceNotes.useQuery(
+    {
+      workspaceId: selectedWorkspace,
+    },
+    {
+      enabled: selectedWorkspace !== "all",
     }
-  }, [user, selectedWorkspace]);
+  );
 
-  useEffect(() => {
-    fetchNotes();
-  }, [user, selectedWorkspace, fetchNotes]);
+  const {
+    data: allNotesData,
+    isLoading: allNotesLoading,
+    refetch: allNotesRefetch,
+  } = api.notes.getCurrentUserNotes.useQuery(undefined, {
+    enabled: selectedWorkspace === "all",
+  });
+
+  const loadingNotes = workspaceNotesLoading || allNotesLoading;
 
   return (
     <>
@@ -50,22 +47,24 @@ export default function Notes() {
           </Button>
         </div>
       </CardHeader>
-      {loading ? (
+      {loadingNotes ? (
         <div className="p-4 text-center text-muted-foreground">
           Loading notes...
         </div>
-      ) : notes.length === 0 ? (
+      ) : notesData?.length === 0 ? (
         <div className="p-4 text-center text-muted-foreground">
           No notes found
         </div>
       ) : (
-        <NoteView notes={notes} />
+        <NoteView notes={notesData || allNotesData} />
       )}
       <NoteModal
         note={null}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={fetchNotes}
+        onSave={
+          selectedWorkspace === "all" ? allNotesRefetch : workspaceNotesRefetch
+        }
       />
     </>
   );

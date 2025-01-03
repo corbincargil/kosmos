@@ -17,7 +17,7 @@ import {
 import { Search } from "lucide-react";
 
 interface NoteViewProps {
-  notes: Note[];
+  notes: Note[] | undefined;
 }
 
 export function NoteView({ notes }: NoteViewProps) {
@@ -37,7 +37,7 @@ export function NoteView({ notes }: NoteViewProps) {
   };
 
   const filteredAndSortedNotes = notes
-    .filter((note) => {
+    ?.filter((note) => {
       const searchTerm = searchQuery.toLowerCase();
       return (
         note.title.toLowerCase().includes(searchTerm) ||
@@ -109,9 +109,9 @@ export function NoteView({ notes }: NoteViewProps) {
       </div>
 
       {view === "grid" ? (
-        <NoteGrid notes={filteredAndSortedNotes} />
+        <NoteGrid notes={filteredAndSortedNotes ?? []} />
       ) : (
-        <NoteList notes={filteredAndSortedNotes} />
+        <NoteList notes={filteredAndSortedNotes ?? []} />
       )}
     </div>
   );

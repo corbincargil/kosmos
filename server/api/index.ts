@@ -1,11 +1,12 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { taskRouter } from "@/server/api/routers/task-router";
 import { workspaceRouter } from "./routers/workspace-router";
+import { noteRouter } from "./routers/notes-router";
 
 export const appRouter = createTRPCRouter({
   tasks: taskRouter,
   workspaces: workspaceRouter,
-  // Add other routers here
+  notes: noteRouter,
 });
 
 export type AppRouter = typeof appRouter;

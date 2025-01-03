@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/dialog";
 import { useUser } from "@clerk/nextjs";
 import { useWorkspace } from "@/contexts/workspace-context";
+import { api } from "@/trpc/react";
+import { toast } from "@/hooks/use-toast";
 
 dayjs.extend(relativeTime);
 
@@ -37,36 +39,27 @@ export function NoteModal({ note, isOpen, onClose, onSave }: NoteModalProps) {
   const [isEditing, setIsEditing] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = async () => {
-    if (!user || selectedWorkspace === "all") return;
+  const { mutate: createNoteMutation } = api.notes.createNote.useMutation({
+    onSuccess: () => {
+      onSave();
+      onClose();
+      setTitle("");
+      setContent("");
 
-    setIsSaving(true);
-    try {
-      const response = await fetch("/api/notes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          content,
-          workspaceId: selectedWorkspace,
-          userId: user.publicMetadata.dbUserId,
-        }),
+      toast({
+        title: "Success",
+        variant: "success",
+        description: "Note created successfully",
       });
-
-      if (response.ok) {
-        onSave();
-        onClose();
-        setTitle("");
-        setContent("");
-      }
-    } catch (error) {
-      console.error("Failed to save note:", error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to create note",
+        variant: "destructive",
+      });
+    },
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -153,7 +146,18 @@ export function NoteModal({ note, isOpen, onClose, onSave }: NoteModalProps) {
         </div>
 
         <div className="flex justify-end mt-4">
-          <Button onClick={handleSave} disabled={isSaving || !title.trim()}>
+          <Button
+            onClick={() => {
+              setIsSaving(true);
+              createNoteMutation({
+                title,
+                content,
+                workspaceId: Number(selectedWorkspace),
+                userId: Number(user?.publicMetadata.dbUserId),
+              });
+            }}
+            disabled={isSaving || !title.trim()}
+          >
             {isSaving ? "Saving..." : "Save"}
           </Button>
         </div>

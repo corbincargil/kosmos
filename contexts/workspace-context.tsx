@@ -36,7 +36,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const { user, isLoaded } = useUser();
 
   const { data: workspaces, refetch: refreshWorkspaces } =
-    api.workspaces.getUserWorkspaces.useQuery();
+    api.workspaces.getUserWorkspaces.useQuery(undefined, {
+      enabled: !!user,
+    });
 
   useEffect(() => {
     refreshWorkspaces();

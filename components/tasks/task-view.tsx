@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Task, TaskStatus } from "@/types/task";
-import { Workspace } from "@/types/workspace";
+import { Task } from "@/types/task";
 import { KanbanBoard } from "./task-board/kanban-board";
 import { TaskViewToggle } from "./task-view-toggle";
 import { useToast } from "@/hooks/use-toast";

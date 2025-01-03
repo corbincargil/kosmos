@@ -74,7 +74,7 @@ export const TaskController = {
         validatedData.title,
         validatedData.userId,
         validatedData.workspaceId,
-        validatedData.description,
+        validatedData.description ?? undefined,
         validatedData.dueDate,
         validatedData.status,
         validatedData.priority ?? undefined
@@ -101,7 +101,7 @@ export const TaskController = {
       const task = await TaskService.editTask(
         taskId,
         validatedData.title,
-        validatedData.description,
+        validatedData.description ?? undefined,
         validatedData.dueDate,
         validatedData.status,
         validatedData.priority,

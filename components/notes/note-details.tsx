@@ -7,89 +7,47 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Note } from "@/types/note";
 import { useToast } from "@/hooks/use-toast";
+import { api } from "@/trpc/react";
 
 dayjs.extend(relativeTime);
 
 interface NoteDetailsProps {
-  params: {
-    id: string;
-  };
+  noteData?: Note;
 }
 
-export default function NoteDetails({ params }: NoteDetailsProps) {
+export default function NoteDetails({ noteData }: NoteDetailsProps) {
   const { toast } = useToast();
-  const [loading] = useState(true);
-  const [note, setNote] = useState<Note | null>(null);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const utils = api.useUtils();
+  const [title, setTitle] = useState(noteData?.title || "");
+  const [content, setContent] = useState(noteData?.content || "");
   const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    const fetchNote = async () => {
-      const response = await fetch(`/api/notes/${params.id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setNote(data);
-        setTitle(data.title);
-        setContent(data.content);
-      } else {
-        setNote(null);
-      }
-    };
+  const { mutate: updateNoteMutation, isPending } =
+    api.notes.updateNote.useMutation({
+      onSuccess: () => {
+        utils.notes.getCurrentWorkspaceNotes.invalidate();
 
-    fetchNote();
-  }, [params.id]);
-
-  const handleSave = async () => {
-    if (!note) return;
-
-    setIsSaving(true);
-    try {
-      const response = await fetch(`/api/notes/${note.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          content,
-        }),
-      });
-
-      if (response.ok) {
-        const updatedNote = await response.json();
-        setNote(updatedNote);
         toast({
           title: "Success",
           variant: "success",
           description: "Note updated successfully",
         });
-      } else {
-        throw new Error("Failed to update note");
-      }
-    } catch (error) {
-      console.error("Error updating note:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update note",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  };
+      },
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to update note",
+          variant: "destructive",
+        });
+      },
+    });
 
-  if (!note && !loading) {
+  if (!noteData) {
     return <p>Note not found</p>;
-  }
-
-  if (!note && loading) {
-    return <p>Loading...</p>;
   }
 
   return (
@@ -105,7 +63,7 @@ export default function NoteDetails({ params }: NoteDetailsProps) {
 
         <div className="flex items-center justify-between mb-4">
           <p className="text-muted-foreground">
-            Last updated {dayjs(note?.updatedAt).fromNow()}
+            Last updated {dayjs(noteData?.updatedAt).fromNow()}
           </p>
           <Button
             variant="ghost"
@@ -162,14 +120,24 @@ export default function NoteDetails({ params }: NoteDetailsProps) {
                 ),
               }}
             >
-              {content}
+              {noteData?.content}
             </ReactMarkdown>
           </div>
         </div>
 
         <div className="flex justify-end mt-4">
-          <Button onClick={handleSave} disabled={isSaving} variant="default">
-            {isSaving ? "Saving..." : "Save"}
+          <Button
+            onClick={() =>
+              updateNoteMutation({
+                id: noteData.id,
+                title,
+                content,
+              })
+            }
+            disabled={isPending}
+            variant="default"
+          >
+            {isPending ? "Saving..." : "Save"}
           </Button>
         </div>
       </div>
