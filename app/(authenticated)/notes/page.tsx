@@ -8,10 +8,17 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { NoteModal } from "@/components/notes/note-modal";
 import { api } from "@/trpc/react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function Notes() {
   const { selectedWorkspace } = useWorkspace();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const {
     data: notesData,
@@ -41,10 +48,34 @@ export default function Notes() {
       <CardHeader className="p-2">
         <div className="flex justify-between items-center">
           <CardTitle>Notes</CardTitle>
-          <Button size="sm" variant="glow" onClick={() => setIsModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Note
-          </Button>
+          <TooltipProvider>
+            <Tooltip open={showTooltip} onOpenChange={setShowTooltip}>
+              <TooltipTrigger asChild>
+                <span
+                  onClick={() => {
+                    if (selectedWorkspace === "all") {
+                      setShowTooltip(true);
+                    }
+                  }}
+                >
+                  <Button
+                    size="sm"
+                    variant="glow"
+                    onClick={() => setIsModalOpen(true)}
+                    disabled={selectedWorkspace === "all"}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Note
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              {selectedWorkspace === "all" && (
+                <TooltipContent>
+                  <p>Select a specific workspace to create notes</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </CardHeader>
       {loadingNotes ? (
