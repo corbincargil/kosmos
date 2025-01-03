@@ -1,7 +1,6 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { useCallback, useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -9,61 +8,49 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { Task } from "@/types/task";
 import { useWorkspace } from "@/contexts/workspace-context";
 import Link from "next/link";
 import { sortTasks } from "@/components/tasks/task-list/utils";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { Note } from "@/types/note";
 import { TaskPreview } from "@/app/(authenticated)/dashboard/_components/task-preview";
 import { NotePreview } from "@/app/(authenticated)/dashboard/_components/note-preview";
+import { api } from "@/trpc/react";
 
 export default function Dashboard() {
   const { user } = useUser();
   const { selectedWorkspace, workspaces } = useWorkspace();
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [notes, setNotes] = useState<Note[]>([]);
+
+  const tasksQuery = api.tasks.getCurrentWorkspaceTasks.useQuery(
+    { workspaceId: selectedWorkspace },
+    { enabled: selectedWorkspace !== "all" && !!selectedWorkspace }
+  );
+
+  const userTasksQuery = api.tasks.getCurrentUserTasks.useQuery(undefined, {
+    enabled: selectedWorkspace === "all",
+  });
+
+  const notesQuery = api.notes.getCurrentWorkspaceNotes.useQuery(
+    { workspaceId: selectedWorkspace },
+    { enabled: selectedWorkspace !== "all" && !!selectedWorkspace }
+  );
+
+  const userNotesQuery = api.notes.getCurrentUserNotes.useQuery(undefined, {
+    enabled: selectedWorkspace === "all",
+  });
+
+  const tasks =
+    selectedWorkspace === "all"
+      ? userTasksQuery.data ?? []
+      : tasksQuery.data ?? [];
+
+  const notes =
+    selectedWorkspace === "all"
+      ? userNotesQuery.data ?? []
+      : notesQuery.data ?? [];
 
   const Greeting =
     '"I am the vine; you are the branches. If you remain in me and I in you, you will bear much fruit; apart from me you can do nothing." - John 15:5';
-
-  const fetchTasks = useCallback(async () => {
-    if (user) {
-      const userId = user.publicMetadata.dbUserId as number;
-      const queryParam =
-        selectedWorkspace === "all"
-          ? `userId=${userId}`
-          : `workspaceId=${selectedWorkspace}`;
-
-      const response = await fetch(`/api/tasks?${queryParam}&limit=5`);
-      if (response.ok) {
-        const tasksData = await response.json();
-        setTasks(sortTasks(tasksData));
-      }
-    }
-  }, [user, selectedWorkspace]);
-
-  const fetchNotes = useCallback(async () => {
-    if (user) {
-      const userId = user.publicMetadata.dbUserId as number;
-      const queryParam =
-        selectedWorkspace === "all"
-          ? `userId=${userId}`
-          : `workspaceId=${selectedWorkspace}`;
-
-      const response = await fetch(`/api/notes?${queryParam}&limit=5`);
-      if (response.ok) {
-        const notesData = await response.json();
-        setNotes(notesData);
-      }
-    }
-  }, [user, selectedWorkspace]);
-
-  useEffect(() => {
-    fetchTasks();
-    fetchNotes();
-  }, [user, selectedWorkspace, fetchTasks, fetchNotes]);
 
   return (
     <div className="space-y-4">
@@ -88,9 +75,12 @@ export default function Dashboard() {
             <CardContent>
               {tasks.length ? (
                 <TaskPreview
-                  tasks={tasks}
+                  tasks={sortTasks(tasks.slice(0, 5))}
                   workspaces={workspaces}
-                  onTasksChanged={fetchTasks}
+                  onTasksChanged={async () => {
+                    tasksQuery.refetch();
+                    userTasksQuery.refetch();
+                  }}
                 />
               ) : (
                 <p className="text-muted-foreground">You have no tasks yet.</p>
@@ -111,7 +101,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               {notes.length ? (
-                <NotePreview notes={notes} />
+                <NotePreview notes={notes.slice(0, 5)} />
               ) : (
                 <p className="text-muted-foreground">You have no notes yet.</p>
               )}

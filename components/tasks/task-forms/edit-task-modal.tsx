@@ -15,8 +15,8 @@ type EditTaskModalProps = {
   onClose: () => void;
   task: Task;
   workspaces: Workspace[];
-  onSubmit: (data: Task) => Promise<void>;
-  onDelete: (taskId: number) => Promise<void>;
+  onSubmit: (data: Task) => void;
+  onDelete: (taskId: number) => void;
 };
 
 export const EditTaskModal: React.FC<EditTaskModalProps> = ({
@@ -30,12 +30,12 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({
   const handleSubmit = async (
     data: Omit<Task, "id" | "createdAt" | "updatedAt">
   ) => {
-    await onSubmit({ ...data, id: task.id });
+    onSubmit({ ...data, id: task.id });
     onClose();
   };
 
   const handleDelete = async () => {
-    await onDelete(task.id!);
+    onDelete(task.id);
     onClose();
   };
 

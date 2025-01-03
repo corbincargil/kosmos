@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Task, TaskStatus } from "@/types/task";
-import { Workspace } from "@/types/workspace";
+import { Task } from "@/types/task";
 import { KanbanBoard } from "./task-board/kanban-board";
 import { TaskViewToggle } from "./task-view-toggle";
 import { useToast } from "@/hooks/use-toast";
@@ -21,18 +20,16 @@ import { TaskAccordion } from "./task-list/task-accordion";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useWorkspace } from "@/contexts/workspace-context";
 import { useTheme } from "@/components/theme-manager";
+import { useUser } from "@clerk/nextjs";
+import { api } from "@/trpc/react";
 
 interface TaskViewProps {
   tasks: Task[];
-  workspaces: Workspace[];
-  userId: number;
-  onTasksChanged: () => Promise<void>;
+  onTasksChanged: () => void | Promise<void>;
 }
 
 export const TaskView: React.FC<TaskViewProps> = ({
   tasks,
-  workspaces,
-  userId,
   onTasksChanged,
 }) => {
   const router = useRouter();
@@ -46,6 +43,8 @@ export const TaskView: React.FC<TaskViewProps> = ({
   const [activeFilters, setActiveFilters] = useState<Set<number>>(new Set());
   const [showAll, setShowAll] = useState(true);
   const { theme } = useTheme();
+  const { workspaces } = useWorkspace();
+  const { user } = useUser();
 
   const filteredTasks = tasks.filter((task) => {
     if (selectedWorkspace !== "all") return true;
@@ -71,60 +70,27 @@ export const TaskView: React.FC<TaskViewProps> = ({
     setActiveFilters(new Set());
   };
 
-  const handleAddTask = async (
-    data: Omit<Task, "id" | "createdAt" | "updatedAt">
-  ) => {
-    try {
-      const response = await fetch("/api/tasks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+  const addTaskMutation = api.tasks.createTask.useMutation({
+    onSuccess: async () => {
+      await onTasksChanged();
+      setIsDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "Task created successfully",
+        variant: "success",
       });
-
-      if (response.ok) {
-        await onTasksChanged();
-        setIsDialogOpen(false);
-        toast({
-          title: "Success",
-          description: "Task created successfully",
-          variant: "success",
-        });
-      } else {
-        throw new Error("Failed to create task");
-      }
-    } catch (error) {
-      console.error("Error creating task:", error);
+    },
+    onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to create task",
+        description: error.message,
         variant: "destructive",
       });
-    }
-  };
+    },
+  });
 
-  const handleEditTask = async (taskData: Partial<Task>) => {
-    if (!editingTask) {
-      console.error("No task is currently being edited");
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/tasks/${editingTask.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...editingTask, ...taskData }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error response:", errorData);
-        throw new Error(
-          `Failed to update task: ${errorData.message || response.statusText}`
-        );
-      }
-
+  const updateTaskMutation = api.tasks.updateTask.useMutation({
+    onSuccess: async () => {
       await onTasksChanged();
       setEditingTask(null);
       toast({
@@ -132,72 +98,52 @@ export const TaskView: React.FC<TaskViewProps> = ({
         description: "Task updated successfully",
         variant: "success",
       });
-    } catch (error) {
-      console.error("Error updating task:", error);
+    },
+    onError: (error) => {
       toast({
         title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to update task",
+        description: error.message,
         variant: "destructive",
       });
-    }
-  };
+    },
+  });
 
-  const handleUpdateStatus = async (taskId: number, newStatus: TaskStatus) => {
-    const existingTask = tasks.find((task) => task.id === taskId);
-    if (!existingTask) return;
-
-    const response = await fetch(`/api/tasks/${taskId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...existingTask,
-        status: newStatus,
-      }),
-    });
-
-    if (response.ok) {
+  const updateStatusMutation = api.tasks.updateTaskStatus.useMutation({
+    onSuccess: async () => {
       await onTasksChanged();
       toast({
         title: "Success",
-        description: `Task status updated to ${newStatus}`,
+        description: "Task status updated successfully",
         variant: "success",
       });
-    } else {
+    },
+    onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to update task status",
+        description: error.message,
         variant: "destructive",
       });
-    }
-  };
+    },
+  });
 
-  const handleDeleteTask = async (taskId: number) => {
-    try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: "DELETE",
+  const deleteTaskMutation = api.tasks.deleteTask.useMutation({
+    onSuccess: async () => {
+      await onTasksChanged();
+      setEditingTask(null);
+      toast({
+        title: "Success",
+        description: "Task deleted successfully",
+        variant: "success",
       });
-
-      if (response.ok) {
-        await onTasksChanged();
-        setEditingTask(null);
-        toast({
-          title: "Success",
-          description: "Task deleted successfully",
-          variant: "success",
-        });
-      } else {
-        throw new Error("Failed to delete task");
-      }
-    } catch (error) {
-      console.error("Error deleting task:", error);
+    },
+    onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to delete task",
+        description: error.message,
         variant: "destructive",
       });
-    }
-  };
+    },
+  });
 
   const handleViewChange = (newView: "list" | "board") => {
     const params = new URLSearchParams(searchParams);
@@ -268,8 +214,8 @@ export const TaskView: React.FC<TaskViewProps> = ({
             <DialogDescription></DialogDescription>
             <div className="max-h-[80vh] overflow-y-auto">
               <TaskForm
-                onSubmit={handleAddTask}
-                userId={userId}
+                onSubmit={async (data) => addTaskMutation.mutate(data)}
+                userId={user?.publicMetadata.dbUserId as number}
                 workspaces={workspaces}
               />
             </div>
@@ -281,21 +227,28 @@ export const TaskView: React.FC<TaskViewProps> = ({
         <TaskAccordion
           tasks={filteredTasks}
           workspaces={workspaces}
-          userId={userId}
-          onUpdateStatus={handleUpdateStatus}
+          userId={user?.publicMetadata.dbUserId as number}
+          onUpdateStatus={async (taskId, newStatus) =>
+            updateStatusMutation.mutate({ id: taskId, status: newStatus })
+          }
           onEdit={setEditingTask}
-          onAddTask={handleAddTask}
-          onDeleteTask={handleDeleteTask}
+          onAddTask={async (data) => {
+            await addTaskMutation.mutateAsync(data);
+          }}
         />
       )}
       {filteredTasks.length > 0 && viewMode === "board" && (
         <KanbanBoard
           tasks={filteredTasks}
           workspaces={workspaces}
-          userId={userId}
-          onUpdateStatus={handleUpdateStatus}
+          userId={user?.publicMetadata.dbUserId as number}
+          onUpdateStatus={async (taskId, newStatus) =>
+            updateStatusMutation.mutate({ id: taskId, status: newStatus })
+          }
           onEditTask={setEditingTask}
-          onAddTask={handleAddTask}
+          onAddTask={async (data) => {
+            await addTaskMutation.mutateAsync(data);
+          }}
         />
       )}
       {editingTask && (
@@ -304,8 +257,8 @@ export const TaskView: React.FC<TaskViewProps> = ({
           onClose={() => setEditingTask(null)}
           task={editingTask}
           workspaces={workspaces}
-          onSubmit={handleEditTask}
-          onDelete={handleDeleteTask}
+          onSubmit={(data) => updateTaskMutation.mutate(data)}
+          onDelete={(id) => deleteTaskMutation.mutate(id)}
         />
       )}
     </div>

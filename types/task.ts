@@ -3,7 +3,7 @@ import { z } from "zod";
 export const TaskSchema = z.object({
   id: z.number().int().positive(),
   title: z.string().max(100),
-  description: z.string().max(255).optional(),
+  description: z.string().max(255).nullable(),
   dueDate: z
     .union([z.date(), z.string()])
     .nullable()

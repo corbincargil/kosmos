@@ -18,13 +18,12 @@ import { InlineTaskForm } from "../task-forms/inline-task-form";
 type TaskAccordionProps = {
   tasks: Task[];
   workspaces: Workspace[];
-  onUpdateStatus: (taskId: number, newStatus: TaskStatus) => Promise<void>;
+  onUpdateStatus: (taskId: number, newStatus: TaskStatus) => void;
   onEdit: (task: Task) => void;
   onAddTask: (
     task: Omit<Task, "id" | "createdAt" | "updatedAt">
   ) => Promise<void>;
   userId: number;
-  onDeleteTask: (taskId: number) => Promise<void>;
 };
 
 export const TaskAccordion: React.FC<TaskAccordionProps> = ({
@@ -110,7 +109,7 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
                           workspaces.find((w) => w.id === task.workspaceId)!
                         }
                         onUpdateStatus={(taskId, newStatus) =>
-                          onUpdateStatus(taskId, newStatus as TaskStatus)
+                          onUpdateStatus(taskId, newStatus)
                         }
                         onEdit={() => onEdit(task)}
                       />

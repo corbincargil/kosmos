@@ -1,57 +1,40 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { api } from "@/trpc/react";
 
 export default function SignedInPage() {
   const { isLoaded, isSignedIn, user } = useUser();
   const router = useRouter();
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncError, setSyncError] = useState<string | null>(null);
+
+  const { mutate: syncUserMutation } = api.users.syncUser.useMutation({
+    onSuccess: () => {
+      router.push("/dashboard");
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
 
   useEffect(() => {
-    if (isLoaded && isSignedIn && user) {
-      setIsSyncing(true);
-      fetch("/api/sync-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          email: user.primaryEmailAddress?.emailAddress,
-        }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to sync user");
-          }
-          return response.json();
-        })
-        .then(async () => {
-          await user.reload();
-          router.push("/dashboard");
-        })
-        .catch((error) => {
-          console.error("Error syncing user:", error);
-          setSyncError("Failed to sync user. Please try again.");
-        })
-        .finally(() => {
-          setIsSyncing(false);
-        });
-    } else if (isLoaded && !isSignedIn) {
-      router.push("/");
+    if (isLoaded && isSignedIn && user?.primaryEmailAddress?.emailAddress) {
+      syncUserMutation({
+        clerkUserId: user.id,
+        email: user.primaryEmailAddress.emailAddress,
+      });
     }
-  }, [isLoaded, isSignedIn, user, router]);
+  }, [isLoaded, isSignedIn, user, syncUserMutation]);
 
-  if (isSyncing) {
-    return <div>Syncing user data...</div>;
+  if (isLoaded && !isSignedIn) {
+    router.push("/");
+    return <div>Redirecting to home...</div>;
   }
 
-  if (syncError) {
-    return <div>Error: {syncError}</div>;
+  if (!user?.primaryEmailAddress?.emailAddress) {
+    return <div>Error: Could not fetch user email address from Clerk</div>;
   }
 
-  return <div>Redirecting to dashboard...</div>;
+  return <div>Syncing user data...</div>;
 }

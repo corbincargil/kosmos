@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Task, TaskStatus } from "@/types/task";
 import { Workspace } from "@/types/workspace";
 import { SwipeableTaskCard } from "../task-list/swipeable-task-card";
@@ -13,7 +13,7 @@ interface KanbanBoardProps {
   tasks: Task[];
   workspaces: Workspace[];
   userId: number;
-  onUpdateStatus: (taskId: number, newStatus: TaskStatus) => Promise<void>;
+  onUpdateStatus: (taskId: number, newStatus: TaskStatus) => void;
   onEditTask: (task: Task) => void;
   onAddTask: (
     task: Omit<Task, "id" | "createdAt" | "updatedAt">
@@ -41,11 +41,6 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onAddTask,
 }) => {
   const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus | null>(null);
-  const [tasks, setTasks] = useState(initialTasks);
-
-  useEffect(() => {
-    setTasks(initialTasks);
-  }, [initialTasks]);
 
   const handleAddTask = (status: TaskStatus) => {
     setNewTaskStatus(status);
@@ -63,17 +58,6 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   };
 
   const handleStatusUpdate = async (taskId: number, newStatus: TaskStatus) => {
-    const taskToUpdate = tasks.find((t) => t.id === taskId);
-    if (!taskToUpdate) return;
-
-    const previousTasks = [...tasks];
-
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, status: newStatus } : task
-      )
-    );
-
     try {
       await onUpdateStatus(taskId, newStatus);
     } catch (error) {
@@ -83,7 +67,6 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
         description: "Failed to update task status",
         variant: "destructive",
       });
-      setTasks(previousTasks);
     }
   };
 
@@ -113,7 +96,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
           </h3>
           <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded-lg min-h-[200px]">
             <div className="space-y-2 p-1 overflow-y-auto max-h-[420px] md:max-h-[600px] lg:max-h-[800px]">
-              {tasks
+              {initialTasks
                 .filter((task) => task.status === status)
                 .map((task) => (
                   <SwipeableTaskCard
@@ -122,7 +105,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     workspace={
                       workspaces.find((w) => w.id === task.workspaceId)!
                     }
-                    onUpdateStatus={handleStatusUpdate}
+                    onUpdateStatus={(taskId, newStatus) =>
+                      onUpdateStatus(taskId, newStatus)
+                    }
                     onEdit={() => onEditTask(task)}
                     onQuickMove={() => handleQuickMoveToNext(task)}
                     onQuickMoveBack={() => handleQuickMoveToPrevious(task)}

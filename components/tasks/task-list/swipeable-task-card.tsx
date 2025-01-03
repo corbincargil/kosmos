@@ -94,7 +94,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
       setIsRightSwiped(false);
 
       // Trigger the status update
-      onUpdateStatus(task.id!, newStatus);
+      onUpdateStatus(task.id, newStatus);
     }
   };
 
@@ -184,7 +184,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
       setIsLeftSwiped(false);
 
       // Trigger the status update
-      onUpdateStatus(task.id!, newStatus);
+      onUpdateStatus(task.id, newStatus);
     }
   };
 

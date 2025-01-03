@@ -7,7 +7,7 @@ export const WorkspaceSchema = z.object({
   color: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  ownerId: z.number().int().positive(),
+  userId: z.number().int().positive(),
 });
 
 export type Workspace = z.infer<typeof WorkspaceSchema>;

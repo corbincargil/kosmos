@@ -11,6 +11,7 @@ import {
   Trash2,
   Warehouse,
 } from "lucide-react";
+import { useWorkspace } from "@/contexts/workspace-context";
 
 type TaskFormProps = {
   onSubmit: (
@@ -31,7 +32,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   onCancel,
   userId,
   workspaceId,
-  workspaces,
   task,
   onDelete,
   isEditing = false,
@@ -46,6 +46,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     workspaceId: workspaceId || "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { workspaces } = useWorkspace();
   const formRef = React.useRef<HTMLFormElement>(null);
 
   const handleKeyDown = (e: KeyboardEvent) => {
