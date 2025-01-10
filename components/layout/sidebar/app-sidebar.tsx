@@ -16,6 +16,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useWorkspace } from "@/contexts/workspace-context";
 import {
@@ -71,14 +72,22 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 export function AppSidebar() {
+  const [mounted, setMounted] = useState(false);
+
   const { workspaces, selectedWorkspace, setSelectedWorkspace } =
     useWorkspace();
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
+  const { setOpenMobile } = useSidebar();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleNavigation = () => {
+    if (window.innerWidth < 768) {
+      setOpenMobile(false);
+    }
+  };
 
   if (!mounted) {
     return (
@@ -97,6 +106,7 @@ export function AppSidebar() {
                   ? "border-b border-b-white text-white"
                   : ""
               }
+              onClick={handleNavigation}
             >
               <Link href={dashboardLink.href} className="rounded-none">
                 <dashboardLink.icon size={20} />
@@ -117,6 +127,7 @@ export function AppSidebar() {
                           ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
                           : ""
                       }
+                      onClick={handleNavigation}
                     >
                       <Link
                         href={`${item.href}?workspace=${selectedWorkspace}`}
@@ -144,6 +155,7 @@ export function AppSidebar() {
                           ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
                           : ""
                       }
+                      onClick={handleNavigation}
                     >
                       <Link
                         href={`${item.href}?workspace=${selectedWorkspace}`}
@@ -250,6 +262,7 @@ export function AppSidebar() {
                 ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
                 : ""
             }
+            onClick={handleNavigation}
           >
             <Link
               href={`${dashboardLink.href}?workspace=${selectedWorkspace}`}
@@ -273,6 +286,7 @@ export function AppSidebar() {
                         ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
                         : ""
                     }
+                    onClick={handleNavigation}
                   >
                     <Link
                       href={`${item.href}?workspace=${selectedWorkspace}`}
@@ -300,6 +314,7 @@ export function AppSidebar() {
                         ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
                         : ""
                     }
+                    onClick={handleNavigation}
                   >
                     <Link
                       href={`${item.href}?workspace=${selectedWorkspace}`}
