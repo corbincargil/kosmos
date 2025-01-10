@@ -3,25 +3,35 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { TaskSchema, TaskStatus } from "@/types/task";
 
 export const taskRouter = createTRPCRouter({
-  getCurrentWorkspaceTasks: protectedProcedure
+  getTasks: protectedProcedure
     .input(
       z.object({
         workspaceId: z.string(),
       })
     )
     .query(async ({ ctx, input }) => {
+      if (input.workspaceId === "all") {
+        return ctx.db.task.findMany({
+          where: {
+            userId: Number(ctx.userId),
+          },
+          orderBy: [
+            { priority: { sort: "desc", nulls: "last" } },
+            { createdAt: "desc" },
+          ],
+        });
+      }
       return ctx.db.task.findMany({
         where: {
           userId: Number(ctx.userId),
           workspaceId: Number(input.workspaceId),
         },
+        orderBy: [
+          { priority: { sort: "desc", nulls: "last" } },
+          { createdAt: "desc" },
+        ],
       });
     }),
-  getCurrentUserTasks: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.task.findMany({
-      where: { userId: Number(ctx.userId) },
-    });
-  }),
   createTask: protectedProcedure
     .input(TaskSchema.omit({ id: true, createdAt: true, updatedAt: true }))
     .mutation(async ({ ctx, input }) => {

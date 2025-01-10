@@ -23,18 +23,10 @@ import { useTheme } from "@/components/theme-manager";
 import { useUser } from "@clerk/nextjs";
 import { api } from "@/trpc/react";
 
-interface TaskViewProps {
-  tasks: Task[];
-  onTasksChanged: () => void | Promise<void>;
-}
-
-export const TaskView: React.FC<TaskViewProps> = ({
-  tasks,
-  onTasksChanged,
-}) => {
+export const TaskView: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const defaultView = (searchParams.get("view") as "list" | "board") || "list";
+  const defaultView = (searchParams.get("view") as "list" | "board") || "board";
   const [viewMode, setViewMode] = useState<"list" | "board">(defaultView);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -46,10 +38,12 @@ export const TaskView: React.FC<TaskViewProps> = ({
   const { workspaces } = useWorkspace();
   const { user } = useUser();
 
-  const filteredTasks = tasks.filter((task) => {
-    if (selectedWorkspace !== "all") return true;
-    if (showAll) return true;
-    return activeFilters.has(task.workspaceId);
+  const {
+    data: tasks,
+    isLoading: tasksLoading,
+    refetch: refetchTasks,
+  } = api.tasks.getTasks.useQuery({
+    workspaceId: selectedWorkspace,
   });
 
   const toggleFilter = (workspaceId: number) => {
@@ -72,7 +66,7 @@ export const TaskView: React.FC<TaskViewProps> = ({
 
   const addTaskMutation = api.tasks.createTask.useMutation({
     onSuccess: async () => {
-      await onTasksChanged();
+      await refetchTasks();
       setIsDialogOpen(false);
       toast({
         title: "Success",
@@ -91,7 +85,7 @@ export const TaskView: React.FC<TaskViewProps> = ({
 
   const updateTaskMutation = api.tasks.updateTask.useMutation({
     onSuccess: async () => {
-      await onTasksChanged();
+      await refetchTasks();
       setEditingTask(null);
       toast({
         title: "Success",
@@ -110,7 +104,7 @@ export const TaskView: React.FC<TaskViewProps> = ({
 
   const updateStatusMutation = api.tasks.updateTaskStatus.useMutation({
     onSuccess: async () => {
-      await onTasksChanged();
+      await refetchTasks();
       toast({
         title: "Success",
         description: "Task status updated successfully",
@@ -128,7 +122,7 @@ export const TaskView: React.FC<TaskViewProps> = ({
 
   const deleteTaskMutation = api.tasks.deleteTask.useMutation({
     onSuccess: async () => {
-      await onTasksChanged();
+      await refetchTasks();
       setEditingTask(null);
       toast({
         title: "Success",
@@ -151,6 +145,10 @@ export const TaskView: React.FC<TaskViewProps> = ({
     router.push(`?${params.toString()}`);
     setViewMode(newView);
   };
+
+  if (tasksLoading) return <p>Loading tasks...</p>;
+
+  if (!tasks) return <p>No tasks found</p>;
 
   return (
     <div>
@@ -222,10 +220,9 @@ export const TaskView: React.FC<TaskViewProps> = ({
           </DialogContent>
         </Dialog>
       </div>
-      {filteredTasks.length === 0 && <p>You have no tasks yet.</p>}
-      {filteredTasks.length > 0 && viewMode === "list" && (
+      {tasks.length > 0 && viewMode === "list" && (
         <TaskAccordion
-          tasks={filteredTasks}
+          tasks={tasks}
           workspaces={workspaces}
           userId={user?.publicMetadata.dbUserId as number}
           onUpdateStatus={async (taskId, newStatus) =>
@@ -237,9 +234,9 @@ export const TaskView: React.FC<TaskViewProps> = ({
           }}
         />
       )}
-      {filteredTasks.length > 0 && viewMode === "board" && (
+      {tasks.length > 0 && viewMode === "board" && (
         <KanbanBoard
-          tasks={filteredTasks}
+          tasks={tasks}
           workspaces={workspaces}
           userId={user?.publicMetadata.dbUserId as number}
           onUpdateStatus={async (taskId, newStatus) =>
