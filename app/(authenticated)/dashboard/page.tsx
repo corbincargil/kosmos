@@ -21,13 +21,8 @@ export default function Dashboard() {
   const { user } = useUser();
   const { selectedWorkspace, workspaces } = useWorkspace();
 
-  const tasksQuery = api.tasks.getCurrentWorkspaceTasks.useQuery(
-    { workspaceId: selectedWorkspace },
-    { enabled: selectedWorkspace !== "all" && !!selectedWorkspace }
-  );
-
-  const userTasksQuery = api.tasks.getCurrentUserTasks.useQuery(undefined, {
-    enabled: selectedWorkspace === "all",
+  const { data: tasks, refetch: refetchTasks } = api.tasks.getTasks.useQuery({
+    workspaceId: selectedWorkspace,
   });
 
   const notesQuery = api.notes.getCurrentWorkspaceNotes.useQuery(
@@ -38,11 +33,6 @@ export default function Dashboard() {
   const userNotesQuery = api.notes.getCurrentUserNotes.useQuery(undefined, {
     enabled: selectedWorkspace === "all",
   });
-
-  const tasks =
-    selectedWorkspace === "all"
-      ? userTasksQuery.data ?? []
-      : tasksQuery.data ?? [];
 
   const notes =
     selectedWorkspace === "all"
@@ -73,13 +63,12 @@ export default function Dashboard() {
               </Link>
             </CardHeader>
             <CardContent>
-              {tasks.length ? (
+              {tasks?.length ? (
                 <TaskPreview
                   tasks={sortTasks(tasks.slice(0, 5))}
                   workspaces={workspaces}
                   onTasksChanged={async () => {
-                    tasksQuery.refetch();
-                    userTasksQuery.refetch();
+                    refetchTasks();
                   }}
                 />
               ) : (
