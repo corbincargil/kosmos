@@ -118,7 +118,10 @@ export function AppSidebar() {
                           : ""
                       }
                     >
-                      <Link href={item.href} className="rounded-none">
+                      <Link
+                        href={`${item.href}?workspace=${selectedWorkspace}`}
+                        className="rounded-none"
+                      >
                         <item.icon size={20} />
                         <span>{item.label}</span>
                       </Link>
@@ -142,7 +145,10 @@ export function AppSidebar() {
                           : ""
                       }
                     >
-                      <Link href={item.href} className="rounded-none">
+                      <Link
+                        href={`${item.href}?workspace=${selectedWorkspace}`}
+                        className="rounded-none"
+                      >
                         <item.icon size={20} />
                         <span>{item.label}</span>
                       </Link>
@@ -240,12 +246,15 @@ export function AppSidebar() {
           <SidebarMenuButton
             asChild
             className={
-              pathname === dashboardLink.href
-                ? "border-b border-b-white text-white"
+              pathname.includes(dashboardLink.href)
+                ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
                 : ""
             }
           >
-            <Link href={dashboardLink.href} className="rounded-none">
+            <Link
+              href={`${dashboardLink.href}?workspace=${selectedWorkspace}`}
+              className="rounded-none"
+            >
               <dashboardLink.icon size={20} />
               <span>{dashboardLink.label}</span>
             </Link>
@@ -260,12 +269,15 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     className={
-                      pathname === item.href
+                      pathname.includes(item.href)
                         ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
                         : ""
                     }
                   >
-                    <Link href={item.href} className="rounded-none">
+                    <Link
+                      href={`${item.href}?workspace=${selectedWorkspace}`}
+                      className="rounded-none"
+                    >
                       <item.icon size={20} />
                       <span>{item.label}</span>
                     </Link>
@@ -284,12 +296,15 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     className={
-                      pathname === item.href
+                      pathname.includes(item.href)
                         ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
                         : ""
                     }
                   >
-                    <Link href={item.href} className="rounded-none">
+                    <Link
+                      href={`${item.href}?workspace=${selectedWorkspace}`}
+                      className="rounded-none"
+                    >
                       <item.icon size={20} />
                       <span>{item.label}</span>
                     </Link>

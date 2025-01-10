@@ -15,18 +15,18 @@ export const TaskViewToggle: React.FC<TaskViewToggleProps> = ({
     <div className="flex justify-end">
       <div className="flex gap-2">
         <Button
-          variant={viewMode === "list" ? "default" : "outline"}
-          size="sm"
-          onClick={() => onToggle("list")}
-        >
-          <List className="h-4 w-4" />
-        </Button>
-        <Button
           variant={viewMode === "board" ? "default" : "outline"}
           size="sm"
           onClick={() => onToggle("board")}
         >
           <LayoutGrid className="h-4 w-4" />
+        </Button>
+        <Button
+          variant={viewMode === "list" ? "default" : "outline"}
+          size="sm"
+          onClick={() => onToggle("list")}
+        >
+          <List className="h-4 w-4" />
         </Button>
       </div>
     </div>
