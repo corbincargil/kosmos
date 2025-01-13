@@ -35,7 +35,7 @@ export function TaskPreview({
         <SwipeableTaskCard
           key={task.id}
           task={task}
-          workspace={workspaces.find((w) => w.id === task.workspaceId)!}
+          workspace={workspaces.find((w) => w.uuid === task.workspaceUuid)!}
           onUpdateStatus={handleUpdateStatus}
           onEdit={() => {}}
           showStatus={true}

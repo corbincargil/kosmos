@@ -152,7 +152,7 @@ export function NoteModal({ note, isOpen, onClose, onSave }: NoteModalProps) {
               createNoteMutation({
                 title,
                 content,
-                workspaceId: Number(selectedWorkspace),
+                workspaceUuid: selectedWorkspace,
                 userId: Number(user?.publicMetadata.dbUserId),
               });
             }}

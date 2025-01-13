@@ -1,4 +1,4 @@
-import * as userService from "@/services/user-service";
+import * as userService from "@/old-api-routes/services/user-service";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs/server";

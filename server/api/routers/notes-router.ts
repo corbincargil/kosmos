@@ -13,7 +13,7 @@ export const noteRouter = createTRPCRouter({
       return ctx.db.note.findMany({
         where: {
           userId: Number(ctx.userId),
-          workspaceId: Number(input.workspaceId),
+          workspaceUuid: input.workspaceId,
         },
       });
     }),
@@ -37,10 +37,13 @@ export const noteRouter = createTRPCRouter({
         uuid: true,
         createdAt: true,
         updatedAt: true,
+        workspaceId: true,
       })
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.note.create({ data: input });
+      return ctx.db.note.create({
+        data: { ...input },
+      });
     }),
 
   updateNote: protectedProcedure

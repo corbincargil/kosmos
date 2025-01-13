@@ -11,7 +11,7 @@ export const TaskSchema = z.object({
   status: z.enum(["TODO", "IN_PROGRESS", "COMPLETED"]).default("TODO"),
   priority: z.enum(["LOW", "MEDIUM", "HIGH"]).nullable(),
   userId: z.number().int().positive(),
-  workspaceId: z.number().int().positive(),
+  workspaceUuid: z.string().uuid(),
   createdAt: z
     .union([z.date(), z.string()])
     .optional()

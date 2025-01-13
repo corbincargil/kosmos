@@ -26,14 +26,14 @@ export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
     dueDate: "",
     status: initialStatus,
     priority: "" as TaskPriority | "",
-    workspaceId: selectedWorkspace === "all" ? "" : selectedWorkspace,
+    workspaceUuid: selectedWorkspace === "all" ? "" : selectedWorkspace,
   });
 
   useEffect(() => {
     setFormData((prevData) => ({
       ...prevData,
       status: initialStatus,
-      workspaceId: selectedWorkspace === "all" ? "" : selectedWorkspace,
+      workspaceUuid: selectedWorkspace === "all" ? "" : selectedWorkspace,
     }));
   }, [initialStatus, selectedWorkspace]);
 
@@ -56,12 +56,12 @@ export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
         ...formData,
         userId,
         priority: formData.priority || null,
-        workspaceId: Number(formData.workspaceId),
+        workspaceUuid: selectedWorkspace,
         dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
       };
       await onSubmit(taskData);
     },
-    [onSubmit, formData, userId]
+    [onSubmit, formData, userId, selectedWorkspace]
   );
 
   const handleKeyDown = useCallback(
@@ -126,8 +126,8 @@ export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
           />
           {selectedWorkspace === "all" && (
             <select
-              name="workspaceId"
-              value={formData.workspaceId}
+              name="workspaceUuid"
+              value={formData.workspaceUuid}
               onChange={handleChange}
               required
               className="text-xs font-medium focus:outline-none bg-transparent dark:text-gray-300"

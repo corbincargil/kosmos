@@ -17,7 +17,7 @@ interface WorkspaceContextType {
   workspaces: Workspace[];
   selectedWorkspace: string;
   selectedWorkspaceColor: string;
-  setSelectedWorkspace: (id: string) => void;
+  setSelectedWorkspace: (uuid: string) => void;
   refreshWorkspaces: () => Promise<void>;
 }
 
@@ -50,7 +50,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         ? theme === "dark"
           ? "#FFFFFF"
           : "#000000"
-        : workspaces?.find((w) => w.id.toString() === selectedWorkspace)
+        : workspaces?.find((w) => w.uuid.toString() === selectedWorkspace)
             ?.color ?? (theme === "dark" ? "#FFFFFF" : "#000000");
 
     setSelectedWorkspaceColor(newColor);

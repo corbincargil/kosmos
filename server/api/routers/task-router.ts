@@ -24,7 +24,7 @@ export const taskRouter = createTRPCRouter({
       return ctx.db.task.findMany({
         where: {
           userId: Number(ctx.userId),
-          workspaceId: Number(input.workspaceId),
+          workspaceUuid: input.workspaceId,
         },
         orderBy: [
           { priority: { sort: "desc", nulls: "last" } },
@@ -33,9 +33,17 @@ export const taskRouter = createTRPCRouter({
       });
     }),
   createTask: protectedProcedure
-    .input(TaskSchema.omit({ id: true, createdAt: true, updatedAt: true }))
+    .input(
+      TaskSchema.omit({
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+      })
+    )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.task.create({ data: input });
+      return ctx.db.task.create({
+        data: { ...input },
+      });
     }),
   updateTask: protectedProcedure
     .input(TaskSchema.omit({ createdAt: true, updatedAt: true }))

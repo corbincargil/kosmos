@@ -6,7 +6,8 @@ export const NoteSchema = z.object({
   title: z.string().max(100),
   content: z.string(),
   userId: z.number().int().positive(),
-  workspaceId: z.number().int().positive(),
+  workspaceId: z.number().int().positive().nullable(),
+  workspaceUuid: z.string().uuid(),
   createdAt: z.union([z.date(), z.string()]).transform((val) => new Date(val)),
   updatedAt: z.union([z.date(), z.string()]).transform((val) => new Date(val)),
 });

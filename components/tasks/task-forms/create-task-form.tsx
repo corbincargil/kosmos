@@ -19,7 +19,7 @@ type TaskFormProps = {
   ) => Promise<void>;
   onCancel?: () => void;
   userId: number;
-  workspaceId?: number;
+  workspaceUuid: string;
   workspaces: Workspace[];
   task?: Task;
   onDelete?: () => void;
@@ -31,7 +31,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   onSubmit,
   onCancel,
   userId,
-  workspaceId,
+  workspaceUuid,
   task,
   onDelete,
   isEditing = false,
@@ -43,7 +43,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     dueDate: "",
     status: initialStatus || ("TODO" as TaskStatus),
     priority: "" as TaskPriority | "",
-    workspaceId: workspaceId || "",
+    workspaceUuid: workspaceUuid || "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { workspaces } = useWorkspace();
@@ -80,7 +80,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           : "",
         status: task.status,
         priority: task.priority || "",
-        workspaceId: task.workspaceId.toString(),
+        workspaceUuid: task.workspaceUuid,
       });
     }
   }, [task, isEditing]);
@@ -102,16 +102,16 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     if (isSubmitting) return;
 
     setIsSubmitting(true);
-    const taskData: Omit<Task, "id" | "createdAt" | "updatedAt"> = {
-      ...formData,
-      userId,
-      priority: formData.priority || null,
-      workspaceId: Number(formData.workspaceId),
-      dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
-    };
+    const workspace = workspaces.find((w) => w.uuid === formData.workspaceUuid);
 
     try {
-      await onSubmit(taskData);
+      await onSubmit({
+        ...formData,
+        userId,
+        priority: formData.priority || null,
+        dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
+        workspaceUuid: workspace?.uuid || "",
+      });
     } catch (error) {
       console.error("Error submitting task:", error);
     } finally {
@@ -173,7 +173,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         </div>
 
         <div className="md:w-1/3 space-y-4 bg-gray-100 dark:bg-gray-700 p-1 rounded-md">
-          {!workspaceId || isEditing ? (
+          {!workspaceUuid || isEditing ? (
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <Warehouse
@@ -190,7 +190,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               <select
                 id="workspaceId"
                 name="workspaceId"
-                value={formData.workspaceId}
+                value={formData.workspaceUuid}
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"

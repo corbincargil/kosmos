@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { TaskService } from "../services/task-service";
-import { TaskSchema } from "../types/task";
+import { TaskSchema } from "../../types/task";
 
 export const TaskController = {
   getTasksByWorkspaceId: async (req: NextRequest) => {
@@ -73,7 +73,8 @@ export const TaskController = {
       const task = await TaskService.createTask(
         validatedData.title,
         validatedData.userId,
-        validatedData.workspaceId,
+        // @ts-ignore
+        validatedData.workspaceUuid,
         validatedData.description ?? undefined,
         validatedData.dueDate,
         validatedData.status,
@@ -105,6 +106,7 @@ export const TaskController = {
         validatedData.dueDate,
         validatedData.status,
         validatedData.priority,
+        // @ts-ignore
         validatedData.workspaceId
       );
       return NextResponse.json(task);

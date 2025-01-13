@@ -132,6 +132,7 @@ export default function NoteDetails({ noteData }: NoteDetailsProps) {
                 id: noteData.id,
                 title,
                 content,
+                workspaceUuid: noteData.workspaceUuid,
               })
             }
             disabled={isPending}

@@ -9,6 +9,7 @@ datasource db {
 
 model User {
   id          Int         @id @default(autoincrement())
+  uuid        String      @unique @default(uuid())
   email       String      @unique
   clerkUserId String      @unique
   workspaces  Workspace[]
@@ -20,6 +21,7 @@ model User {
 
 model Workspace {
   id        Int      @id @default(autoincrement())
+  uuid      String   @unique @default(uuid())
   name      String   @db.VarChar(50)
   color     String   @default("#3B82F6")
   icon      String   @default("Croissant")
@@ -32,31 +34,34 @@ model Workspace {
 }
 
 model Task {
-  id          Int           @id @default(autoincrement())
-  title       String        @db.VarChar(100)
-  userId      Int
-  user        User          @relation(fields: [userId], references: [id])
-  workspace   Workspace     @relation(fields: [workspaceId], references: [id])
-  workspaceId Int
-  description String?
-  dueDate     DateTime?
-  status      TaskStatus    @default(TODO)
-  priority    TaskPriority?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id            Int           @id @default(autoincrement())
+  uuid          String        @unique @default(uuid())
+  title         String        @db.VarChar(100)
+  userId        Int
+  user          User          @relation(fields: [userId], references: [id])
+  workspace     Workspace     @relation(fields: [workspaceUuid], references: [uuid])
+  workspaceId   Int?
+  workspaceUuid String
+  description   String?
+  dueDate       DateTime?
+  status        TaskStatus    @default(TODO)
+  priority      TaskPriority?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
 model Note {
-  id          Int       @id @default(autoincrement())
-  uuid        String    @unique @default(uuid())
-  title       String    @db.VarChar(100)
-  content     String    @db.Text
-  userId      Int
-  user        User      @relation(fields: [userId], references: [id])
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-  workspaceId Int
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+  title         String    @db.VarChar(100)
+  content       String    @db.Text
+  userId        Int
+  user          User      @relation(fields: [userId], references: [id])
+  workspace     Workspace @relation(fields: [workspaceUuid], references: [uuid])
+  workspaceId   Int?
+  workspaceUuid String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 enum TaskStatus {

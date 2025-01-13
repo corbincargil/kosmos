@@ -212,9 +212,15 @@ export const TaskView: React.FC = () => {
             <DialogDescription></DialogDescription>
             <div className="max-h-[80vh] overflow-y-auto">
               <TaskForm
-                onSubmit={async (data) => addTaskMutation.mutate(data)}
+                onSubmit={async (data) =>
+                  addTaskMutation.mutate({
+                    ...data,
+                    workspaceUuid: selectedWorkspace,
+                  })
+                }
                 userId={user?.publicMetadata.dbUserId as number}
                 workspaces={workspaces}
+                workspaceUuid={selectedWorkspace}
               />
             </div>
           </DialogContent>
@@ -230,7 +236,10 @@ export const TaskView: React.FC = () => {
           }
           onEdit={setEditingTask}
           onAddTask={async (data) => {
-            await addTaskMutation.mutateAsync(data);
+            await addTaskMutation.mutateAsync({
+              ...data,
+              workspaceUuid: selectedWorkspace,
+            });
           }}
         />
       )}
@@ -244,7 +253,10 @@ export const TaskView: React.FC = () => {
           }
           onEditTask={setEditingTask}
           onAddTask={async (data) => {
-            await addTaskMutation.mutateAsync(data);
+            await addTaskMutation.mutateAsync({
+              ...data,
+              workspaceUuid: selectedWorkspace,
+            });
           }}
         />
       )}

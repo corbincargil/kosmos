@@ -103,7 +103,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     key={task.id}
                     task={task}
                     workspace={
-                      workspaces.find((w) => w.id === task.workspaceId)!
+                      workspaces.find((w) => w.uuid === task.workspaceUuid)!
                     }
                     onUpdateStatus={(taskId, newStatus) =>
                       onUpdateStatus(taskId, newStatus)

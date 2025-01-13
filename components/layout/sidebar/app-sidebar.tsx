@@ -234,8 +234,8 @@ export function AppSidebar() {
                 : Croissant;
               return (
                 <SelectItem
-                  key={workspace.id}
-                  value={workspace.id.toString()}
+                  key={workspace.uuid}
+                  value={workspace.uuid.toString()}
                   className="text-workspace-darker"
                   style={{ color: workspace.color }}
                 >
