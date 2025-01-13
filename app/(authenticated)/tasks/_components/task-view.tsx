@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Task } from "@/types/task";
-import { KanbanBoard } from "./task-board/kanban-board";
+import { KanbanBoard } from "../../tasks/_components/task-board/kanban-board";
 import { TaskViewToggle } from "./task-view-toggle";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -14,8 +14,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { TaskForm } from "./task-forms/create-task-form";
-import { EditTaskModal } from "./task-forms/edit-task-modal";
+import { TaskForm } from "../../tasks/_components/task-forms/create-task-form";
+import { EditTaskModal } from "../../tasks/_components/task-forms/edit-task-modal";
 import { TaskAccordion } from "./task-list/task-accordion";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useWorkspace } from "@/contexts/workspace-context";

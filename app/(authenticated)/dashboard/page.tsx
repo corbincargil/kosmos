@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/card";
 import { useWorkspace } from "@/contexts/workspace-context";
 import Link from "next/link";
-import { sortTasks } from "@/components/tasks/task-list/utils";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { TaskPreview } from "@/app/(authenticated)/dashboard/_components/task-preview";
@@ -65,7 +64,7 @@ export default function Dashboard() {
             <CardContent>
               {tasks?.length ? (
                 <TaskPreview
-                  tasks={sortTasks(tasks.slice(0, 5))}
+                  tasks={tasks.slice(0, 5)}
                   workspaces={workspaces}
                   onTasksChanged={async () => {
                     refetchTasks();

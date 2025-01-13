@@ -3,11 +3,11 @@
 import React, { useState } from "react";
 import { Task, TaskStatus } from "@/types/task";
 import { Workspace } from "@/types/workspace";
-import { SwipeableTaskCard } from "../task-list/swipeable-task-card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { InlineTaskForm } from "../task-forms/inline-task-form";
 import { toast } from "@/hooks/use-toast";
+import { SwipeableTaskCard } from "./swipeable-task-card";
 
 interface KanbanBoardProps {
   tasks: Task[];

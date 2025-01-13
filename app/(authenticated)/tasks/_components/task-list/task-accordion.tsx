@@ -6,14 +6,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Task, TaskStatus } from "@/types/task";
-import { SwipeableTaskCard } from "./swipeable-task-card";
-import { sortStatuses } from "./utils";
+import { sortStatuses } from "@/app/(authenticated)/tasks/_components/task-list/utils";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import styles from "./task-accordion.module.css";
 import { ALL_STATUSES } from "@/types/task";
 import { Workspace } from "@/types/workspace";
-import { InlineTaskForm } from "../task-forms/inline-task-form";
+import { InlineTaskForm } from "../../../tasks/_components/task-forms/inline-task-form";
+import { SwipeableTaskCard } from "../task-board/swipeable-task-card";
 
 type TaskAccordionProps = {
   tasks: Task[];
