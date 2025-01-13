@@ -181,15 +181,15 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                   className="text-gray-600 dark:text-gray-400"
                 />
                 <label
-                  htmlFor="workspaceId"
+                  htmlFor="workspaceUuid"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   Workspace
                 </label>
               </div>
               <select
-                id="workspaceId"
-                name="workspaceId"
+                id="workspaceUuid"
+                name="workspaceUuid"
                 value={formData.workspaceUuid}
                 onChange={handleChange}
                 required
@@ -197,7 +197,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               >
                 <option value="">Select a workspace</option>
                 {workspaces.map((workspace) => (
-                  <option key={workspace.id} value={workspace.id}>
+                  <option key={workspace.uuid} value={workspace.uuid}>
                     {workspace.name}
                   </option>
                 ))}

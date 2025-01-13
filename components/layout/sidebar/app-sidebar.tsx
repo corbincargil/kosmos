@@ -212,8 +212,7 @@ export function AppSidebar() {
                 {selectedWorkspace === "all"
                   ? "All"
                   : workspaces.find(
-                      (workspace) =>
-                        workspace.id.toString() === selectedWorkspace
+                      (workspace) => workspace.uuid === selectedWorkspace
                     )?.name}
               </span>
             </SelectValue>
