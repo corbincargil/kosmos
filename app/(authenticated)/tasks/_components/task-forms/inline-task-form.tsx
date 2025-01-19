@@ -3,18 +3,16 @@ import { Task, TaskPriority, TaskStatus } from "@/types/task";
 import { X, Check } from "lucide-react";
 import { useWorkspace } from "@/contexts/workspace-context";
 import { Button } from "@/components/ui/button";
+import { api } from "@/trpc/react";
+import { toast } from "@/hooks/use-toast";
 
 type InlineTaskFormProps = {
-  onSubmit: (
-    data: Omit<Task, "id" | "createdAt" | "updatedAt">
-  ) => Promise<void>;
   onCancel: () => void;
   userId: number;
   initialStatus: TaskStatus;
 };
 
 export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
-  onSubmit,
   onCancel,
   userId,
   initialStatus,
@@ -27,6 +25,27 @@ export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
     status: initialStatus,
     priority: "" as TaskPriority | "",
     workspaceUuid: selectedWorkspace === "all" ? "" : selectedWorkspace,
+  });
+
+  const utils = api.useUtils();
+
+  const createTaskMutation = api.tasks.createTask.useMutation({
+    onSuccess: () => {
+      onCancel();
+      utils.tasks.invalidate();
+      toast({
+        variant: "success",
+        title: "Success",
+        description: "Task created successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    },
   });
 
   useEffect(() => {
@@ -52,16 +71,16 @@ export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      const taskData: Omit<Task, "id" | "createdAt" | "updatedAt"> = {
+      const taskData: Omit<Task, "id" | "createdAt" | "updatedAt" | "uuid"> = {
         ...formData,
         userId,
         priority: formData.priority || null,
         workspaceUuid: selectedWorkspace,
         dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
       };
-      await onSubmit(taskData);
+      createTaskMutation.mutate(taskData);
     },
-    [onSubmit, formData, userId, selectedWorkspace]
+    [createTaskMutation, formData, userId, selectedWorkspace]
   );
 
   const handleKeyDown = useCallback(

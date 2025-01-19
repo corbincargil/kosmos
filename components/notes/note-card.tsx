@@ -48,7 +48,7 @@ export function NoteCard({ note, className }: NoteCardProps) {
           Last updated {dayjs(note.updatedAt).fromNow()}
         </CardDescription>
       </CardHeader>
-      <Link href={`/notes/${note.uuid}`} className={className}>
+      <Link href={`/notes/edit/${note.uuid}`} className={className}>
         <CardContent className="p-2 md:p-4 lg:p-6 flex-1 overflow-hidden">
           <div className="prose dark:prose-invert prose-sm max-w-none [&>*]:break-words">
             <ReactMarkdown

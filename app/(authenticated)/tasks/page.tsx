@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { TaskView } from "@/app/(authenticated)/tasks/_components/task-view";
+import { TaskView } from "@/app/(authenticated)/tasks/_components/task-view/";
 
 export default function TasksPage() {
   return (

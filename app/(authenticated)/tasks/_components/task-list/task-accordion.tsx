@@ -20,9 +20,6 @@ type TaskAccordionProps = {
   workspaces: Workspace[];
   onUpdateStatus: (taskId: number, newStatus: TaskStatus) => void;
   onEdit: (task: Task) => void;
-  onAddTask: (
-    task: Omit<Task, "id" | "createdAt" | "updatedAt">
-  ) => Promise<void>;
   userId: number;
 };
 
@@ -31,7 +28,6 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
   workspaces,
   onUpdateStatus,
   onEdit,
-  onAddTask,
   userId,
 }) => {
   const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus | null>(null);
@@ -56,13 +52,6 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
   };
 
   const handleCancelNewTask = () => {
-    setNewTaskStatus(null);
-  };
-
-  const handleSubmitNewTask = async (
-    taskData: Omit<Task, "id" | "createdAt" | "updatedAt">
-  ) => {
-    await onAddTask(taskData);
     setNewTaskStatus(null);
   };
 
@@ -119,7 +108,6 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
                 {newTaskStatus === status && (
                   <div ref={newTaskFormRef} className="px-2">
                     <InlineTaskForm
-                      onSubmit={handleSubmitNewTask}
                       onCancel={handleCancelNewTask}
                       userId={userId}
                       initialStatus={status as TaskStatus}

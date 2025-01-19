@@ -1,5 +1,6 @@
+"use client";
+
 import { Task, TaskPriority, TaskStatus } from "@/types/task";
-import { Workspace } from "@/types/workspace";
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,42 +13,87 @@ import {
   Warehouse,
 } from "lucide-react";
 import { useWorkspace } from "@/contexts/workspace-context";
+import { TaskConfirmDeleteModal } from "./task-confirm-delete-modal";
+import { useRouter } from "next/navigation";
+import { api } from "@/trpc/react";
+import { toast } from "@/hooks/use-toast";
 
 type TaskFormProps = {
-  onSubmit: (
-    data: Omit<Task, "id" | "createdAt" | "updatedAt">
-  ) => Promise<void>;
+  taskId?: string;
   onCancel?: () => void;
-  userId: number;
-  workspaceUuid: string;
-  workspaces: Workspace[];
-  task?: Task;
-  onDelete?: () => void;
-  isEditing?: boolean;
-  initialStatus?: TaskStatus;
 };
 
-export const TaskForm: React.FC<TaskFormProps> = ({
-  onSubmit,
-  onCancel,
-  userId,
-  workspaceUuid,
-  task,
-  onDelete,
-  isEditing = false,
-  initialStatus,
-}) => {
+export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
+  const { workspaces, selectedWorkspace } = useWorkspace();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     dueDate: "",
-    status: initialStatus || ("TODO" as TaskStatus),
+    status: "TODO" as TaskStatus,
     priority: "" as TaskPriority | "",
-    workspaceUuid: workspaceUuid || "",
+    workspaceUuid: selectedWorkspace,
   });
+  const [task, setTask] = useState<Task | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { workspaces } = useWorkspace();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const formRef = React.useRef<HTMLFormElement>(null);
+  const router = useRouter();
+
+  const utils = api.useUtils();
+
+  const { data: taskData } = api.tasks.getTaskByUuid.useQuery(
+    { uuid: taskId || "" },
+    { enabled: !!taskId }
+  );
+
+  const updateTaskMutation = api.tasks.updateTask.useMutation({
+    onSuccess: async () => {
+      toast({
+        title: "Success",
+        description: "Task updated successfully",
+        variant: "success",
+      });
+      utils.tasks.invalidate();
+      router.back();
+    },
+    onError: (error) => {
+      console.log("Error updating task:", error);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+    onSettled: () => {
+      setIsSubmitting(false);
+    },
+  });
+
+  const createTaskMutation = api.tasks.createTask.useMutation({
+    onSuccess: async () => {
+      toast({
+        title: "Success",
+        description: "Task created successfully",
+        variant: "success",
+      });
+      utils.tasks.invalidate();
+      router.back();
+    },
+    onError: (error) => {
+      console.log("Error creating task:", error);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  useEffect(() => {
+    if (taskData) {
+      setTask(taskData);
+    }
+  }, [taskData]);
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
@@ -71,7 +117,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   }, []);
 
   useEffect(() => {
-    if (task && isEditing) {
+    if (task) {
       setFormData({
         title: task.title,
         description: task.description || "",
@@ -83,7 +129,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         workspaceUuid: task.workspaceUuid,
       });
     }
-  }, [task, isEditing]);
+  }, [task]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -101,21 +147,22 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     e.preventDefault();
     if (isSubmitting) return;
 
-    setIsSubmitting(true);
-    const workspace = workspaces.find((w) => w.uuid === formData.workspaceUuid);
-
-    try {
-      await onSubmit({
+    if (task) {
+      updateTaskMutation.mutate({
         ...formData,
-        userId,
+        id: task?.id,
+        uuid: task?.uuid,
         priority: formData.priority || null,
         dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
-        workspaceUuid: workspace?.uuid || "",
+        workspaceUuid: formData.workspaceUuid,
       });
-    } catch (error) {
-      console.error("Error submitting task:", error);
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      createTaskMutation.mutate({
+        ...formData,
+        priority: formData.priority || null,
+        dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
+        workspaceUuid: formData.workspaceUuid,
+      });
     }
   };
 
@@ -173,37 +220,35 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         </div>
 
         <div className="md:w-1/3 space-y-4 bg-gray-100 dark:bg-gray-700 p-1 rounded-md">
-          {!workspaceUuid || isEditing ? (
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Warehouse
-                  size={16}
-                  className="text-gray-600 dark:text-gray-400"
-                />
-                <label
-                  htmlFor="workspaceUuid"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Workspace
-                </label>
-              </div>
-              <select
-                id="workspaceUuid"
-                name="workspaceUuid"
-                value={formData.workspaceUuid}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Warehouse
+                size={16}
+                className="text-gray-600 dark:text-gray-400"
+              />
+              <label
+                htmlFor="workspaceUuid"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                <option value="">Select a workspace</option>
-                {workspaces.map((workspace) => (
-                  <option key={workspace.uuid} value={workspace.uuid}>
-                    {workspace.name}
-                  </option>
-                ))}
-              </select>
+                Workspace
+              </label>
             </div>
-          ) : null}
+            <select
+              id="workspaceUuid"
+              name="workspaceUuid"
+              value={formData.workspaceUuid}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            >
+              <option value="">Select a workspace</option>
+              {workspaces.map((workspace) => (
+                <option key={workspace.uuid} value={workspace.uuid}>
+                  {workspace.name}
+                </option>
+              ))}
+            </select>
+          </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Calendar
@@ -279,8 +324,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
       <div className="mt-6 flex justify-between items-center">
         <div>
-          {isEditing && onDelete && (
-            <Button type="button" variant="destructive" onClick={onDelete}>
+          {task && (
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => setShowDeleteModal(true)}
+            >
               <Trash2 size={20} />
             </Button>
           )}
@@ -300,12 +349,20 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           >
             {isSubmitting
               ? "Submitting..."
-              : isEditing
+              : task
               ? "Update Task"
               : "Create Task"}
           </Button>
         </div>
       </div>
+      <TaskConfirmDeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          router.back();
+        }}
+        recordId={task?.id || 0}
+      />
     </form>
   );
 };

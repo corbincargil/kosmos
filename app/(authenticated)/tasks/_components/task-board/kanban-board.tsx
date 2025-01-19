@@ -15,9 +15,6 @@ interface KanbanBoardProps {
   userId: number;
   onUpdateStatus: (taskId: number, newStatus: TaskStatus) => void;
   onEditTask: (task: Task) => void;
-  onAddTask: (
-    task: Omit<Task, "id" | "createdAt" | "updatedAt">
-  ) => Promise<void>;
 }
 
 const columns: TaskStatus[] = ["TODO", "IN_PROGRESS", "COMPLETED"];
@@ -38,7 +35,6 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   userId,
   onUpdateStatus,
   onEditTask,
-  onAddTask,
 }) => {
   const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus | null>(null);
 
@@ -47,13 +43,6 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   };
 
   const handleCancelNewTask = () => {
-    setNewTaskStatus(null);
-  };
-
-  const handleSubmitNewTask = async (
-    taskData: Omit<Task, "id" | "createdAt" | "updatedAt">
-  ) => {
-    await onAddTask(taskData);
     setNewTaskStatus(null);
   };
 
@@ -119,7 +108,6 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
             {newTaskStatus === status ? (
               <div className="mt-4">
                 <InlineTaskForm
-                  onSubmit={handleSubmitNewTask}
                   onCancel={handleCancelNewTask}
                   userId={userId}
                   initialStatus={status}
