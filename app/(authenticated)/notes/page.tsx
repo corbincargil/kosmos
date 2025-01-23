@@ -13,33 +13,28 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { NoteView } from "./_components/note-view";
-import { NoteModal } from "./_components/note-modal";
+import { useRouter } from "next/navigation";
 
 export default function Notes() {
   const { selectedWorkspace } = useWorkspace();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const router = useRouter();
 
-  const {
-    data: notesData,
-    isLoading: workspaceNotesLoading,
-    refetch: workspaceNotesRefetch,
-  } = api.notes.getCurrentWorkspaceNotes.useQuery(
-    {
-      workspaceId: selectedWorkspace,
-    },
-    {
-      enabled: selectedWorkspace !== "all",
-    }
-  );
+  const { data: notesData, isLoading: workspaceNotesLoading } =
+    api.notes.getCurrentWorkspaceNotes.useQuery(
+      {
+        workspaceId: selectedWorkspace,
+      },
+      {
+        enabled: selectedWorkspace !== "all",
+      }
+    );
 
-  const {
-    data: allNotesData,
-    isLoading: allNotesLoading,
-    refetch: allNotesRefetch,
-  } = api.notes.getCurrentUserNotes.useQuery(undefined, {
-    enabled: selectedWorkspace === "all",
-  });
+  const { data: allNotesData, isLoading: allNotesLoading } =
+    api.notes.getCurrentUserNotes.useQuery(undefined, {
+      enabled: selectedWorkspace === "all",
+    });
 
   const loadingNotes = workspaceNotesLoading || allNotesLoading;
 
@@ -61,7 +56,9 @@ export default function Notes() {
                   <Button
                     size="sm"
                     variant="glow"
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() =>
+                      router.push(`/notes/add?workspace=${selectedWorkspace}`)
+                    }
                     disabled={selectedWorkspace === "all"}
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -89,14 +86,6 @@ export default function Notes() {
       ) : (
         <NoteView notes={notesData || allNotesData} />
       )}
-      <NoteModal
-        note={null}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={
-          selectedWorkspace === "all" ? allNotesRefetch : workspaceNotesRefetch
-        }
-      />
     </>
   );
 }

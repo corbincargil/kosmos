@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import Link from "next/link";
+import { useParams, useSearchParams } from "next/navigation";
 
 dayjs.extend(relativeTime);
 
@@ -24,6 +25,7 @@ interface NoteCardProps {
 
 export function NoteCard({ note, className }: NoteCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const searchParams = useSearchParams();
 
   const handleButtonClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -39,16 +41,22 @@ export function NoteCard({ note, className }: NoteCardProps) {
       )}
     >
       <CardHeader className="p-2 md:p-4 lg:p-6">
-        <a href={`/notes/${note.uuid}`} className={className}>
+        <Link
+          href={`/notes/edit/${note.uuid}?${searchParams.toString()}`}
+          className={className}
+        >
           <CardTitle className="text-md lg:text-lg hover:text-blue-500 transition-colors">
             {note.title}
           </CardTitle>
-        </a>
+        </Link>
         <CardDescription>
           Last updated {dayjs(note.updatedAt).fromNow()}
         </CardDescription>
       </CardHeader>
-      <Link href={`/notes/edit/${note.uuid}`} className={className}>
+      <Link
+        href={`/notes/edit/${note.uuid}?${searchParams.toString()}`}
+        className={className}
+      >
         <CardContent className="p-2 md:p-4 lg:p-6 flex-1 overflow-hidden">
           <div className="prose dark:prose-invert prose-sm max-w-none [&>*]:break-words">
             <ReactMarkdown
