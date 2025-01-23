@@ -32,21 +32,28 @@ export const taskRouter = createTRPCRouter({
         ],
       });
     }),
+  getTaskByUuid: protectedProcedure
+    .input(z.object({ uuid: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.task.findUnique({ where: { uuid: input.uuid } });
+    }),
   createTask: protectedProcedure
     .input(
       TaskSchema.omit({
         id: true,
+        uuid: true,
         createdAt: true,
         updatedAt: true,
+        userId: true,
       })
     )
     .mutation(async ({ ctx, input }) => {
       return ctx.db.task.create({
-        data: { ...input },
+        data: { ...input, userId: Number(ctx.userId) },
       });
     }),
   updateTask: protectedProcedure
-    .input(TaskSchema.omit({ createdAt: true, updatedAt: true }))
+    .input(TaskSchema.omit({ createdAt: true, updatedAt: true, userId: true }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.task.update({
         where: { id: input.id },

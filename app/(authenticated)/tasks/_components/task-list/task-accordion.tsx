@@ -6,23 +6,20 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Task, TaskStatus } from "@/types/task";
-import { SwipeableTaskCard } from "./swipeable-task-card";
-import { sortStatuses } from "./utils";
+import { sortStatuses } from "@/app/(authenticated)/tasks/_components/task-list/utils";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import styles from "./task-accordion.module.css";
 import { ALL_STATUSES } from "@/types/task";
 import { Workspace } from "@/types/workspace";
-import { InlineTaskForm } from "../task-forms/inline-task-form";
+import { InlineTaskForm } from "../../../tasks/_components/task-forms/inline-task-form";
+import { SwipeableTaskCard } from "../task-board/swipeable-task-card";
 
 type TaskAccordionProps = {
   tasks: Task[];
   workspaces: Workspace[];
   onUpdateStatus: (taskId: number, newStatus: TaskStatus) => void;
   onEdit: (task: Task) => void;
-  onAddTask: (
-    task: Omit<Task, "id" | "createdAt" | "updatedAt">
-  ) => Promise<void>;
   userId: number;
 };
 
@@ -31,7 +28,6 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
   workspaces,
   onUpdateStatus,
   onEdit,
-  onAddTask,
   userId,
 }) => {
   const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus | null>(null);
@@ -56,13 +52,6 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
   };
 
   const handleCancelNewTask = () => {
-    setNewTaskStatus(null);
-  };
-
-  const handleSubmitNewTask = async (
-    taskData: Omit<Task, "id" | "createdAt" | "updatedAt">
-  ) => {
-    await onAddTask(taskData);
     setNewTaskStatus(null);
   };
 
@@ -119,7 +108,6 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
                 {newTaskStatus === status && (
                   <div ref={newTaskFormRef} className="px-2">
                     <InlineTaskForm
-                      onSubmit={handleSubmitNewTask}
                       onCancel={handleCancelNewTask}
                       userId={userId}
                       initialStatus={status as TaskStatus}

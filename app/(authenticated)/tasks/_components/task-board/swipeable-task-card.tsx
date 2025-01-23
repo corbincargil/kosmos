@@ -4,7 +4,7 @@ import { Task } from "@/types/task";
 import { Workspace } from "@/types/workspace";
 import dayjs from "dayjs";
 import { Flag, ChevronRight, ChevronLeft } from "lucide-react";
-import { getPreviousStatus } from "./utils";
+import { getPreviousStatus } from "@/app/(authenticated)/tasks/_components/task-list/utils";
 import { TaskStatus } from "@/types/task";
 
 type SwipeableTaskCardProps = {
