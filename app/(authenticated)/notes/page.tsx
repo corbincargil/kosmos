@@ -1,12 +1,10 @@
 "use client";
 
 import { CardHeader, CardTitle } from "@/components/ui/card";
-import { NoteView } from "@/components/notes/note-view";
 import { useWorkspace } from "@/contexts/workspace-context";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { NoteModal } from "@/components/notes/note-modal";
 import { api } from "@/trpc/react";
 import {
   Tooltip,
@@ -14,6 +12,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { NoteView } from "./_components/note-view";
+import { NoteModal } from "./_components/note-modal";
 
 export default function Notes() {
   const { selectedWorkspace } = useWorkspace();

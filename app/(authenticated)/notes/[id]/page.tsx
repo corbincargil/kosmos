@@ -1,10 +1,10 @@
 "use client";
 
-import NoteDetails from "@/components/notes/note-details";
 import { Button } from "@/components/ui/button";
 import { api } from "@/trpc/react";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import NoteDetails from "../_components/note-details";
 
 export interface NoteDetailsProps {
   params: {

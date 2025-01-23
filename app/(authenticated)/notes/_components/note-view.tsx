@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import { Note } from "@/types/note";
-import { NotesViewToggle } from "@/components/notes/notes-view-toggle";
-import { NoteGrid } from "@/components/notes/note-grid";
-import { NoteList } from "@/components/notes/note-list";
+import { NotesViewToggle } from "./notes-view-toggle";
+import { NoteGrid } from "./note-grid";
+import { NoteList } from "./note-list";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import {
