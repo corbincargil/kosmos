@@ -75,7 +75,7 @@ export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
         ...formData,
         userId,
         priority: formData.priority || null,
-        workspaceUuid: selectedWorkspace,
+        workspaceUuid: formData.workspaceUuid || selectedWorkspace,
         dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
       };
       createTaskMutation.mutate(taskData);
@@ -153,7 +153,7 @@ export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
             >
               <option value="">Select workspace</option>
               {workspaces.map((workspace) => (
-                <option key={workspace.id} value={workspace.id}>
+                <option key={workspace.uuid} value={workspace.uuid}>
                   {workspace.name}
                 </option>
               ))}
