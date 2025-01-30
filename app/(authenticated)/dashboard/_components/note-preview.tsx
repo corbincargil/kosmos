@@ -1,5 +1,5 @@
 import { Note } from "@/types/note";
-import { NoteCard } from "../../../../components/notes/note-card";
+import { NoteCard } from "../../notes/_components/note-card";
 
 interface NotePreviewProps {
   notes: Note[];

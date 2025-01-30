@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/trpc/react";
 import {
@@ -12,8 +10,6 @@ import {
   type Note,
   type CreateNoteInput,
 } from "@/types/note";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -24,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
+import RichTextEditor from "../../_components/rich-text-editor";
 
 interface NewNoteFormProps {
   workspaceUuid: string;
@@ -94,11 +91,12 @@ export default function NoteForm({
     if (note) {
       updateNoteMutation({ id: note.id, data });
     } else {
-      createNoteMutation(data);
+      createNoteMutation({ ...data, content: data.content || "" });
     }
   };
 
   const content = form.watch("content");
+  console.log(content);
 
   return (
     <Form {...form}>
@@ -124,7 +122,9 @@ export default function NoteForm({
         />
 
         <div className="flex items-center justify-between">
-          <FormMessage>{form.formState.errors.content?.message}</FormMessage>
+          <FormMessage>
+            {form.formState.errors.content?.message as string}
+          </FormMessage>
           <Button
             type="button"
             variant="ghost"
@@ -135,65 +135,17 @@ export default function NoteForm({
           </Button>
         </div>
 
-        <div className="relative min-h-[300px] border rounded-md">
-          <FormField
-            control={form.control}
-            name="content"
-            render={({ field }) => (
-              <FormItem className="h-full">
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Write your note content here... (Markdown supported)"
-                    className={cn(
-                      "min-h-[300px] font-mono resize-none p-3",
-                      "absolute inset-0 w-full",
-                      isEditing ? "opacity-100 z-10" : "opacity-0 -z-10"
-                    )}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <div
-            className={cn(
-              "absolute inset-0 w-full p-3",
-              "prose prose-sm dark:prose-invert max-w-none overflow-y-auto",
-              !isEditing ? "opacity-100 z-10" : "opacity-0 -z-10"
-            )}
-            onClick={() => setIsEditing(true)}
-          >
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                p: ({ ...props }) => <p className="my-2" {...props} />,
-                a: ({ ...props }) => (
-                  <a
-                    className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500"
-                    {...props}
-                  />
-                ),
-                ul: ({ ...props }) => (
-                  <ul className="list-disc list-inside my-2" {...props} />
-                ),
-                ol: ({ ...props }) => (
-                  <ol className="list-decimal list-inside my-2" {...props} />
-                ),
-                pre: ({ ...props }) => (
-                  <pre
-                    className="overflow-x-auto p-2 rounded-lg bg-muted"
-                    {...props}
-                  />
-                ),
-                code: ({ ...props }) => (
-                  <code className="bg-muted rounded px-1" {...props} />
-                ),
-              }}
-            >
-              {content || "Nothing to preview"}
-            </ReactMarkdown>
-          </div>
-        </div>
+        <FormField
+          control={form.control}
+          name="content"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <RichTextEditor content={content} onChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
 
         <div className="flex justify-end gap-2">
           <Button type="button" onClick={() => router.back()} variant="glow">

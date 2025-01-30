@@ -17,7 +17,6 @@ import { useRouter } from "next/navigation";
 
 export default function Notes() {
   const { selectedWorkspace } = useWorkspace();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const router = useRouter();
 
