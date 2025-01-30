@@ -1,12 +1,10 @@
 "use client";
 
 import { CardHeader, CardTitle } from "@/components/ui/card";
-import { NoteView } from "@/components/notes/note-view";
 import { useWorkspace } from "@/contexts/workspace-context";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { NoteModal } from "@/components/notes/note-modal";
 import { api } from "@/trpc/react";
 import {
   Tooltip,
@@ -14,32 +12,28 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { NoteView } from "./_components/note-view";
+import { useRouter } from "next/navigation";
 
 export default function Notes() {
   const { selectedWorkspace } = useWorkspace();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const router = useRouter();
 
-  const {
-    data: notesData,
-    isLoading: workspaceNotesLoading,
-    refetch: workspaceNotesRefetch,
-  } = api.notes.getCurrentWorkspaceNotes.useQuery(
-    {
-      workspaceId: selectedWorkspace,
-    },
-    {
-      enabled: selectedWorkspace !== "all",
-    }
-  );
+  const { data: notesData, isLoading: workspaceNotesLoading } =
+    api.notes.getCurrentWorkspaceNotes.useQuery(
+      {
+        workspaceId: selectedWorkspace,
+      },
+      {
+        enabled: selectedWorkspace !== "all",
+      }
+    );
 
-  const {
-    data: allNotesData,
-    isLoading: allNotesLoading,
-    refetch: allNotesRefetch,
-  } = api.notes.getCurrentUserNotes.useQuery(undefined, {
-    enabled: selectedWorkspace === "all",
-  });
+  const { data: allNotesData, isLoading: allNotesLoading } =
+    api.notes.getCurrentUserNotes.useQuery(undefined, {
+      enabled: selectedWorkspace === "all",
+    });
 
   const loadingNotes = workspaceNotesLoading || allNotesLoading;
 
@@ -61,7 +55,9 @@ export default function Notes() {
                   <Button
                     size="sm"
                     variant="glow"
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() =>
+                      router.push(`/notes/add?workspace=${selectedWorkspace}`)
+                    }
                     disabled={selectedWorkspace === "all"}
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -89,14 +85,6 @@ export default function Notes() {
       ) : (
         <NoteView notes={notesData || allNotesData} />
       )}
-      <NoteModal
-        note={null}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={
-          selectedWorkspace === "all" ? allNotesRefetch : workspaceNotesRefetch
-        }
-      />
     </>
   );
 }

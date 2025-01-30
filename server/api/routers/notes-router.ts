@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { NoteSchema } from "@/types/note";
+import { CreateNoteSchema, NoteSchema, UpdateNoteSchema } from "@/types/note";
 
 export const noteRouter = createTRPCRouter({
   getCurrentWorkspaceNotes: protectedProcedure
@@ -31,35 +31,24 @@ export const noteRouter = createTRPCRouter({
     }),
 
   createNote: protectedProcedure
-    .input(
-      NoteSchema.omit({
-        id: true,
-        uuid: true,
-        createdAt: true,
-        updatedAt: true,
-        workspaceId: true,
-      })
-    )
+    .input(CreateNoteSchema)
     .mutation(async ({ ctx, input }) => {
       return ctx.db.note.create({
-        data: { ...input },
+        data: { ...input, userId: Number(ctx.userId) },
       });
     }),
 
   updateNote: protectedProcedure
     .input(
-      NoteSchema.omit({
-        createdAt: true,
-        updatedAt: true,
-        uuid: true,
-        userId: true,
-        workspaceId: true,
+      z.object({
+        id: z.number(),
+        data: UpdateNoteSchema,
       })
     )
     .mutation(async ({ ctx, input }) => {
       return ctx.db.note.update({
         where: { id: input.id },
-        data: input,
+        data: input.data,
       });
     }),
 
