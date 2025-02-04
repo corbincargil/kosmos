@@ -1,13 +1,16 @@
 "use client";
 
-import Header from "@/components/layout/header/header";
+import Header from "@/app/(authenticated)/_components/layout/header/header";
 import { redirect } from "next/navigation";
 import { ReactNode, useEffect } from "react";
 import { WorkspaceProvider } from "@/contexts/workspace-context";
-import { ThemeProvider, useTheme } from "@/components/theme-manager";
+import {
+  ThemeProvider,
+  useTheme,
+} from "@/app/(authenticated)/_components/theme/theme-manager";
 import { useUser } from "@clerk/nextjs";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/layout/sidebar/app-sidebar";
+import { AppSidebar } from "@/app/(authenticated)/_components/layout/sidebar/app-sidebar";
 
 export default function AuthenticatedLayout({
   children,
