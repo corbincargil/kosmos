@@ -1,22 +1,36 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/trpc/react";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { WorkspaceType } from "@prisma/client";
 
 interface WorkspaceFormProps {
   closeModal: () => void;
   workspaceId?: number;
   initialName?: string;
   initialColor?: string;
+  initialType?: WorkspaceType;
+  initialIcon?: string;
 }
 
 export default function WorkspaceForm({
   workspaceId,
   initialName = "",
   initialColor = "#000000",
+  initialType = WorkspaceType.DEFAULT,
+  initialIcon = "Croissant",
   closeModal,
 }: WorkspaceFormProps) {
   const [name, setName] = useState(initialName);
   const [color, setColor] = useState(initialColor);
+  const [type, setType] = useState<WorkspaceType>(initialType);
+  const [icon, setIcon] = useState(initialIcon);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isEditing = !!workspaceId;
@@ -68,9 +82,12 @@ export default function WorkspaceForm({
     e.preventDefault();
     setIsSubmitting(true);
     if (isEditing) {
-      editWorkspaceMutation({ id: workspaceId, name, color });
+      editWorkspaceMutation({
+        id: workspaceId,
+        data: { name, color, type, icon },
+      });
     } else {
-      addWorkspaceMutation({ name, color });
+      addWorkspaceMutation({ name, color, type, icon });
     }
   };
 
@@ -95,6 +112,21 @@ export default function WorkspaceForm({
           disabled={isSubmitting}
         />
       </div>
+      <Select
+        value={type}
+        onValueChange={(value) => setType(value as WorkspaceType)}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Select Workspace Type" />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.values(WorkspaceType).map((type) => (
+            <SelectItem key={type} value={type}>
+              {type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <button
         type="submit"
         className="bg-blue-500 text-white px-4 py-2 rounded w-full disabled:opacity-50"

@@ -55,6 +55,8 @@ export default function AdminPage() {
               workspaceId={editingWorkspace?.id}
               initialName={editingWorkspace?.name}
               initialColor={editingWorkspace?.color}
+              initialType={editingWorkspace?.type}
+              initialIcon={editingWorkspace?.icon}
               closeModal={() => {
                 setIsModalOpen(false);
                 setEditingWorkspace(null);

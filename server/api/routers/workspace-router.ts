@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { WorkspaceType } from "@prisma/client";
+import { WorkspaceFormSchema } from "@/types/workspace";
 
 export const workspaceRouter = createTRPCRouter({
   getUserWorkspaces: protectedProcedure.query(async ({ ctx }) => {
@@ -13,12 +15,7 @@ export const workspaceRouter = createTRPCRouter({
   }),
 
   addWorkspace: protectedProcedure
-    .input(
-      z.object({
-        name: z.string(),
-        color: z.string(),
-      })
-    )
+    .input(WorkspaceFormSchema)
     .mutation(async ({ ctx, input }) => {
       return ctx.db.workspace.create({
         data: {
@@ -33,14 +30,13 @@ export const workspaceRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.number(),
-        name: z.string(),
-        color: z.string(),
+        data: WorkspaceFormSchema,
       })
     )
     .mutation(async ({ ctx, input }) => {
       return ctx.db.workspace.update({
         where: { id: input.id },
-        data: input,
+        data: input.data,
       });
     }),
 

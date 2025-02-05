@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TaskAccordion } from "../task-list/task-accordion";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useWorkspace } from "@/contexts/workspace-context";
-import { useTheme } from "@/components/theme-manager";
+import { useTheme } from "@/app/(authenticated)/_components/theme/theme-manager";
 import { useUser } from "@clerk/nextjs";
 import { api } from "@/trpc/react";
 import QuickFilters from "./quick-filters";
