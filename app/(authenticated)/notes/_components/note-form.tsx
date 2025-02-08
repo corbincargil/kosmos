@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -93,6 +93,17 @@ export default function NoteForm({
     note && (hasContentChanges || form.watch("title") !== lastSavedTitle);
   const isSaving = isCreating || isUpdating;
 
+  const onSubmit = useCallback(
+    (data: CreateNoteInput) => {
+      if (note) {
+        updateNote({ id: note.id, data });
+      } else {
+        createNote({ ...data, content: data.content || "" });
+      }
+    },
+    [note, createNote, updateNote]
+  );
+
   useEffect(() => {
     if (!note || !hasChanges || isSaving) return;
 
@@ -101,15 +112,7 @@ export default function NoteForm({
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [hasChanges, note, form, isSaving]);
-
-  function onSubmit(data: CreateNoteInput) {
-    if (note) {
-      updateNote({ id: note.id, data });
-    } else {
-      createNote({ ...data, content: data.content || "" });
-    }
-  }
+  }, [hasChanges, note, form, isSaving, onSubmit]);
 
   return (
     <Form {...form}>

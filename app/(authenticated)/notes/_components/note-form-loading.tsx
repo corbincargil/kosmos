@@ -1,10 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRouter } from "next/navigation";
 
 export default function NoteFormLoading() {
-  const router = useRouter();
-
   return (
     <div className="flex flex-col space-y-4 h-full w-full">
       <div>

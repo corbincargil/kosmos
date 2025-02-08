@@ -4,7 +4,7 @@ import Text from "@tiptap/extension-text";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import { Editor } from "@tiptap/react";
-import { MutableRefObject, RefObject } from "react";
+import { MutableRefObject } from "react";
 
 export const normalizeHtml = (html: string = "") => {
   return html
