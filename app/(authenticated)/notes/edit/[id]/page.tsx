@@ -24,12 +24,10 @@ export default function EditNotePage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="container mx-auto py-6">
-      <NoteForm
-        workspaceUuid={noteData.workspaceUuid}
-        note={noteData}
-        cancelButtonText="Back"
-      />
-    </div>
+    <NoteForm
+      workspaceUuid={noteData.workspaceUuid}
+      note={noteData}
+      cancelButtonText="Back"
+    />
   );
 }

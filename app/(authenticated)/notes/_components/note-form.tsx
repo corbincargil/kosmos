@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -22,7 +22,7 @@ import {
 import { useRouter } from "next/navigation";
 import RichTextEditor from "../../_components/rich-text-editor";
 
-interface NewNoteFormProps {
+interface NoteFormProps {
   workspaceUuid: string;
   note?: Note;
   cancelButtonText?: string;
@@ -31,12 +31,18 @@ interface NewNoteFormProps {
 export default function NoteForm({
   workspaceUuid,
   note,
-  cancelButtonText = "Cancel",
-}: NewNoteFormProps) {
+  cancelButtonText = "Close",
+}: NoteFormProps) {
   const { toast } = useToast();
   const utils = api.useUtils();
-  const [isEditing, setIsEditing] = useState(true);
   const router = useRouter();
+
+  // State management
+  const [hasContentChanges, setHasContentChanges] = useState(false);
+  const [lastSavedContent, setLastSavedContent] = useState(note?.content || "");
+  const [lastSavedTitle, setLastSavedTitle] = useState(note?.title || "");
+
+  // Form setup
   const form = useForm<CreateNoteInput>({
     resolver: zodResolver(CreateNoteSchema),
     defaultValues: {
@@ -46,11 +52,20 @@ export default function NoteForm({
     },
   });
 
-  const { mutate: createNoteMutation, isPending } =
+  function handleError() {
+    toast({
+      title: "Error",
+      description: `Failed to ${note ? "update" : "create"} note`,
+      variant: "destructive",
+    });
+  }
+
+  //* create note mutation
+  const { mutate: createNote, isPending: isCreating } =
     api.notes.createNote.useMutation({
       onSuccess: () => {
-        form.reset();
         utils.notes.getCurrentWorkspaceNotes.invalidate();
+        form.reset();
         toast({
           title: "Success",
           variant: "success",
@@ -58,51 +73,49 @@ export default function NoteForm({
         });
         router.back();
       },
-      onError: () => {
-        toast({
-          title: "Error",
-          description: "Failed to create note",
-          variant: "destructive",
-        });
-      },
+      onError: handleError,
     });
 
-  const { mutate: updateNoteMutation } = api.notes.updateNote.useMutation({
-    onSuccess: () => {
-      utils.notes.getCurrentWorkspaceNotes.invalidate();
-      form.reset();
-      toast({
-        title: "Success",
-        variant: "success",
-        description: "Note updated successfully",
-      });
-      router.back();
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update note",
-        variant: "destructive",
-      });
-    },
-  });
+  //* update note mutation
+  const { mutate: updateNote, isPending: isUpdating } =
+    api.notes.updateNote.useMutation({
+      onSuccess: () => {
+        utils.notes.getCurrentWorkspaceNotes.invalidate();
+        utils.notes.getNoteByUuid.invalidate(note?.uuid || "");
+        setLastSavedContent(form.getValues("content"));
+        setLastSavedTitle(form.getValues("title"));
+        setHasContentChanges(false);
+      },
+      onError: handleError,
+    });
 
-  const onSubmit = (data: CreateNoteInput) => {
+  const hasChanges =
+    note && (hasContentChanges || form.watch("title") !== lastSavedTitle);
+  const isSaving = isCreating || isUpdating;
+
+  useEffect(() => {
+    if (!note || !hasChanges || isSaving) return;
+
+    const timer = setTimeout(() => {
+      form.handleSubmit(onSubmit)();
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [hasChanges, note, form, isSaving]);
+
+  function onSubmit(data: CreateNoteInput) {
     if (note) {
-      updateNoteMutation({ id: note.id, data });
+      updateNote({ id: note.id, data });
     } else {
-      createNoteMutation({ ...data, content: data.content || "" });
+      createNote({ ...data, content: data.content || "" });
     }
-  };
-
-  const content = form.watch("content");
-  console.log(content);
+  }
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col space-y-4"
+        className="flex flex-col space-y-4 h-full"
       >
         <FormField
           control={form.control}
@@ -113,7 +126,7 @@ export default function NoteForm({
                 <Input
                   {...field}
                   placeholder="Note title"
-                  className="text-xl font-semibold focus-visible:ring-0"
+                  className="bg-transparent text-3xl font-extrabold border-none focus-visible:ring-workspace-lighter"
                 />
               </FormControl>
               <FormMessage />
@@ -121,27 +134,22 @@ export default function NoteForm({
           )}
         />
 
-        <div className="flex items-center justify-between">
-          <FormMessage>
-            {form.formState.errors.content?.message as string}
-          </FormMessage>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsEditing(!isEditing)}
-          >
-            {isEditing ? "Preview" : "Edit"}
-          </Button>
+        <div className="pl-4 text-sm text-muted-foreground min-h-[20px]">
+          {hasChanges && "Unsaved changes"}
         </div>
 
         <FormField
           control={form.control}
           name="content"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="flex-1">
               <FormControl>
-                <RichTextEditor content={content} onChange={field.onChange} />
+                <RichTextEditor
+                  content={field.value}
+                  onChange={(value) => form.setValue("content", value)}
+                  onCompareContent={setHasContentChanges}
+                  lastSavedContent={lastSavedContent}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -151,14 +159,8 @@ export default function NoteForm({
           <Button type="button" onClick={() => router.back()} variant="glow">
             {cancelButtonText}
           </Button>
-          <Button type="submit" disabled={isPending || !form.formState.isValid}>
-            {isPending
-              ? note
-                ? "Updating..."
-                : "Creating..."
-              : note
-              ? "Update Note"
-              : "Create Note"}
+          <Button type="submit" disabled={isSaving || !form.formState.isValid}>
+            {isSaving ? "Saving..." : note ? "Save" : "Create Note"}
           </Button>
         </div>
       </form>

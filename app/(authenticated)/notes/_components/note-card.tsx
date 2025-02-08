@@ -35,7 +35,7 @@ export function NoteCard({ note, className }: NoteCardProps) {
   return (
     <Card
       className={cn(
-        "hover:shadow-lg transition-all relative cursor-pointer overflow-hidden",
+        "hover:shadow-sm hover:shadow-workspace-lighter hover:scale-[1.01] transition-all relative cursor-pointer overflow-hidden",
         !isExpanded && "max-h-[400px]"
       )}
     >
@@ -44,9 +44,7 @@ export function NoteCard({ note, className }: NoteCardProps) {
         className={className}
       >
         <CardHeader className="p-2 md:p-4 lg:p-6">
-          <CardTitle className="text-md lg:text-lg hover:text-blue-500 transition-colors">
-            {note.title}
-          </CardTitle>
+          <CardTitle className="text-md lg:text-lg">{note.title}</CardTitle>
           <CardDescription>
             Last updated {dayjs(note.updatedAt).fromNow()}
           </CardDescription>

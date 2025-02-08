@@ -7,12 +7,15 @@ import TaskList from "@tiptap/extension-task-list";
 import DragHandle from "@tiptap-pro/extension-drag-handle-react";
 import "./styles.css";
 import { GripVerticalIcon } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { handleContentChange, normalizeHtml } from "./helpers";
 
 interface RichTextEditorProps {
   content: string;
   onChange?: (value: string) => void;
   readOnly?: boolean;
+  onCompareContent?: (hasChanges: boolean) => void;
+  lastSavedContent?: string;
 }
 
 const extensions = [
@@ -34,21 +37,39 @@ const RichTextEditor = ({
   content,
   onChange,
   readOnly = false,
+  onCompareContent,
+  lastSavedContent,
 }: RichTextEditorProps) => {
+  const initialContentRef = useRef(normalizeHtml(content));
+
   const editor = useEditor({
     extensions,
     content,
     editable: !readOnly,
     onUpdate: ({ editor }) => {
-      onChange?.(editor.getHTML());
+      const currentContent = normalizeHtml(editor.getHTML());
+      onChange?.(currentContent);
+
+      if (onCompareContent) {
+        onCompareContent(
+          currentContent !==
+            normalizeHtml(lastSavedContent || initialContentRef.current)
+        );
+      }
     },
   });
 
   useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content || "");
+    if (editor) {
+      handleContentChange({
+        editor,
+        content,
+        lastSavedContent: lastSavedContent || "",
+        initialContentRef,
+        onCompareContent,
+      });
     }
-  }, [content, editor]);
+  }, [content, editor, onCompareContent, lastSavedContent]);
 
   if (!editor) {
     return null;
