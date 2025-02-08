@@ -19,6 +19,12 @@ type SwipeableTaskCardProps = {
   showQuickMoveBack?: boolean;
 };
 
+const stripHtmlTags = (html: string) => {
+  const tmp = document.createElement("div");
+  tmp.innerHTML = html;
+  return tmp.textContent;
+};
+
 export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
   task,
   workspace,
@@ -326,7 +332,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
                     isCompleted ? "line-through" : ""
                   }`}
                 >
-                  {task.description}
+                  {stripHtmlTags(task.description)}
                 </p>
               )}
             </div>

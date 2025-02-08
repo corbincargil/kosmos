@@ -4,7 +4,7 @@ export const TaskSchema = z.object({
   id: z.number().int().positive(),
   uuid: z.string().uuid(),
   title: z.string().max(100),
-  description: z.string().max(255).nullable(),
+  description: z.string().max(1600).nullable(),
   dueDate: z
     .union([z.date(), z.string()])
     .nullable()

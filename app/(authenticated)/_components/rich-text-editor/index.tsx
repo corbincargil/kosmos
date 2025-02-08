@@ -7,6 +7,7 @@ import TaskList from "@tiptap/extension-task-list";
 import DragHandle from "@tiptap-pro/extension-drag-handle-react";
 import "./styles.css";
 import { GripVerticalIcon } from "lucide-react";
+import { useEffect } from "react";
 
 interface RichTextEditorProps {
   content: string;
@@ -42,6 +43,12 @@ const RichTextEditor = ({
       onChange?.(editor.getHTML());
     },
   });
+
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content || "");
+    }
+  }, [content, editor]);
 
   if (!editor) {
     return null;
