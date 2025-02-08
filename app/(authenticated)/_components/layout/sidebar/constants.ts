@@ -4,7 +4,6 @@ import {
   Home,
   List,
   FileText,
-  Settings,
   Coffee,
   Pizza,
   Cookie,

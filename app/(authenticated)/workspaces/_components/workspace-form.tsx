@@ -30,7 +30,7 @@ export default function WorkspaceForm({
   const [name, setName] = useState(initialName);
   const [color, setColor] = useState(initialColor);
   const [type, setType] = useState<WorkspaceType>(initialType);
-  const [icon, setIcon] = useState(initialIcon);
+  const [icon] = useState(initialIcon);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isEditing = !!workspaceId;
