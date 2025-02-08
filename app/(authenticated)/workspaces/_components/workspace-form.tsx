@@ -9,6 +9,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { WorkspaceType } from "@prisma/client";
+import { Input } from "@/components/ui/input";
 
 interface WorkspaceFormProps {
   closeModal: () => void;
@@ -94,18 +95,19 @@ export default function WorkspaceForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex gap-2 items-center">
-        <input
+        <Input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Workspace name"
-          className="border p-2 rounded w-full"
+          className="border p-2 rounded w-full font-semibold text-lg"
           maxLength={50}
           required
           disabled={isSubmitting}
         />
-        <input
+        <Input
           type="color"
+          className="w-30 h-10 p-1"
           value={color}
           onChange={(e) => setColor(e.target.value)}
           required
