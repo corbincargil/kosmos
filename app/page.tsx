@@ -2,17 +2,9 @@
 
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { useEffect } from "react";
 
 export default function SignInPage() {
   const { isSignedIn } = useAuth();
-
-  useEffect(() => {
-    if (isSignedIn) {
-      redirect("/dashboard");
-    }
-  }, [isSignedIn]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 p-4">
@@ -27,12 +19,21 @@ export default function SignInPage() {
             Welcome Back
           </h1>
           <div className="animate-fade-in-up">
-            <Link
-              href="/sign-in"
-              className="block w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-center transition-colors duration-300 text-lg"
-            >
-              Sign In
-            </Link>
+            {isSignedIn ? (
+              <Link
+                href="/dashboard"
+                className="block w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-center transition-colors duration-300 text-lg"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/sign-in"
+                className="block w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-center transition-colors duration-300 text-lg"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
         </div>
       </div>
