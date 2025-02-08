@@ -26,6 +26,7 @@ export default function WorkspaceList({
         >
           <div className="flex flex-col">
             <h3 className="font-semibold">{workspace.name}</h3>
+            <p className="text-sm text-gray-500">Type: {workspace.type}</p>
             <p className="text-sm text-gray-500">
               Created: {new Date(workspace.createdAt).toLocaleDateString()}
             </p>

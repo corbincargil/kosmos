@@ -21,6 +21,8 @@ export const workspaceRouter = createTRPCRouter({
         data: {
           name: input.name,
           color: input.color,
+          type: input.type,
+          icon: input.icon,
           userId: Number(ctx.userId),
         },
       });

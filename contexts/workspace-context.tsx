@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Workspace } from "@/types/workspace";
-import { useTheme } from "@/components/theme-manager";
+import { useTheme } from "@/app/(authenticated)/_components/theme/theme-manager";
 import { api } from "@/trpc/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -19,6 +19,7 @@ interface WorkspaceContextType {
   selectedWorkspaceColor: string;
   setSelectedWorkspace: (uuid: string) => void;
   refreshWorkspaces: () => Promise<void>;
+  workspacesLoading: boolean;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(
@@ -33,16 +34,19 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [selectedWorkspaceColor, setSelectedWorkspaceColor] = useState<string>(
     theme === "dark" ? "#FFFFFF" : "#000000"
   );
-  const { user, isLoaded } = useUser();
+  const { user, isLoaded: userLoaded } = useUser();
 
-  const { data: workspaces, refetch: refreshWorkspaces } =
-    api.workspaces.getUserWorkspaces.useQuery(undefined, {
-      enabled: !!user,
-    });
+  const {
+    data: workspaces,
+    refetch: refreshWorkspaces,
+    isLoading: workspacesLoading,
+  } = api.workspaces.getUserWorkspaces.useQuery(undefined, {
+    enabled: !!user,
+  });
 
   useEffect(() => {
     refreshWorkspaces();
-  }, [isLoaded, user]);
+  }, [userLoaded, user]);
 
   useEffect(() => {
     const newColor =
@@ -91,6 +95,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         selectedWorkspaceColor,
         setSelectedWorkspace,
         refreshWorkspaces: () => refreshWorkspaces().then(),
+        workspacesLoading,
       }}
     >
       {children}
