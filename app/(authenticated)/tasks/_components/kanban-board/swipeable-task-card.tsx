@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useSwipeable } from "react-swipeable";
-import { Task } from "@/types/task";
+import { Task, TaskStatusConfig } from "@/types/task";
 import { Workspace } from "@/types/workspace";
 import dayjs from "dayjs";
 import { Flag, ChevronRight, ChevronLeft } from "lucide-react";
 import { getPreviousStatus } from "@/app/(authenticated)/tasks/_components/task-list/utils";
-import { TaskStatus } from "@/types/task";
+import { TaskStatus } from "@prisma/client";
+import { cn } from "@/lib/utils";
 
 type SwipeableTaskCardProps = {
   task: Task;
@@ -104,7 +105,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
     }
   };
 
-  const isCompleted = task.status === "COMPLETED";
+  const isCompleted = task.status === TaskStatus.COMPLETED;
 
   const getSwipeBackgroundColor = (
     direction: "left" | "right",
@@ -148,7 +149,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
 
   const getClipPath = (direction: "left" | "right") => {
     const absOffset = Math.abs(offset);
-    const clipPercentage = Math.min(100, (absOffset / 60) * 100); // Reduced from 70
+    const clipPercentage = Math.min(100, (absOffset / 60) * 100);
 
     if (direction === "left") {
       return offset < 0
@@ -254,7 +255,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
         className="absolute inset-0 flex"
         style={{ clipPath: getClipPath("right") }}
       >
-        {task.status === "TODO" ? (
+        {task.status === TaskStatus.TODO ? (
           <div className="w-[80px] flex flex-row">
             {/* In Progress option */}
             <div
@@ -280,7 +281,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
               <p className="text-sm">Completed</p>
             </div>
           </div>
-        ) : task.status === "IN_PROGRESS" ? (
+        ) : task.status === TaskStatus.IN_PROGRESS ? (
           // Completed option for IN_PROGRESS tasks
           <div
             className={`max-w-[140px] flex-1 flex flex-col items-center justify-center px-2 text-white ${getSwipeBackgroundColor(
@@ -339,27 +340,13 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
             <div className="flex items-center gap-2 flex-shrink-0">
               {showStatus && (
                 <span
-                  className="text-xs px-2 py-0.5 rounded-full font-medium"
-                  style={{
-                    backgroundColor:
-                      task.status === "TODO"
-                        ? "rgb(234 179 8 / 15%)"
-                        : task.status === "IN_PROGRESS"
-                        ? "rgb(59 130 246 / 15%)"
-                        : "rgb(34 197 94 / 15%)",
-                    color:
-                      task.status === "TODO"
-                        ? "rgb(234 179 8)"
-                        : task.status === "IN_PROGRESS"
-                        ? "rgb(59 130 246)"
-                        : "rgb(34 197 94)",
-                  }}
+                  className={cn(
+                    "text-xs px-2 py-0.5 rounded-full font-medium",
+                    TaskStatusConfig[task.status].backgroundColor,
+                    TaskStatusConfig[task.status].color
+                  )}
                 >
-                  {task.status === "TODO"
-                    ? "Todo"
-                    : task.status === "IN_PROGRESS"
-                    ? "In Progress"
-                    : "Completed"}
+                  {TaskStatusConfig[task.status].label}
                 </span>
               )}
             </div>

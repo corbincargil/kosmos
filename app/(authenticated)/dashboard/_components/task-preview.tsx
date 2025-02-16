@@ -1,6 +1,6 @@
 import { Task } from "@/types/task";
 import { Workspace } from "@/types/workspace";
-import { SwipeableTaskCard } from "../../tasks/_components/task-board/swipeable-task-card";
+import { SwipeableTaskCard } from "../../tasks/_components/kanban-board/swipeable-task-card";
 
 interface TaskPreviewProps {
   tasks: Task[];

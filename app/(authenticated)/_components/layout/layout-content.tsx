@@ -21,7 +21,7 @@ export function LayoutContent({ children, modal }: LayoutContentProps) {
           <Header theme={theme} toggleTheme={toggleTheme} />
           <main className="flex-1 overflow-auto">
             <div className="h-full px-4 py-6">
-              <div className="rounded-lg max-w-7xl mx-auto h-full">
+              <div className="rounded-lg max-w-[120rem] mx-auto h-full">
                 {children}
                 {modal}
               </div>

@@ -12,7 +12,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useWorkspace } from "@/contexts/workspace-context";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import SidebarSkeleton from "./loading";
 import WorkspaceSelect from "./workspace-select";
 import { dashboardLink, generalLinks, workspaceLinks } from "./constants";
@@ -26,7 +26,6 @@ export function AppSidebar() {
     workspacesLoading,
   } = useWorkspace();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const { setOpenMobile } = useSidebar();
 
@@ -44,7 +43,7 @@ export function AppSidebar() {
       : workspaces.find((w) => w.uuid === selectedWorkspace)?.type || "DEFAULT";
 
   const constructUrl = (baseHref: string) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams();
     params.set("workspace", selectedWorkspace);
     return `${baseHref}?${params.toString()}`;
   };

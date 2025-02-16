@@ -5,8 +5,8 @@ import { TaskView } from "@/app/(authenticated)/tasks/_components/task-view/";
 
 export default function TasksPage() {
   return (
-    <Card>
-      <CardContent className="p-2">
+    <Card className="h-[calc(100vh-6rem)]">
+      <CardContent className="p-4 h-full">
         <TaskView />
       </CardContent>
     </Card>

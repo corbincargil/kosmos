@@ -66,9 +66,13 @@ model Note {
 }
 
 enum TaskStatus {
+  BACKLOG
   TODO
   IN_PROGRESS
+  BLOCKED
   COMPLETED
+  CLOSED
+  CANCELLED
 }
 
 enum TaskPriority {

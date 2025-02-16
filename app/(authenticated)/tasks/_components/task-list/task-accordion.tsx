@@ -5,15 +5,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Task, TaskStatus } from "@/types/task";
+import { Task } from "@/types/task";
 import { sortStatuses } from "@/app/(authenticated)/tasks/_components/task-list/utils";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import styles from "./task-accordion.module.css";
-import { ALL_STATUSES } from "@/types/task";
 import { Workspace } from "@/types/workspace";
 import { InlineTaskForm } from "../../../tasks/_components/task-forms/inline-task-form";
-import { SwipeableTaskCard } from "../task-board/swipeable-task-card";
+import { SwipeableTaskCard } from "../kanban-board/swipeable-task-card";
+import { TaskStatus } from "@prisma/client";
 
 type TaskAccordionProps = {
   tasks: Task[];
@@ -42,7 +42,7 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
     return acc;
   }, {} as Record<string, Task[]>);
 
-  const sortedStatuses = ALL_STATUSES.sort(sortStatuses);
+  const sortedStatuses = Object.values(TaskStatus).sort(sortStatuses);
 
   const handleAddTask = (status: TaskStatus) => {
     setNewTaskStatus(status);

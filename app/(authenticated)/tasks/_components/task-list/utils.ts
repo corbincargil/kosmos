@@ -1,5 +1,5 @@
-import { Task, TaskStatus } from "@/types/task";
-
+import { Task } from "@/types/task";
+import { TaskStatus } from "@prisma/client";
 export const sortStatuses = (a: string, b: string) => {
   const order = ["TODO", "IN_PROGRESS", "COMPLETED"];
   return order.indexOf(a) - order.indexOf(b);
