@@ -358,6 +358,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
         isOpen={showDeleteModal}
         onClose={() => {
           setShowDeleteModal(false);
+          router.back();
         }}
         recordId={task?.id || 0}
       />
