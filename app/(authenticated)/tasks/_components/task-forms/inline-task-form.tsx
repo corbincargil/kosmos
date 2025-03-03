@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Task } from "@/types/task";
-import { X, Check } from "lucide-react";
+import { X, Check, Loader2 } from "lucide-react";
 import { useWorkspace } from "@/contexts/workspace-context";
 import { Button } from "@/components/ui/button";
 import { api } from "@/trpc/react";
@@ -30,24 +30,25 @@ export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
 
   const utils = api.useUtils();
 
-  const createTaskMutation = api.tasks.createTask.useMutation({
-    onSuccess: () => {
-      onCancel();
-      utils.tasks.invalidate();
-      toast({
-        variant: "success",
-        title: "Success",
-        description: "Task created successfully.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    },
-  });
+  const { mutate: createTaskMutation, isPending } =
+    api.tasks.createTask.useMutation({
+      onSuccess: () => {
+        onCancel();
+        utils.tasks.invalidate();
+        toast({
+          variant: "success",
+          title: "Success",
+          description: "Task created successfully.",
+        });
+      },
+      onError: (error) => {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message,
+        });
+      },
+    });
 
   useEffect(() => {
     setFormData((prevData) => ({
@@ -79,9 +80,9 @@ export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
         workspaceUuid: formData.workspaceUuid || selectedWorkspace,
         dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
       };
-      createTaskMutation.mutate(taskData);
+      if (!isPending) createTaskMutation(taskData);
     },
-    [createTaskMutation, formData, userId, selectedWorkspace]
+    [createTaskMutation, formData, userId, selectedWorkspace, isPending]
   );
 
   const handleKeyDown = useCallback(
@@ -179,6 +180,7 @@ export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
             <Button
               type="button"
               variant="ghost"
+              disabled={isPending}
               className="hover:bg-secondary hover:text-secondary-foreground dark:hover:bg-gray-700 dark:hover:text-gray-100"
               onClick={onCancel}
             >
@@ -187,9 +189,10 @@ export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
             <Button
               type="submit"
               variant="ghost"
+              disabled={isPending}
               className="hover:bg-secondary hover:text-secondary-foreground dark:hover:bg-gray-700 dark:hover:text-gray-100"
             >
-              <Check size={16} />
+              {isPending ? <Loader2 className="animate-spin" /> : <Check />}
             </Button>
           </div>
         </div>
