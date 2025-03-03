@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Task } from "@/types/task";
 import { Workspace } from "@/types/workspace";
 import { SwipeableTaskCard } from "./swipeable-task-card";
@@ -24,8 +24,6 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onUpdateStatus,
   onEditTask,
 }) => {
-  const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus | null>(null);
-
   const getNextStatus = (currentStatus: TaskStatus): TaskStatus | null => {
     const currentIndex = columns.indexOf(currentStatus);
     return currentIndex < columns.length - 1 ? columns[currentIndex + 1] : null;
@@ -50,21 +48,10 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     }
   };
 
-  const handleAddTask = (status: TaskStatus) => {
-    setNewTaskStatus(status);
-  };
-
   return (
     <div className="h-full flex flex-row gap-4 overflow-x-auto snap-x snap-mandatory sm:snap-none">
       {columns.map((status) => (
-        <KanbanColumn
-          key={status}
-          status={status}
-          newTaskStatus={newTaskStatus}
-          setNewTaskStatus={setNewTaskStatus}
-          handleAddTask={handleAddTask}
-          userId={userId}
-        >
+        <KanbanColumn key={status} status={status} userId={userId}>
           {tasks
             .filter((task) => task.status === status)
             .map((task) => (

@@ -3,24 +3,23 @@ import { TaskStatus } from "@prisma/client";
 import { InlineTaskForm } from "../task-forms/inline-task-form";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { useState } from "react";
 
 interface KanbanColumnProps {
   status: TaskStatus;
   children: React.ReactNode;
-  newTaskStatus: TaskStatus | null;
-  setNewTaskStatus: (status: TaskStatus | null) => void;
-  handleAddTask: (status: TaskStatus) => void;
   userId: number;
 }
 
 export default function KanbanColumn({
   status,
-  newTaskStatus,
-  setNewTaskStatus,
-  handleAddTask,
   userId,
   children,
 }: KanbanColumnProps) {
+  const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus | null>(null);
+  const handleAddTask = (status: TaskStatus) => {
+    setNewTaskStatus(status);
+  };
   return (
     <div
       key={status}
