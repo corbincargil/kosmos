@@ -20,7 +20,7 @@ export default function WorkspaceSelect({
 }) {
   return (
     <Select value={selectedWorkspace} onValueChange={setSelectedWorkspace}>
-      <SelectTrigger className="flex items-center w-full font-bold text-workspace-darker focus:ring-1 focus:border-none focus:ring-workspace-lighter px-0">
+      <SelectTrigger className="flex items-center w-full font-bold text-workspace-darker focus:ring-1 focus:border-none focus:ring-workspace-lighter px-0 pl-2">
         {selectedWorkspace === "all" ? (
           <Croissant
             size={28}
@@ -30,7 +30,7 @@ export default function WorkspaceSelect({
         ) : (
           (() => {
             const workspace = workspaces.find(
-              (w) => w.id.toString() === selectedWorkspace
+              (w) => w.uuid === selectedWorkspace
             );
             const IconComponent = workspace?.icon
               ? ICON_MAP[workspace.icon]
@@ -39,7 +39,6 @@ export default function WorkspaceSelect({
               <IconComponent
                 size={28}
                 className="text-workspace-darker shrink-0 mr-2"
-                data-sidebar-component="icon"
                 style={{ color: workspace?.color }}
               />
             );

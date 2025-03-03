@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { WorkspaceType } from "@prisma/client";
 import { Input } from "@/components/ui/input";
+import IconSelect from "./icon-select";
 
 interface WorkspaceFormProps {
   closeModal: () => void;
@@ -31,7 +32,7 @@ export default function WorkspaceForm({
   const [name, setName] = useState(initialName);
   const [color, setColor] = useState(initialColor);
   const [type, setType] = useState<WorkspaceType>(initialType);
-  const [icon] = useState(initialIcon);
+  const [icon, setIcon] = useState(initialIcon);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isEditing = !!workspaceId;
@@ -107,10 +108,15 @@ export default function WorkspaceForm({
         />
         <Input
           type="color"
-          className="w-30 h-10 p-1"
+          className="w-20 h-10 p-1"
           value={color}
           onChange={(e) => setColor(e.target.value)}
           required
+          disabled={isSubmitting}
+        />
+        <IconSelect
+          value={icon}
+          onValueChange={setIcon}
           disabled={isSubmitting}
         />
       </div>
