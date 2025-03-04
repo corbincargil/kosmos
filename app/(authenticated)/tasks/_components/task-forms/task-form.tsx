@@ -172,7 +172,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2 space-y-2 bg-white dark:bg-gray-800 rounded-md shadow-sm"
+      className="sm:max-w-4xl sm:p-4 max-w-[96vw] max-h-[90vh] p-2 space-y-2 bg-white dark:bg-gray-800 rounded-md shadow-sm"
       tabIndex={-1}
     >
       <div className="md:flex md:space-x-4">
@@ -209,12 +209,14 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
                 Description
               </label>
             </div>
-            <RichTextEditor
-              content={formData.description}
-              onChange={(value) =>
-                setFormData({ ...formData, description: value })
-              }
-            />
+            <div className="sm:max-h-[40vh] max-h-[20vh] overflow-y-auto">
+              <RichTextEditor
+                content={formData.description}
+                onChange={(value) =>
+                  setFormData({ ...formData, description: value })
+                }
+              />
+            </div>
           </div>
         </div>
 
