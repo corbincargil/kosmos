@@ -3,7 +3,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { ICON_MAP } from "@/app/(authenticated)/_components/layout/sidebar/constants";
 
