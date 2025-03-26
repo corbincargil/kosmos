@@ -12,9 +12,13 @@ model User {
   uuid        String      @unique @default(uuid())
   email       String      @unique
   clerkUserId String      @unique
+
   workspaces  Workspace[]
   tasks       Task[]
   notes       Note[]
+  oauthStates OAuthState[]
+  oauthConnections OAuthConnection[]
+
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }
@@ -28,8 +32,10 @@ model Workspace {
   icon      String        @default("Croissant")
   user      User          @relation(fields: [userId], references: [id])
   userId    Int
+
   tasks     Task[]
   notes     Note[]
+  
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 }
@@ -65,6 +71,28 @@ model Note {
   updatedAt     DateTime  @updatedAt
 }
 
+model OAuthState {
+  id        Int           @id @default(autoincrement())
+  state     String        @unique
+  userId    Int
+  provider  OAuthProvider
+  used      Boolean       @default(false)
+  expiresAt DateTime
+  createdAt DateTime      @default(now())
+  user      User          @relation(fields: [userId], references: [id])
+}
+
+model OAuthConnection {
+  userId       Int
+  provider     OAuthProvider
+  accessToken  String
+  refreshToken String
+  expiresAt    DateTime
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@id([userId, provider])
+}
+
 enum TaskStatus {
   BACKLOG
   TODO
@@ -87,7 +115,12 @@ enum WorkspaceType {
   FAITH
   FAMILY
   FITNESS
+  FINANCE
   PERSONAL
   SCHOOL
   WORK
+}
+
+enum OAuthProvider {
+  SCHWAB
 }

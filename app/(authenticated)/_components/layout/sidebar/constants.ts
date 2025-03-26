@@ -1,6 +1,7 @@
 import {
   LucideIcon,
   Croissant,
+  ChartNoAxesCombined,
   Home,
   List,
   FileText,
@@ -45,6 +46,10 @@ export const workspaceLinks: Record<
     { href: "/sermons", label: "Sermons", icon: FileText },
   ],
   FAMILY: [{ href: "/events", label: "Events", icon: Calendar }],
+  FINANCE: [
+    { href: "/budget", label: "Budget", icon: DollarSign },
+    { href: "/finance/schwab", label: "Schwab", icon: ChartNoAxesCombined },
+  ],
   FITNESS: [{ href: "/workouts", label: "Workouts", icon: BicepsFlexed }],
   PERSONAL: [],
   SCHOOL: [{ href: "/courses", label: "Courses", icon: GraduationCap }],
