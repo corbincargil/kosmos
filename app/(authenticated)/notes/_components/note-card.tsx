@@ -50,7 +50,7 @@ export function NoteCard({ note, className }: NoteCardProps) {
           </CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="max-h-[600px] overflow-y-auto">
           <RichTextEditor content={note.content} readOnly />
         </CardContent>
       </Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
 import NoteForm from "../../../_components/note-form";
@@ -25,7 +25,7 @@ export default function InterceptedEditNotePage({
   if (isLoading) {
     return (
       <Dialog open={true} onOpenChange={() => router.back()}>
-        <DialogContent className="max-w-6xl h-[96vh] flex flex-col p-12">
+        <DialogContent className="max-w-6xl flex flex-col p-6">
           <div className="flex justify-center items-center h-full">
             <NoteFormLoading />
           </div>
@@ -40,8 +40,13 @@ export default function InterceptedEditNotePage({
 
   return (
     <Dialog open={true} onOpenChange={() => router.back()}>
-      <DialogContent className="max-w-6xl h-[96vh] flex flex-col p-12">
-        <NoteForm workspaceUuid={noteData.workspaceUuid} note={noteData} />
+      <DialogContent className="max-w-6xl p-4 h-[96vh] flex flex-col">
+        <DialogHeader className="sr-only">
+          <DialogTitle>{noteData.title}</DialogTitle>
+        </DialogHeader>
+        <div className="flex-1 min-h-0">
+          <NoteForm workspaceUuid={noteData.workspaceUuid} note={noteData} />
+        </div>
       </DialogContent>
     </Dialog>
   );

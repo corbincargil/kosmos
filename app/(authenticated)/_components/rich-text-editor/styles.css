@@ -1,10 +1,6 @@
 .tiptap {
   padding: 1rem;
-  height: inherit;
   border: none;
-  min-height: 300px;
-  max-height: 900px;
-  overflow-y: auto;
 
 
   &:focus-visible {

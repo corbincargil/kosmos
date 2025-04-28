@@ -37,12 +37,10 @@ export default function NoteForm({
   const utils = api.useUtils();
   const router = useRouter();
 
-  // State management
   const [hasContentChanges, setHasContentChanges] = useState(false);
   const [lastSavedContent, setLastSavedContent] = useState(note?.content || "");
   const [lastSavedTitle, setLastSavedTitle] = useState(note?.title || "");
 
-  // Form setup
   const form = useForm<CreateNoteInput>({
     resolver: zodResolver(CreateNoteSchema),
     defaultValues: {
@@ -118,7 +116,7 @@ export default function NoteForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col space-y-4 h-full"
+        className="flex flex-col h-full"
       >
         <FormField
           control={form.control}
@@ -129,7 +127,7 @@ export default function NoteForm({
                 <Input
                   {...field}
                   placeholder="Note title"
-                  className="bg-transparent text-3xl font-extrabold border-none focus-visible:ring-workspace-lighter"
+                  className="text-3xl font-extrabold border-none focus-visible:ring-workspace-lighter"
                 />
               </FormControl>
               <FormMessage />
@@ -145,20 +143,22 @@ export default function NoteForm({
           control={form.control}
           name="content"
           render={({ field }) => (
-            <FormItem className="flex-1">
+            <FormItem className="flex-1 min-h-0">
               <FormControl>
-                <RichTextEditor
-                  content={field.value}
-                  onChange={(value) => form.setValue("content", value)}
-                  onCompareContent={setHasContentChanges}
-                  lastSavedContent={lastSavedContent}
-                />
+                <div className="h-full overflow-auto">
+                  <RichTextEditor
+                    content={field.value}
+                    onChange={(value) => form.setValue("content", value)}
+                    onCompareContent={setHasContentChanges}
+                    lastSavedContent={lastSavedContent}
+                  />
+                </div>
               </FormControl>
             </FormItem>
           )}
         />
 
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 mt-2">
           <Button type="button" onClick={() => router.back()} variant="glow">
             {cancelButtonText}
           </Button>

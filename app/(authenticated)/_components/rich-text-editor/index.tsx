@@ -83,7 +83,7 @@ const RichTextEditor = ({
           <GripVerticalIcon className="w-4 h-4 text-gray-500" />
         </DragHandle>
       )}
-      <EditorContent editor={editor} className="h-full" />
+      <EditorContent editor={editor} />
     </>
   );
 };
