@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/tooltip";
 import { NoteView } from "./_components/note-view";
 import { useRouter } from "next/navigation";
+import GridLoading from "./_components/loading/grid-loading";
+import ControlsLoading from "./_components/loading/controls-loading";
 
 export default function Notes() {
   const { selectedWorkspace } = useWorkspace();
@@ -76,7 +78,8 @@ export default function Notes() {
       </CardHeader>
       {loadingNotes ? (
         <div className="p-4 text-center text-muted-foreground">
-          Loading notes...
+          <ControlsLoading />
+          <GridLoading />
         </div>
       ) : notesData?.length === 0 ? (
         <div className="p-4 text-center text-muted-foreground">
