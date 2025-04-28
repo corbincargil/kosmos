@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
 import NoteForm from "../../../_components/note-form";
@@ -43,6 +43,7 @@ export default function InterceptedEditNotePage({
       <DialogContent className="max-w-6xl p-4 h-[96vh] flex flex-col">
         <DialogHeader className="sr-only">
           <DialogTitle>{noteData.title}</DialogTitle>
+          <DialogDescription sr-only="true">Edit note form</DialogDescription>
         </DialogHeader>
         <div className="flex-1 min-h-0">
           <NoteForm workspaceUuid={noteData.workspaceUuid} note={noteData} />

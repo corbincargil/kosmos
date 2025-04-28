@@ -46,12 +46,11 @@ export default function EditTaskModalPage() {
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent
-        className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2"
-        aria-describedby="task-dialog-description"
+        className="sm:max-w-7xl sm:p-4 max-w-[96vw] p-2"
       >
         <DialogHeader>
           <DialogTitle>Edit Task</DialogTitle>
-          <DialogDescription id="task-dialog-description"></DialogDescription>
+          <DialogDescription sr-only="true">Edit task form</DialogDescription>
         </DialogHeader>
         <TaskForm taskId={id as string} onCancel={onClose} />
       </DialogContent>

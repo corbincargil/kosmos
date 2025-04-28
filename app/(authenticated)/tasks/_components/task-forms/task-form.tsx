@@ -172,7 +172,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="sm:max-w-4xl sm:p-4 max-w-[96vw] max-h-[90vh] p-2 space-y-2 bg-white dark:bg-gray-800 rounded-md shadow-sm"
+      className="sm:max-w-7xl sm:p-4 max-w-[96vw] max-h-[90vh] p-2 space-y-2 bg-white dark:bg-gray-800 rounded-md shadow-sm"
       tabIndex={-1}
     >
       <div className="md:flex md:space-x-4">
@@ -361,7 +361,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
         isOpen={showDeleteModal}
         onClose={() => {
           setShowDeleteModal(false);
-          router.back();
+          // router.back();
         }}
         recordId={task?.id || 0}
       />

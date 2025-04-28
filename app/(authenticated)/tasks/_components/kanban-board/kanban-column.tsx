@@ -23,7 +23,7 @@ export default function KanbanColumn({
   return (
     <div
       key={status}
-      className="flex-1 min-w-[80vw] md:min-w-[300px] max-w-[500px] flex flex-col h-full snap-center"
+      className="flex-1 min-w-[80vw] md:min-w-[320px] max-w-[500px] flex flex-col h-full snap-center"
     >
       <h3 className="text-lg font-semibold p-1">{getTaskLabel(status)}</h3>
       <div className="flex-1 bg-secondary px-2 pt-2 rounded-lg overflow-y-auto">

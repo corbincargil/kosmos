@@ -1,7 +1,5 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Paragraph from "@tiptap/extension-paragraph";
-import Text from "@tiptap/extension-text";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import DragHandle from "@tiptap-pro/extension-drag-handle-react";
@@ -28,8 +26,6 @@ const extensions = [
       keepMarks: true,
     },
   }),
-  Paragraph,
-  Text,
   TaskList,
   TaskItem,
 ];
@@ -45,6 +41,7 @@ const RichTextEditor = ({
   const initialContentRef = useRef(normalizeHtml(content));
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions,
     content,
     editable: !readOnly,
