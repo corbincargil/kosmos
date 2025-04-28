@@ -1,7 +1,7 @@
 .tiptap {
   padding: 1rem;
   border: none;
-
+  height: inherit;
 
   &:focus-visible {
     outline: none;

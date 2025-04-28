@@ -209,12 +209,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
                 Description
               </label>
             </div>
-            <div className="sm:max-h-[40vh] max-h-[20vh] overflow-y-auto">
+            <div className="sm:h-[40vh] h-[20vh] overflow-y-auto ring-1 ring-gray-300 dark:ring-gray-600 rounded-md">
               <RichTextEditor
                 content={formData.description}
                 onChange={(value) =>
                   setFormData({ ...formData, description: value })
                 }
+                className="h-full"
               />
             </div>
           </div>

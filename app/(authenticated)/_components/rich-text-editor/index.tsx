@@ -16,6 +16,7 @@ interface RichTextEditorProps {
   readOnly?: boolean;
   onCompareContent?: (hasChanges: boolean) => void;
   lastSavedContent?: string;
+  className?: string;
 }
 
 const extensions = [
@@ -39,6 +40,7 @@ const RichTextEditor = ({
   readOnly = false,
   onCompareContent,
   lastSavedContent,
+  className,
 }: RichTextEditorProps) => {
   const initialContentRef = useRef(normalizeHtml(content));
 
@@ -83,7 +85,7 @@ const RichTextEditor = ({
           <GripVerticalIcon className="w-4 h-4 text-gray-500" />
         </DragHandle>
       )}
-      <EditorContent editor={editor} />
+      <EditorContent editor={editor} className={className} />
     </>
   );
 };
