@@ -15,6 +15,7 @@ import QuickFilters from "./quick-filters";
 import { Button } from "@/components/ui/button";
 import { TaskStatus } from "@prisma/client";
 import AllTasksSwitch from "./all-tasks-switch";
+import KanbanLoading from "../loading/kanban-loading";
 
 export const TaskView: React.FC = () => {
   const [showAll, setShowAll] = useState(true);
@@ -108,7 +109,6 @@ export const TaskView: React.FC = () => {
     router.push(`/tasks/edit/${task.uuid}?${params.toString()}`);
   };
 
-  if (tasksLoading) return <p>Loading tasks...</p>;
 
   if (tasksError) return <p>Error loading tasks</p>;
 
@@ -137,7 +137,8 @@ export const TaskView: React.FC = () => {
           Create Task
         </Button>
       </div>
-      {tasks.length > 0 && currentView === "list" && (
+      {tasksLoading && <KanbanLoading />}
+      {tasks.length > 0 && currentView === "list" && !tasksLoading && (
         <div className="flex-1 overflow-hidden">
           <TaskAccordion
             tasks={filteredTasks || []}
@@ -148,7 +149,7 @@ export const TaskView: React.FC = () => {
           />
         </div>
       )}
-      {tasks.length > 0 && currentView === "board" && (
+      {tasks.length > 0 && currentView === "board" && !tasksLoading && (
         <div className="flex-1 overflow-hidden">
           <KanbanBoard
             columns={
@@ -162,9 +163,9 @@ export const TaskView: React.FC = () => {
           />
         </div>
       )}
-      {tasks.length === 0 && (
+      {tasks.length === 0 && !tasksLoading && (
         <div className="flex justify-center items-center h-full">
-          <p className="text-gray-500">No tasks found</p>
+          <p className="text-gray-500">No tasks found 🥺</p>
         </div>
       )}
     </div>

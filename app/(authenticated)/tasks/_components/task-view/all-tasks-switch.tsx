@@ -17,11 +17,15 @@ export default function AllTasksSwitch() {
   return (
     <>
       <Label className="text-sm font-medium">All Tasks:</Label>
-      <Switch checked={showAll} onCheckedChange={handleToggle}>
-        <Button variant="ghost" className={!showAll ? "bg-secondary" : ""}>
+      <Switch
+        checked={showAll}
+        onCheckedChange={handleToggle}
+        className="data-[state=checked]:bg-workspace"
+      >
+        <Button variant="default" className={!showAll ? "bg-background" : ""}>
           Primary
         </Button>
-        <Button variant="ghost" className={showAll ? "bg-secondary" : ""}>
+        <Button variant="ghost" className={showAll ? "bg-background" : ""}>
           All
         </Button>
       </Switch>

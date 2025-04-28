@@ -49,7 +49,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-row gap-4 overflow-x-auto snap-x snap-mandatory sm:snap-none">
+    <div className="bg-background p-2 rounded-lg h-full flex flex-row gap-4 overflow-x-auto snap-x snap-mandatory sm:snap-none">
       {columns.map((status) => (
         <KanbanColumn key={status} status={status} userId={userId}>
           {tasks

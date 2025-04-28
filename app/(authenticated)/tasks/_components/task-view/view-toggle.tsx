@@ -22,7 +22,7 @@ export const TaskViewToggle: React.FC = () => {
   };
 
   return (
-    <div className="bg-primary/20 p-1 rounded-md flex justify-end">
+    <div className="bg-input p-1 rounded-md flex justify-end">
       <div className="flex gap-2">
         <Button
           variant={viewMode === "board" ? "default" : "outline"}
