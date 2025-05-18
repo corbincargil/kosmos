@@ -32,6 +32,9 @@ export default function EditTaskModalPage() {
   if (isLoading) {
     return (
       <Dialog open={true}>
+        <DialogHeader>
+          <DialogTitle hidden>Loading task edit form...</DialogTitle>
+        </DialogHeader>
         <DialogContent>
           <div>Loading...</div>
         </DialogContent>
@@ -44,13 +47,13 @@ export default function EditTaskModalPage() {
   }
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent
-        className="sm:max-w-7xl sm:p-4 max-w-[96vw] p-2"
-      >
+      <Dialog open={true} onOpenChange={onClose}>
+        <DialogContent
+          className="max-w-7xl w-[96vw]"
+        >
         <DialogHeader>
           <DialogTitle>Edit Task</DialogTitle>
-          <DialogDescription sr-only="true">Edit task form</DialogDescription>
+          <DialogDescription hidden>Edit task form</DialogDescription>
         </DialogHeader>
         <TaskForm taskId={id as string} onCancel={onClose} />
       </DialogContent>

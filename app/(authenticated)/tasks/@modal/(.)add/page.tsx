@@ -20,16 +20,13 @@ export default function AddTaskModal() {
         <Button variant="glow">Create New Task</Button>
       </DialogTrigger>
       <DialogContent
-        className="sm:max-w-4xl sm:p-4 max-w-[96vw] p-2"
-        aria-describedby="task-dialog"
+        className="max-w-7xl w-[96vw]"
       >
         <DialogHeader>
           <DialogTitle>Create New Task</DialogTitle>
+          <DialogDescription hidden>Create new task form</DialogDescription>
         </DialogHeader>
-        <DialogDescription></DialogDescription>
-        <div className="max-h-[80vh] overflow-y-auto">
           <TaskForm />
-        </div>
       </DialogContent>
     </Dialog>
   );
