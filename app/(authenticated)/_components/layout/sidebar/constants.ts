@@ -21,6 +21,10 @@ import {
   GraduationCap,
   ListCheck,
   BookOpen,
+  Code,
+  Church,
+  Heart,
+  Dumbbell,
 } from "lucide-react";
 
 export const dashboardLink = {
@@ -70,4 +74,8 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   House,
   Binary,
   DollarSign,
+  Code,
+  Church,
+  Heart,
+  Dumbbell,
 };
