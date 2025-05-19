@@ -8,10 +8,10 @@ datasource db {
 }
 
 model User {
-  id          Int    @id @default(autoincrement())
-  uuid        String @unique @default(uuid())
-  email       String @unique
-  clerkUserId String @unique
+  id               Int               @id @default(autoincrement())
+  uuid             String            @unique @default(uuid())
+  email            String            @unique
+  clerkUserId      String            @unique
 
   workspaces       Workspace[]
   tasks            Task[]
@@ -19,61 +19,61 @@ model User {
   oauthStates      OAuthState[]
   oauthConnections OAuthConnection[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 }
 
 model Workspace {
-  id    Int           @id @default(autoincrement())
-  uuid  String        @unique @default(uuid())
-  name  String        @db.VarChar(50)
-  type  WorkspaceType @default(DEFAULT)
-  color String        @default("#3B82F6")
-  icon  String        @default("Croissant")
+  id        Int           @id @default(autoincrement())
+  uuid      String        @unique @default(uuid())
+  name      String        @db.VarChar(50)
+  type      WorkspaceType @default(DEFAULT)
+  color     String        @default("#3B82F6")
+  icon      String        @default("Croissant")
+  
+  user      User          @relation(fields: [userId], references: [id])
+  userId    Int
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  tasks     Task[]
+  notes     Note[]
 
-  tasks Task[]
-  notes Note[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 }
 
 model Task {
-  id          Int           @id @default(autoincrement())
-  uuid        String        @unique @default(uuid())
-  title       String        @db.VarChar(100)
-  description String?
-  dueDate     DateTime?
-  status      TaskStatus    @default(TODO)
-  priority    TaskPriority?
-
+  id            Int           @id @default(autoincrement())
+  uuid          String        @unique @default(uuid())
+  title         String        @db.VarChar(100)
+  description   String?
+  dueDate       DateTime?
+  status        TaskStatus    @default(TODO)
+  priority      TaskPriority?
+  
+  user          User          @relation(fields: [userId], references: [id])
   userId        Int
-  user          User      @relation(fields: [userId], references: [id])
-  workspace     Workspace @relation(fields: [workspaceUuid], references: [uuid])
-  workspaceId   Int?
+  workspace     Workspace     @relation(fields: [workspaceUuid], references: [uuid])
   workspaceUuid String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  workspaceId   Int?
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
 model Note {
-  id      Int    @id @default(autoincrement())
-  uuid    String @unique @default(uuid())
-  title   String @db.VarChar(100)
-  content String @db.Text
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(uuid())
+  title         String    @db.VarChar(100)
+  content       String
 
-  userId        Int
   user          User      @relation(fields: [userId], references: [id])
+  userId        Int
   workspace     Workspace @relation(fields: [workspaceUuid], references: [uuid])
-  workspaceId   Int?
   workspaceUuid String
+  workspaceId   Int?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model OAuthState {
