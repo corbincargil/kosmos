@@ -9,7 +9,7 @@ env:
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
   DIRECT_URL: ${{ secrets.DIRECT_URL }}
-
+  TIPTAP_PRO_TOKEN: ${{ secrets.TIPTAP_PRO_TOKEN }}
 jobs:
   deploy-production:
     permissions: write-all
