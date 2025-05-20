@@ -38,6 +38,7 @@ jobs:
             echo DATABASE_URL=${{ steps.create-branch.outputs.db_url_with_pooler }}?sslmode=require >> .env
             echo DIRECT_URL=${{ steps.create-branch.outputs.db_url }}?sslmode=require >> .env
 
+            npm install prisma@5.20.0 -D
             npx prisma generate
             npx prisma migrate deploy
 
