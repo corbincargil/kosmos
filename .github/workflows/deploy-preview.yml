@@ -8,6 +8,7 @@ env:
   NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
   NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  TIPTAP_PRO_TOKEN: ${{ secrets.TIPTAP_PRO_TOKEN }}
 
 
 jobs:
@@ -16,6 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Configure TipTap Pro Registry
+        run: |
+          npm config set "@tiptap-pro:registry" https://registry.tiptap.dev/
+          npm config set "@tiptap-cloud:registry" https://registry.tiptap.dev/
+          npm config set "//registry.tiptap.dev/:_authToken" ${{ env.TIPTAP_PRO_TOKEN }}
 
       - name: Get branch name
         id: branch-name
