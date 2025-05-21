@@ -18,6 +18,19 @@ export const taskRouter = createTRPCRouter({
             userId: Number(ctx.userId),
             status: { in: input.statuses },
           },
+          include: {
+            tags: {
+              select: {
+                tag: {
+                  select: {
+                    autoId: true,
+                    name: true,
+                    color: true,
+                  }
+                }
+              }
+            }
+          },
           orderBy: [
             { priority: { sort: "desc", nulls: "last" } },
             { createdAt: "desc" },
@@ -30,6 +43,19 @@ export const taskRouter = createTRPCRouter({
           workspaceUuid: input.workspaceId,
           status: { in: input.statuses },
         },
+        include: {
+          tags: {
+            select: {
+              tag: {
+                select: {
+                  autoId: true,
+                  name: true,
+                  color: true,
+                }
+              }
+            }
+          }
+        },
         orderBy: [
           { priority: { sort: "desc", nulls: "last" } },
           { createdAt: "desc" },
@@ -39,7 +65,26 @@ export const taskRouter = createTRPCRouter({
   getTaskByUuid: protectedProcedure
     .input(z.object({ uuid: z.string() }))
     .query(async ({ ctx, input }) => {
-      return ctx.db.task.findUnique({ where: { uuid: input.uuid } });
+      const task = await ctx.db.task.findUnique({ 
+        where: { uuid: input.uuid },
+        include: { 
+          tags: { 
+            select: { 
+              tag: {
+                select: {
+                  autoId: true,
+                  name: true,
+                  color: true,
+                }
+              }
+            } 
+          } 
+        }
+      });
+      return task ? {
+        ...task,
+        tags: task.tags.map(t => t.tag)
+      } : null;
     }),
   createTask: protectedProcedure
     .input(
@@ -52,20 +97,60 @@ export const taskRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const { tags, ...data } = input;
       return ctx.db.task.create({
-        data: { ...input, userId: Number(ctx.userId) },
+        data: {
+          ...data,
+          userId: Number(ctx.userId),
+          tags: tags ? {
+            create: tags.map(tagId => ({
+              tag: {
+                connect: {
+                  autoId: tagId
+                }
+              }
+            }))
+          } : undefined
+        },
+        include: {
+          tags: {
+            include: {
+              tag: true
+            }
+          }
+        }
       });
     }),
   updateTask: protectedProcedure
     .input(TaskSchema.omit({ createdAt: true, updatedAt: true, userId: true }))
     .mutation(async ({ ctx, input }) => {
+      const { tags, ...data } = input;
       return ctx.db.task.update({
         where: { id: input.id },
-        data: input,
+        data: {
+          ...data,
+          tags: tags ? {
+            deleteMany: {},
+            create: tags.map(tagId => ({
+              tag: {
+                connect: {
+                  autoId: tagId
+                }
+              }
+            }))
+          } : undefined
+        },
+        include: {
+          tags: {
+            include: {
+              tag: true
+            }
+          }
+        }
       });
     }),
   updateTaskStatus: protectedProcedure
-    .input(z.object({ id: z.number(), status: z.string() })) //? update to include workspaceId and userId ?
+    .input(z.object({ id: z.number(), status: z.string() }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.task.update({
         where: { id: input.id },
@@ -73,7 +158,7 @@ export const taskRouter = createTRPCRouter({
       });
     }),
   deleteTask: protectedProcedure
-    .input(z.number()) //? update to include workspaceId and userId ?
+    .input(z.number())
     .mutation(async ({ ctx, input }) => {
       return ctx.db.task.delete({ where: { id: input } });
     }),
