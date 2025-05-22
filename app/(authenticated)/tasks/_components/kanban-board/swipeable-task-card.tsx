@@ -7,13 +7,28 @@ import { Flag, ChevronRight, ChevronLeft } from "lucide-react";
 import { getPreviousStatus } from "@/app/(authenticated)/tasks/_components/task-list/utils";
 import { TaskStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
+import { ICON_MAP } from "@/app/(authenticated)/_components/layout/sidebar/constants";
 
 type SwipeableTaskCardProps = {
-  task: Task;
+  task: Task & {
+    taskType?: {
+      autoId: number;
+      name: string;
+      color: string;
+      icon: string;
+    } | null;
+    tags?: {
+      tag: {
+        autoId: number;
+        name: string;
+        color: string;
+      };
+    }[];
+  };
   workspace: Workspace;
-  onUpdateStatus: (taskId: number, newStatus: TaskStatus) => void;
-  onEdit: () => void;
   onQuickMove?: () => void;
+  onUpdateStatus?: (status: TaskStatus) => void;
+  onEdit?: () => void;
   showStatus?: boolean;
   showQuickMove?: boolean;
   onQuickMoveBack?: () => void;
@@ -101,7 +116,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
       setIsRightSwiped(false);
 
       // Trigger the status update
-      onUpdateStatus(task.id, newStatus);
+      onUpdateStatus?.(newStatus);
     }
   };
 
@@ -191,7 +206,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
       setIsLeftSwiped(false);
 
       // Trigger the status update
-      onUpdateStatus(task.id, newStatus);
+      onUpdateStatus?.(newStatus);
     }
   };
 
@@ -308,6 +323,16 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
           <div className="flex justify-between items-start gap-2">
             <div className="flex-grow min-w-0">
               <div className="flex items-start gap-2">
+                {task.taskType && (
+                  <div className="flex-shrink-0 mt-0.5" title={task.taskType.name}>
+                    {ICON_MAP[task.taskType.icon] && 
+                      React.createElement(ICON_MAP[task.taskType.icon], {
+                        size: 14,
+                        className: "text-gray-500 dark:text-gray-400"
+                      })
+                    }
+                  </div>
+                )}
                 <h3
                   className={`text-sm font-medium line-clamp-1 ${
                     isCompleted
@@ -372,31 +397,57 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
                 </p>
               )}
             </div>
-            <div className="hidden md:flex items-center gap-1">
-              {showQuickMoveBack && onQuickMoveBack && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onQuickMoveBack();
-                  }}
-                  className="flex items-center justify-center p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
-                  title="Move to previous status"
-                >
-                  <ChevronLeft className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                </button>
+            <div className="flex items-center gap-1">
+              {task.tags && task.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 justify-end">
+                  {task.tags.map((t) => {
+                    if (typeof t !== 'object' || t === null) return null;
+                    const tagObj = t as { tag?: { autoId: number; name: string; color: string; }; autoId?: number; name?: string; color?: string; };
+                    const tag = tagObj.tag ? tagObj.tag : tagObj;
+                    if (!tag || typeof tag !== 'object') return null;
+                    if (!('autoId' in tag && 'name' in tag && 'color' in tag)) return null;
+                    return (
+                      <span
+                        key={tag.autoId}
+                        className="text-xs px-1.5 py-0.5 rounded-full font-medium"
+                        style={{ 
+                          backgroundColor: `${tag.color}20`, 
+                          color: tag.color,
+                          border: `1px solid ${tag.color}40`
+                        }}
+                      >
+                        {tag.name}
+                      </span>
+                    );
+                  })}
+                </div>
               )}
-              {showQuickMove && onQuickMove && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onQuickMove();
-                  }}
-                  className="flex items-center justify-center p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
-                  title="Move to next status"
-                >
-                  <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                </button>
-              )}
+              <div className="hidden md:flex items-center gap-1">
+                {showQuickMoveBack && onQuickMoveBack && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onQuickMoveBack();
+                    }}
+                    className="flex items-center justify-center p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
+                    title="Move to previous status"
+                  >
+                    <ChevronLeft className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  </button>
+                )}
+                {showQuickMove && onQuickMove && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onQuickMove();
+                    }}
+                    className="flex items-center justify-center p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors opacity-0 group-hover:opacity-100"
+                    title="Move to next status"
+                  >
+                    <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { Task } from "@/types/task";
 import { TaskPriority, TaskStatus } from "@prisma/client";
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,8 @@ import {
   Flag,
   Trash2,
   Warehouse,
+  TagIcon,
+  Bug,
 } from "lucide-react";
 import { useWorkspace } from "@/contexts/workspace-context";
 import { TaskConfirmDeleteModal } from "./task-confirm-delete-modal";
@@ -19,6 +20,8 @@ import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
 import { toast } from "@/hooks/use-toast";
 import RichTextEditor from "@/app/(authenticated)/_components/rich-text-editor";
+import { TagSelect } from "@/app/(authenticated)/_components/forms/tag-input";
+import { TaskTypeSelect } from "@/app/(authenticated)/_components/forms/task-type-select";
 
 type TaskFormProps = {
   taskId?: string;
@@ -34,8 +37,22 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
     status: "TODO" as TaskStatus,
     priority: "" as TaskPriority | "",
     workspaceUuid: selectedWorkspace,
+    tags: [] as number[],
+    taskTypeId: null as number | null,
   });
-  const [task, setTask] = useState<Task | null>(null);
+  const [task, setTask] = useState<{
+    id: number;
+    uuid: string;
+    status: TaskStatus;
+    userId: number;
+    title: string;
+    description: string | null;
+    dueDate: Date | null;
+    priority: TaskPriority | null;
+    workspaceUuid: string;
+    tags: { autoId: number }[];
+    taskTypeId: number | null;
+  } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const formRef = React.useRef<HTMLFormElement>(null);
@@ -129,6 +146,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
         status: task.status,
         priority: task.priority || "",
         workspaceUuid: task.workspaceUuid,
+        tags: task.tags.map(tag => tag.autoId),
+        taskTypeId: task.taskTypeId,
       });
     }
   }, [task]);
@@ -145,6 +164,20 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
     }));
   };
 
+  const handleTagChange = (tagIds: number[]) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: tagIds
+    }));
+  };
+
+  const handleTaskTypeChange = (taskTypeId: number | null) => {
+    setFormData(prev => ({
+      ...prev,
+      taskTypeId
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSubmitting) return;
@@ -157,6 +190,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
         priority: formData.priority || null,
         dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
         workspaceUuid: formData.workspaceUuid,
+        tags: formData.tags,
+        taskTypeId: formData.taskTypeId,
       });
     } else {
       createTaskMutation.mutate({
@@ -164,6 +199,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
         priority: formData.priority || null,
         dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
         workspaceUuid: formData.workspaceUuid,
+        tags: formData.tags,
+        taskTypeId: formData.taskTypeId,
       });
     }
   };
@@ -174,6 +211,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
       onSubmit={handleSubmit}
       className="sm:max-w-7xl sm:p-4 max-w-[96vw] max-h-[90vh] p-2 space-y-2 bg-white dark:bg-gray-800 rounded-md shadow-sm"
       tabIndex={-1}
+      onClick={(e) => e.stopPropagation()}
     >
       <div className="md:flex md:space-x-4">
         <div className="md:w-2/3 space-y-2">
@@ -320,6 +358,42 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
               <option value="IN_PROGRESS">In Progress</option>
               <option value="COMPLETED">Completed</option>
             </select>
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <TagIcon size={16} className="text-gray-600 dark:text-gray-400" />
+              <label
+                htmlFor="tags"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Tags
+              </label>
+            </div>
+            <div onClick={(e) => e.stopPropagation()}>
+              <TagSelect
+                value={formData.tags}
+                onChange={handleTagChange}
+                workspaceUuid={selectedWorkspace}
+              />
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Bug size={16} className="text-gray-600 dark:text-gray-400" />
+              <label
+                htmlFor="taskTypeId"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Task Type
+              </label>
+            </div>
+            <div onClick={(e) => e.stopPropagation()}>
+              <TaskTypeSelect
+                value={formData.taskTypeId}
+                onChange={handleTaskTypeChange}
+                workspaceUuid={selectedWorkspace}
+              />
+            </div>
           </div>
         </div>
       </div>

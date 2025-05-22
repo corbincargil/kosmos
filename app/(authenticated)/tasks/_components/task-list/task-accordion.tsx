@@ -93,12 +93,12 @@ export const TaskAccordion: React.FC<TaskAccordionProps> = ({
                     {statusTasks.map((task) => (
                       <SwipeableTaskCard
                         key={task.id}
-                        task={task}
+                        task={task as Task & { taskType?: { autoId: number; name: string; color: string; icon: string } | null; tags?: { tag: { autoId: number; name: string; color: string; }; }[] }}
                         workspace={
                           workspaces.find((w) => w.uuid === task.workspaceUuid)!
                         }
-                        onUpdateStatus={(taskId, newStatus) =>
-                          onUpdateStatus(taskId, newStatus)
+                        onUpdateStatus={(newStatus) =>
+                          onUpdateStatus(task.id!, newStatus)
                         }
                         onEdit={() => onEdit(task)}
                       />

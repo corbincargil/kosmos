@@ -1,15 +1,15 @@
 import { Workspace } from "@/types/workspace";
 import { Trash } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import WorkspaceDialog from "./workspace-dialog";
 
 interface WorkspaceListProps {
   workspaces: Workspace[];
-  onEditWorkspace: (workspace: Workspace) => void;
   onDeleteWorkspace: (workspace: Workspace) => void;
 }
 
 export default function WorkspaceList({
   workspaces,
-  onEditWorkspace,
   onDeleteWorkspace,
 }: WorkspaceListProps) {
   return (
@@ -31,19 +31,16 @@ export default function WorkspaceList({
               Created: {new Date(workspace.createdAt).toLocaleDateString()}
             </p>
           </div>
-          <div className="flex items-center">
-            <button
-              onClick={() => onEditWorkspace(workspace)}
-              className="bg-blue-500 text-white px-2 py-1 rounded text-sm mr-2"
-            >
-              Edit
-            </button>
-            <button
+          <div className="flex items-center gap-2">
+            <WorkspaceDialog workspace={workspace} />
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => onDeleteWorkspace(workspace)}
-              className="p-1 rounded hover:text-red-500"
+              className="text-destructive hover:text-destructive"
             >
               <Trash size={20} />
-            </button>
+            </Button>
           </div>
         </li>
       ))}

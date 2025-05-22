@@ -73,12 +73,14 @@ export const InlineTaskForm: React.FC<InlineTaskFormProps> = ({
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      const taskData: Omit<Task, "id" | "createdAt" | "updatedAt" | "uuid"> = {
+      const taskData: Omit<Task, "id" | "createdAt" | "updatedAt" | "uuid" | "taskTypeId" | "tags"> & { taskTypeId: number | null; tags: number[] | null } = {
         ...formData,
         userId,
         priority: formData.priority || null,
         workspaceUuid: formData.workspaceUuid || selectedWorkspace,
         dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
+        taskTypeId: null,
+        tags: null,
       };
       if (!isPending) createTaskMutation(taskData);
     },
