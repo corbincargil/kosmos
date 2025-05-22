@@ -10,16 +10,9 @@ import DeleteWorkspaceModal from "./_components/delete-workspace-modal";
 export default function AdminPage() {
   const { workspaces } = useWorkspace();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingWorkspace, setEditingWorkspace] = useState<Workspace | null>(
-    null
-  );
   const [deletingWorkspace, setDeletingWorkspace] = useState<Workspace | null>(
     null
   );
-
-  const openEditModal = (workspace: Workspace) => {
-    setEditingWorkspace(workspace);
-  };
 
   const openDeleteModal = (workspace: Workspace) => {
     setDeletingWorkspace(workspace);
@@ -32,7 +25,6 @@ export default function AdminPage() {
         <h2 className="text-xl font-semibold mb-2">Your Workspaces</h2>
         <WorkspaceList
           workspaces={workspaces}
-          onEditWorkspace={openEditModal}
           onDeleteWorkspace={openDeleteModal}
         />
       </div>
@@ -45,21 +37,15 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {(isModalOpen || editingWorkspace) && (
+      {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg">
             <h2 className="text-xl font-semibold mb-4 dark:text-white">
-              {editingWorkspace ? "Edit Workspace" : "Add New Workspace"}
+              Add New Workspace
             </h2>
             <WorkspaceForm
-              workspaceId={editingWorkspace?.id}
-              initialName={editingWorkspace?.name}
-              initialColor={editingWorkspace?.color}
-              initialType={editingWorkspace?.type}
-              initialIcon={editingWorkspace?.icon}
               closeModal={() => {
                 setIsModalOpen(false);
-                setEditingWorkspace(null);
               }}
             />
           </div>

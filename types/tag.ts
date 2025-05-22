@@ -9,3 +9,5 @@ export const TagSchema = z.object({
 });
 
 export const CreateTagSchema = TagSchema.omit({ autoId: true });
+
+export type Tag = z.infer<typeof TagSchema>;
