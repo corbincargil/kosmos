@@ -33,7 +33,7 @@ export function TagForm({ tag, onSubmit, onCancel }: TagFormProps) {
           type="color"
           value={color}
           onChange={(e) => setColor(e.target.value)}
-          className="w-20 h-10 p-1"
+          className="w-40 h-10 p-0"
           required
         />
       </div>

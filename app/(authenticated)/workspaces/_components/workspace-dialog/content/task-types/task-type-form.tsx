@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TaskType } from "@/types/task-type";
-import { Icon } from "lucide-react";
 import IconSelect from "../../../icon-select";
 
 interface TaskTypeFormProps {
@@ -33,10 +32,7 @@ export function TaskTypeForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <label htmlFor="name" className="text-sm font-medium">
-          Name
-        </label>
+      <div className="flex gap-2 items-center">
         <Input
           id="name"
           value={name}
@@ -44,21 +40,15 @@ export function TaskTypeForm({
           placeholder="Enter task type name"
           required
         />
-      </div>
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Color</label>
-        <input
+          <IconSelect
+            value={icon}
+            onValueChange={(value) => setIcon(value)}
+          />
+        <Input
           type="color"
           value={color}
           onChange={(e) => setColor(e.target.value)}
-          className="w-full h-10 rounded-md border"
-        />
-      </div>
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Icon</label>
-        <IconSelect
-          value={icon}
-          onValueChange={(value) => setIcon(value)}
+          className="w-40 h-10 p-0"
         />
       </div>
       <div className="flex justify-end gap-2">
