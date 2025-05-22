@@ -57,11 +57,11 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
             .map((task) => (
               <SwipeableTaskCard
                 key={task.id}
-                task={task}
+                task={task as Task & { taskType?: { autoId: number; name: string; color: string; icon: string } | null; tags?: { tag: { autoId: number; name: string; color: string; }; }[] }}
                 workspace={
                   workspaces.find((w) => w.uuid === task.workspaceUuid)!
                 }
-                onUpdateStatus={onUpdateStatus}
+                onUpdateStatus={(status) => onUpdateStatus(task.id!, status)}
                 onEdit={() => onEditTask(task)}
                 onQuickMove={() => handleQuickMoveToNext(task)}
                 onQuickMoveBack={() => handleQuickMoveToPrevious(task)}

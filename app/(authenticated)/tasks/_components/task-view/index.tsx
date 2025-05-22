@@ -44,7 +44,7 @@ export const TaskView: React.FC = () => {
 
   useEffect(() => {
     if (fetchedTasks) {
-      setTasks(fetchedTasks);
+      setTasks(fetchedTasks as unknown as Task[]);
     }
   }, [fetchedTasks]);
 
@@ -83,7 +83,7 @@ export const TaskView: React.FC = () => {
     },
     onError: (error) => {
       if (fetchedTasks) {
-        setTasks(fetchedTasks);
+        setTasks(fetchedTasks as unknown as Task[]);
       }
       toast({
         title: "Error",

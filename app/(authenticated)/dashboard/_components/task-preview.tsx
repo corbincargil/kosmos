@@ -34,11 +34,13 @@ export function TaskPreview({
       {tasks.map((task) => (
         <SwipeableTaskCard
           key={task.id}
-          task={task}
+          task={task as Task & { taskType?: { autoId: number; name: string; color: string; icon: string } | null; tags?: { tag: { autoId: number; name: string; color: string; }; }[] }}
           workspace={workspaces.find((w) => w.uuid === task.workspaceUuid)!}
-          onUpdateStatus={handleUpdateStatus}
+          onUpdateStatus={(status) => handleUpdateStatus(task.id, status)}
           onEdit={() => {}}
           showStatus={true}
+          showQuickMove={true}
+          showQuickMoveBack={true}
         />
       ))}
     </div>

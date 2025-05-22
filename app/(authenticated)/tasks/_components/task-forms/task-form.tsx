@@ -1,6 +1,5 @@
 "use client";
 
-import { Task } from "@/types/task";
 import { TaskPriority, TaskStatus } from "@prisma/client";
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";

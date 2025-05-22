@@ -15,6 +15,7 @@ import { ArrowRight } from "lucide-react";
 import { TaskPreview } from "@/app/(authenticated)/dashboard/_components/task-preview";
 import { NotePreview } from "@/app/(authenticated)/dashboard/_components/note-preview";
 import { api } from "@/trpc/react";
+import { Task } from "@/types/task";
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -64,7 +65,7 @@ export default function Dashboard() {
             <CardContent>
               {tasks?.length ? (
                 <TaskPreview
-                  tasks={tasks.slice(0, 5)}
+                  tasks={tasks.slice(0, 5) as unknown as Task[]}
                   workspaces={workspaces}
                   onTasksChanged={async () => {
                     refetchTasks();
