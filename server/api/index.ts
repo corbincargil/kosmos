@@ -6,6 +6,7 @@ import { userRouter } from "./routers/user-router";
 import { schwabRouter } from "./routers/schwab-router";
 import { oauthRouter } from "./routers/oauth-router";
 import { tagRouter } from "./routers/tag-router";
+import { taskTypeRouter } from "./routers/task-type-router";
 
 export const appRouter = createTRPCRouter({
   users: userRouter,
@@ -13,7 +14,7 @@ export const appRouter = createTRPCRouter({
   workspaces: workspaceRouter,
   notes: noteRouter,
   tags: tagRouter,
-  
+  taskTypes: taskTypeRouter,
   oauth: oauthRouter,
   schwab: schwabRouter,
 });

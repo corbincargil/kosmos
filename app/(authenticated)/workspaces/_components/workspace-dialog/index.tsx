@@ -22,9 +22,9 @@ export default function WorkspaceDialog({ workspace }: { workspace: Workspace })
       case "general":
         return <GeneralContent />;
       case "tags":
-        return <TagsContent workspaceId={workspace.id}  />;
+        return <TagsContent workspaceId={workspace.id} />;
       case "task-types":
-        return <TaskTypesContent />;
+        return <TaskTypesContent workspaceId={workspace.id} />;
       default:
         return <GeneralContent />;
     }
@@ -59,7 +59,7 @@ export default function WorkspaceDialog({ workspace }: { workspace: Workspace })
                 <div className="h-12 flex items-center justify-between">
                   <h1 className="text-2xl font-bold">{workspace.name}</h1>
                 </div>
-                  {renderContent()}
+                {renderContent()}
               </div>
             </>
           )}

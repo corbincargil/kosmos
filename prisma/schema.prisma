@@ -53,7 +53,7 @@ model Task {
   status        TaskStatus    @default(TODO)
   priority      TaskPriority?
   
-  taskType      TaskType?     @relation(fields: [taskTypeId], references: [id])
+  taskType      TaskType?     @relation(fields: [taskTypeId], references: [autoId])
   taskTypeId    Int?
   tags          TaskTag[]
   
@@ -95,8 +95,8 @@ model TaskTag {
 }
 
 model TaskType {
-  id            Int       @id @default(autoincrement())
-  uuid          String    @unique @default(uuid())
+  autoId        Int       @id @default(autoincrement())
+  cuid          String    @unique @default(cuid())
   name          String    @db.VarChar(50)
   color         String    @default("#3B82F6")
   icon          String    @default("Bug")
