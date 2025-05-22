@@ -7,13 +7,28 @@ import { Flag, ChevronRight, ChevronLeft } from "lucide-react";
 import { getPreviousStatus } from "@/app/(authenticated)/tasks/_components/task-list/utils";
 import { TaskStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
+import { ICON_MAP } from "@/app/(authenticated)/_components/layout/sidebar/constants";
 
 type SwipeableTaskCardProps = {
-  task: Task;
+  task: Task & {
+    taskType?: {
+      autoId: number;
+      name: string;
+      color: string;
+      icon: string;
+    } | null;
+    tags?: {
+      tag: {
+        autoId: number;
+        name: string;
+        color: string;
+      };
+    }[];
+  };
   workspace: Workspace;
-  onUpdateStatus: (taskId: number, newStatus: TaskStatus) => void;
-  onEdit: () => void;
   onQuickMove?: () => void;
+  onUpdateStatus?: (status: TaskStatus) => void;
+  onEdit?: () => void;
   showStatus?: boolean;
   showQuickMove?: boolean;
   onQuickMoveBack?: () => void;
@@ -101,7 +116,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
       setIsRightSwiped(false);
 
       // Trigger the status update
-      onUpdateStatus(task.id, newStatus);
+      onUpdateStatus?.(newStatus);
     }
   };
 
@@ -191,7 +206,7 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
       setIsLeftSwiped(false);
 
       // Trigger the status update
-      onUpdateStatus(task.id, newStatus);
+      onUpdateStatus?.(newStatus);
     }
   };
 
@@ -308,6 +323,16 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
           <div className="flex justify-between items-start gap-2">
             <div className="flex-grow min-w-0">
               <div className="flex items-start gap-2">
+                {task.taskType && (
+                  <div className="flex-shrink-0 mt-0.5">
+                    {ICON_MAP[task.taskType.icon] && 
+                      React.createElement(ICON_MAP[task.taskType.icon], {
+                        size: 14,
+                        className: "text-gray-500 dark:text-gray-400"
+                      })
+                    }
+                  </div>
+                )}
                 <h3
                   className={`text-sm font-medium line-clamp-1 ${
                     isCompleted
@@ -399,6 +424,31 @@ export const SwipeableTaskCard: React.FC<SwipeableTaskCardProps> = ({
               )}
             </div>
           </div>
+          {/* todo: fix this garbâge */}
+          {task.tags && task.tags.length > 0 && (
+            <div className="absolute bottom-2 right-3 flex flex-wrap gap-1 justify-end">
+              {task.tags.map((t) => {
+                if (typeof t !== 'object' || t === null) return null;
+                const tagObj = t as Record<string, any>;
+                const tag = tagObj.tag ? tagObj.tag : tagObj;
+                if (!tag || typeof tag !== 'object') return null;
+                if (!('autoId' in tag && 'name' in tag && 'color' in tag)) return null;
+                return (
+                  <span
+                    key={tag.autoId}
+                    className="text-xs px-1.5 py-0.5 rounded-full font-medium"
+                    style={{ 
+                      backgroundColor: `${tag.color}20`, 
+                      color: tag.color,
+                      border: `1px solid ${tag.color}40`
+                    }}
+                  >
+                    {tag.name}
+                  </span>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>
