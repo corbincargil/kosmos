@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/command";
 import {
   Popover,
-  PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
@@ -21,16 +20,16 @@ import { Badge } from "@/components/ui/badge";
 type TagSelectProps = {
     value: number[];
     onChange: (tagIds: number[]) => void;
-    workspaceId: string;
+    workspaceUuid: string;
 };
 
-export const TagSelect = ({ value, onChange, workspaceId }: TagSelectProps) => {
+export const TagSelect = ({ value, onChange, workspaceUuid }: TagSelectProps) => {
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState("");
     const containerRef = React.useRef<HTMLDivElement>(null);
     
     const { data: tags, isLoading: isLoadingTags } = api.tags.getTagsByWorkspaceId.useQuery({
-        workspaceId: workspaceId,
+        workspaceUuid: workspaceUuid,
     });
 
     React.useEffect(() => {

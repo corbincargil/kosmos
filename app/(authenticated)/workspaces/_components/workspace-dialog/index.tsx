@@ -22,9 +22,9 @@ export default function WorkspaceDialog({ workspace }: { workspace: Workspace })
       case "general":
         return <GeneralContent />;
       case "tags":
-        return <TagsContent workspaceId={workspace.id} />;
+        return <TagsContent workspaceId={workspace.id} workspaceUuid={workspace.uuid} />;
       case "task-types":
-        return <TaskTypesContent workspaceId={workspace.id} />;
+        return <TaskTypesContent  workspaceId={workspace.id} workspaceUuid={workspace.uuid} />;
       default:
         return <GeneralContent />;
     }

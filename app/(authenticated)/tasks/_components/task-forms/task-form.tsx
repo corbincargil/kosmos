@@ -13,6 +13,7 @@ import {
   Trash2,
   Warehouse,
   TagIcon,
+  Bug,
 } from "lucide-react";
 import { useWorkspace } from "@/contexts/workspace-context";
 import { TaskConfirmDeleteModal } from "./task-confirm-delete-modal";
@@ -21,6 +22,7 @@ import { api } from "@/trpc/react";
 import { toast } from "@/hooks/use-toast";
 import RichTextEditor from "@/app/(authenticated)/_components/rich-text-editor";
 import { TagSelect } from "@/app/(authenticated)/_components/forms/tag-input";
+import { TaskTypeSelect } from "@/app/(authenticated)/_components/forms/task-type-select";
 
 type TaskFormProps = {
   taskId?: string;
@@ -37,6 +39,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
     priority: "" as TaskPriority | "",
     workspaceUuid: selectedWorkspace,
     tags: [] as number[],
+    taskTypeId: null as number | null,
   });
   const [task, setTask] = useState<{
     id: number;
@@ -49,6 +52,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
     priority: TaskPriority | null;
     workspaceUuid: string;
     tags: { autoId: number }[];
+    taskTypeId: number | null;
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -144,6 +148,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
         priority: task.priority || "",
         workspaceUuid: task.workspaceUuid,
         tags: task.tags.map(tag => tag.autoId),
+        taskTypeId: task.taskTypeId,
       });
     }
   }, [task]);
@@ -167,6 +172,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
     }));
   };
 
+  const handleTaskTypeChange = (taskTypeId: number | null) => {
+    setFormData(prev => ({
+      ...prev,
+      taskTypeId
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSubmitting) return;
@@ -180,6 +192,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
         dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
         workspaceUuid: formData.workspaceUuid,
         tags: formData.tags,
+        taskTypeId: formData.taskTypeId,
       });
     } else {
       createTaskMutation.mutate({
@@ -188,6 +201,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
         dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
         workspaceUuid: formData.workspaceUuid,
         tags: formData.tags,
+        taskTypeId: formData.taskTypeId,
       });
     }
   };
@@ -360,7 +374,25 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
               <TagSelect
                 value={formData.tags}
                 onChange={handleTagChange}
-                workspaceId={selectedWorkspace}
+                workspaceUuid={selectedWorkspace}
+              />
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Bug size={16} className="text-gray-600 dark:text-gray-400" />
+              <label
+                htmlFor="taskTypeId"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Task Type
+              </label>
+            </div>
+            <div onClick={(e) => e.stopPropagation()}>
+              <TaskTypeSelect
+                value={formData.taskTypeId}
+                onChange={handleTaskTypeChange}
+                workspaceUuid={selectedWorkspace}
               />
             </div>
           </div>

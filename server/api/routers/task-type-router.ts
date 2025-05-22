@@ -5,11 +5,21 @@ import { CreateTaskTypeSchema, TaskTypeSchema, UpdateTaskTypeSchema } from "@/ty
 
 export const taskTypeRouter = createTRPCRouter({
   getTaskTypesByWorkspaceId: protectedProcedure
-    .input(z.object({ workspaceId: z.number() }))
+    .input(z.object({ workspaceUuid: z.string() }))
     .query(async ({ ctx, input }) => {
+      const workspace = await ctx.db.workspace.findUnique({
+        where: {
+          uuid: input.workspaceUuid,
+        },
+      });
+
+      if (!workspace) {
+        throw new Error("Workspace not found");
+      }
+
       const taskTypes = await ctx.db.taskType.findMany({
         where: {
-          workspaceId: input.workspaceId,
+          workspaceId: workspace.id,
         },
         orderBy: {
           name: 'asc',

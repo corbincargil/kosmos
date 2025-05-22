@@ -4,12 +4,12 @@ import { CreateTagSchema, TagSchema } from "@/types/tag";
 
 export const tagRouter = createTRPCRouter({
   getTagsByWorkspaceId: protectedProcedure
-    .input(z.object({ workspaceId: z.number() }))
+    .input(z.object({ workspaceUuid: z.string() }))
     .query(async ({ ctx, input }) => {
        //todo: remove this query after switching db to connect everything with autoId
       const workspace = await ctx.db.workspace.findUnique({
         where: {
-          id: input.workspaceId,
+          uuid: input.workspaceUuid,
         },
       });
 

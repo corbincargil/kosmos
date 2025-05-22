@@ -12,6 +12,7 @@ export const TaskSchema = z.object({
     .transform((val) => (val ? new Date(val) : null)),
   status: z.nativeEnum(TaskStatus).default("TODO"),
   priority: z.nativeEnum(TaskPriority).nullable(),
+  taskTypeId: z.number().int().positive().nullable(),
   
   userId: z.number().int().positive(),
   workspaceUuid: z.string().uuid(),

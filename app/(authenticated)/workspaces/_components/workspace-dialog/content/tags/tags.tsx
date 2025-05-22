@@ -11,9 +11,10 @@ import { DeleteTagModal } from "./delete-tag-modal";
 
 interface TagsContentProps {
   workspaceId: number;
+  workspaceUuid: string;
 }
 
-export function TagsContent({ workspaceId }: TagsContentProps) {
+export function TagsContent({ workspaceUuid, workspaceId }: TagsContentProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const [deletingTag, setDeletingTag] = useState<Tag | null>(null);
@@ -23,7 +24,7 @@ export function TagsContent({ workspaceId }: TagsContentProps) {
   const utils = api.useUtils();
 
   const { data: tags } = api.tags.getTagsByWorkspaceId.useQuery({
-    workspaceId: workspaceId,
+    workspaceUuid: workspaceUuid,
   });
 
   const { mutate: createTag } = api.tags.createTag.useMutation({
@@ -83,7 +84,7 @@ export function TagsContent({ workspaceId }: TagsContentProps) {
   const handleCreateTag = (data: { name: string; color: string }) => {
     createTag({
       ...data,
-      workspaceId: workspaceId,
+      workspaceId,
     });
   };
 

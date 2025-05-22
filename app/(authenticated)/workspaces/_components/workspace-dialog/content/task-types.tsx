@@ -11,9 +11,10 @@ import { DeleteTaskTypeModal } from "./task-types/delete-task-type-modal";
 
 interface TaskTypesContentProps {
   workspaceId: number;
+  workspaceUuid: string;
 }
 
-export function TaskTypesContent({ workspaceId }: TaskTypesContentProps) {
+export function TaskTypesContent({ workspaceUuid, workspaceId }: TaskTypesContentProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [editingTaskType, setEditingTaskType] = useState<TaskType | null>(null);
   const [deletingTaskType, setDeletingTaskType] = useState<TaskType | null>(null);
@@ -23,7 +24,7 @@ export function TaskTypesContent({ workspaceId }: TaskTypesContentProps) {
   const utils = api.useUtils();
 
   const { data: taskTypes } = api.taskTypes.getTaskTypesByWorkspaceId.useQuery({
-    workspaceId,
+    workspaceUuid,
   });
 
   const { mutate: createTaskType } = api.taskTypes.createTaskType.useMutation({

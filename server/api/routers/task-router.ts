@@ -29,6 +29,14 @@ export const taskRouter = createTRPCRouter({
                   }
                 }
               }
+            },
+            taskType: {
+              select: {
+                autoId: true,
+                name: true,
+                color: true,
+                icon: true,
+              }
             }
           },
           orderBy: [
@@ -54,6 +62,14 @@ export const taskRouter = createTRPCRouter({
                 }
               }
             }
+          },
+          taskType: {
+            select: {
+              autoId: true,
+              name: true,
+              color: true,
+              icon: true,
+            }
           }
         },
         orderBy: [
@@ -78,7 +94,15 @@ export const taskRouter = createTRPCRouter({
                 }
               }
             } 
-          } 
+          },
+          taskType: {
+            select: {
+              autoId: true,
+              name: true,
+              color: true,
+              icon: true,
+            }
+          }
         }
       });
       return task ? {
@@ -117,7 +141,8 @@ export const taskRouter = createTRPCRouter({
             include: {
               tag: true
             }
-          }
+          },
+          taskType: true
         }
       });
     }),
@@ -145,7 +170,8 @@ export const taskRouter = createTRPCRouter({
             include: {
               tag: true
             }
-          }
+          },
+          taskType: true
         }
       });
     }),
