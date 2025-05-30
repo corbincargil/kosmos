@@ -1,90 +1,47 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { PrimaryTaskStatuses, Task } from "@/types/task";
+import React from "react";
+import { Task, PrimaryTaskStatuses } from "@/types/task";
 import { KanbanBoard } from "../kanban-board";
-import { TaskViewToggle } from "./view-toggle";
 import { useToast } from "@/hooks/use-toast";
-import { TaskAccordion } from "../task-list/task-accordion";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useWorkspace } from "@/contexts/workspace-context";
-import { useTheme } from "@/app/(authenticated)/_components/theme/theme-manager";
 import { useUser } from "@clerk/nextjs";
 import { api } from "@/trpc/react";
-import QuickFilters from "./quick-filters";
 import { Button } from "@/components/ui/button";
 import { TaskStatus } from "@prisma/client";
-import AllTasksSwitch from "./all-tasks-switch";
+import { FilterBar } from "@/components/task-filters/filter-bar";
+import { FilterMenu } from "@/components/task-filters/filter-menu";
 import KanbanLoading from "../loading/kanban-loading";
+import { orderStatuses } from "@/lib/task-utils";
 
 export const TaskView: React.FC = () => {
-  const [showAll, setShowAll] = useState(true);
-  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
-  const [tasks, setTasks] = useState<Task[]>([]);
-
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentView = searchParams.get("view") || "board";
+  const statusFilter = searchParams.get("status")?.split(",") as TaskStatus[] || [];
 
   const { user } = useUser();
   const { toast } = useToast();
-  const { theme } = useTheme();
   const { workspaces, selectedWorkspace } = useWorkspace();
-
-  const showAllStatuses = searchParams.get("show-all") === "true";
+  
+  const columns = statusFilter.length > 0 
+    ? orderStatuses(statusFilter)
+    : PrimaryTaskStatuses;
 
   const {
-    data: fetchedTasks,
+    data: tasks,
     isLoading: tasksLoading,
     isError: tasksError,
   } = api.tasks.getTasks.useQuery({
+    filters: searchParams.toString(),
     workspaceId: selectedWorkspace,
-    statuses: showAllStatuses ? undefined : PrimaryTaskStatuses,
+  }, {
+    staleTime: 0,
+    refetchOnWindowFocus: false
   });
-
-  useEffect(() => {
-    if (fetchedTasks) {
-      setTasks(fetchedTasks as unknown as Task[]);
-    }
-  }, [fetchedTasks]);
-
-  const filteredTasks = tasks.filter((task) => {
-    if (activeFilters.size === 0) {
-      return true;
-    }
-    return activeFilters.has(task.workspaceUuid);
-  });
-
-  const toggleFilter = (workspaceUuid: string) => {
-    setShowAll(false);
-    setActiveFilters((prev) => {
-      const newFilters = new Set(prev);
-      if (newFilters.has(workspaceUuid)) {
-        newFilters.delete(workspaceUuid);
-      } else {
-        newFilters.add(workspaceUuid);
-      }
-      return newFilters;
-    });
-  };
-
-  const handleShowAll = () => {
-    setShowAll(true);
-    setActiveFilters(new Set());
-  };
 
   const updateStatusMutation = api.tasks.updateTaskStatus.useMutation({
-    onMutate: ({ id, status }) => {
-      setTasks((currentTasks) =>
-        currentTasks.map((task) =>
-          task.id === id ? { ...task, status: status as TaskStatus } : task
-        )
-      );
-    },
     onError: (error) => {
-      if (fetchedTasks) {
-        setTasks(fetchedTasks as unknown as Task[]);
-      }
       toast({
         title: "Error",
         description: error.message,
@@ -109,53 +66,37 @@ export const TaskView: React.FC = () => {
     router.push(`/tasks/edit/${task.uuid}?${params.toString()}`);
   };
 
-
   if (tasksError) return <p>Error loading tasks</p>;
 
-  if (!tasks) return <p>No tasks found</p>;
+  const typedTasks = tasks as unknown as Task[] || []; //todo: update tRPC procedures so this is not needed
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-        <div className="flex gap-2 items-center w-full sm:w-auto">
-          <TaskViewToggle />
-          <AllTasksSwitch />
-          <QuickFilters
-            selectedWorkspace={selectedWorkspace}
-            showAll={showAll}
-            theme={theme}
-            workspaces={workspaces}
-            activeFilters={activeFilters}
-            handleShowAll={handleShowAll}
-            toggleFilter={toggleFilter}
-          />
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row gap-4 w-full">
+          <div className="flex-1">
+            <div className="hidden sm:block">
+              <FilterBar workspaceUuid={selectedWorkspace} />
+            </div>
+            <div className="sm:hidden">
+              <FilterMenu workspaceUuid={selectedWorkspace} />
+            </div>
+          </div>
         </div>
         <Button
           variant="glow"
           onClick={() => router.push(`/tasks/add?${searchParams.toString()}`)}
+          className="w-full sm:w-auto"
         >
           Create Task
         </Button>
       </div>
       {tasksLoading && <KanbanLoading />}
-      {tasks.length > 0 && currentView === "list" && !tasksLoading && (
-        <div className="flex-1 overflow-hidden">
-          <TaskAccordion
-            tasks={filteredTasks || []}
-            workspaces={workspaces}
-            userId={user?.publicMetadata.dbUserId as number}
-            onUpdateStatus={handleUpdateStatus}
-            onEdit={handleEditTask}
-          />
-        </div>
-      )}
-      {tasks.length > 0 && currentView === "board" && !tasksLoading && (
+      {typedTasks.length > 0 && (
         <div className="flex-1 overflow-hidden">
           <KanbanBoard
-            columns={
-              showAllStatuses ? Object.values(TaskStatus) : PrimaryTaskStatuses
-            }
-            tasks={filteredTasks}
+            columns={columns}
+            tasks={typedTasks}
             workspaces={workspaces}
             userId={user?.publicMetadata.dbUserId as number}
             onUpdateStatus={handleUpdateStatus}
@@ -163,7 +104,7 @@ export const TaskView: React.FC = () => {
           />
         </div>
       )}
-      {tasks.length === 0 && !tasksLoading && (
+      {typedTasks.length === 0 && !tasksLoading && (
         <div className="flex justify-center items-center h-full">
           <p className="text-gray-500">No tasks found 🥺</p>
         </div>
