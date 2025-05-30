@@ -29,11 +29,7 @@ export function FilterDropdown({
       onChange([...selected, value]);
     }
   };
-
-  const handleRemove = (value: string) => {
-    onChange(selected.filter((v) => v !== value));
-  };
-
+  
   return (
     <div className="flex flex-col gap-2">
       <Popover open={open} onOpenChange={setOpen} modal={portal}>
