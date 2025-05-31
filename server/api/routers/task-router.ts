@@ -2,21 +2,25 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { TaskSchema } from "@/types/task";
 import { TaskStatus } from "@prisma/client";
+import { buildWhereClause, parseFilterString } from "../filters/middleware";
 
 export const taskRouter = createTRPCRouter({
   getTasks: protectedProcedure
     .input(
       z.object({
+        filters: z.string().optional(),
         workspaceId: z.string(),
-        statuses: z.array(z.nativeEnum(TaskStatus)).optional(),
       })
     )
     .query(async ({ ctx, input }) => {
+      const filterParams = parseFilterString(input.filters ?? null);
+      const whereClause = buildWhereClause(filterParams);
+      
       if (input.workspaceId === "all") {
         return ctx.db.task.findMany({
           where: {
             userId: Number(ctx.userId),
-            status: { in: input.statuses },
+            ...whereClause
           },
           include: {
             tags: {
@@ -49,7 +53,7 @@ export const taskRouter = createTRPCRouter({
         where: {
           userId: Number(ctx.userId),
           workspaceUuid: input.workspaceId,
-          status: { in: input.statuses },
+          ...whereClause
         },
         include: {
           tags: {
