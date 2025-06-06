@@ -6,6 +6,7 @@ import WorkspaceForm from "./_components/workspace-form";
 import { useWorkspace } from "@/contexts/workspace-context";
 import { Workspace } from "@/types/workspace";
 import DeleteWorkspaceModal from "./_components/delete-workspace-modal";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 export default function AdminPage() {
   const { workspaces } = useWorkspace();
@@ -35,10 +36,16 @@ export default function AdminPage() {
           Add Workspace
         </button>
         <div className="mt-10 p-2 text-xs text-muted-foreground/70 border-t border-border">
-          <span className="mr-2">v: 0.1.0</span>
-          <span>
-            ({process.env.NEXT_PUBLIC_BUILD_TIME || "Build Time Unavailable"})
-          </span>
+          <Tooltip>
+            <TooltipTrigger>
+              <span className="mr-2">v: {process.env.NEXT_PUBLIC_APP_VERSION || "unavailable"}</span>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Version: {process.env.NEXT_PUBLIC_APP_VERSION || "unavailable"}</p>
+              <p>Build Time: {process.env.NEXT_PUBLIC_BUILD_TIME || "unavailable"}</p>
+              <p>Ref: {process.env.NEXT_PUBLIC_BRANCH || "unavailable"}</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
 
