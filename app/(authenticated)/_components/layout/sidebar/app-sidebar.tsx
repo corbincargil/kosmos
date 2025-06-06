@@ -171,7 +171,6 @@ export function AppSidebar() {
         </div>
         <div className="mt-auto p-2 text-xs text-muted-foreground/70 border-t border-border">
           <span className="mr-2">
-            v: {process.env.NEXT_PUBLIC_APP_VERSION || "0.1.0"}
           </span>
         </div>
       </SidebarContent>

@@ -38,12 +38,15 @@ export default function AdminPage() {
         <div className="mt-10 p-2 text-xs text-muted-foreground/70 border-t border-border">
           <Tooltip>
             <TooltipTrigger>
-              <span className="mr-2">v: {process.env.NEXT_PUBLIC_APP_VERSION || "unavailable"}</span>
+              <span className="mr-2">app version</span>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Version: {process.env.NEXT_PUBLIC_APP_VERSION || "unavailable"}</p>
-              <p>Build Time: {process.env.NEXT_PUBLIC_BUILD_TIME || "unavailable"}</p>
-              <p>Ref: {process.env.NEXT_PUBLIC_BRANCH || "unavailable"}</p>
+              <p>
+                <span className="font-semibold">Ref:</span> {process.env.NEXT_PUBLIC_BRANCH || "unavailable"}
+              </p>
+              <p>
+                <span className="font-semibold">Build Time:</span> {process.env.NEXT_PUBLIC_BUILD_TIME || "--:--:--"} UTC (GMT)
+              </p>
             </TooltipContent>
           </Tooltip>
         </div>

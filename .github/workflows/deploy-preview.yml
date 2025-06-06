@@ -10,7 +10,6 @@ env:
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
   TIPTAP_PRO_TOKEN: ${{ secrets.TIPTAP_PRO_TOKEN }}
   NEXT_PUBLIC_BUILD_TIME: ${{ github.event.repository.updated_at }}
-  NEXT_PUBLIC_APP_VERSION: ${{ fromJSON(inputs.package-json).version }}
   NEXT_PUBLIC_BRANCH: ${{ github.ref_name }}
 
 jobs:
