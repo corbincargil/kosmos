@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useRef,
   ReactNode,
 } from "react";
 
@@ -14,6 +15,7 @@ interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   systemTheme: "light" | "dark";
+  isLoaded: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -21,6 +23,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
   const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
+  const [isLoaded, setIsLoaded] = useState(false);
+  const hasInitialized = useRef(false);
 
   const getSystemTheme = (): "light" | "dark" => {
     try {
@@ -33,6 +37,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // Initialize theme from localStorage and system preference
   useEffect(() => {
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
     try {
       const savedTheme = localStorage.getItem("theme") as Theme;
       const currentSystemTheme = getSystemTheme();
@@ -46,6 +53,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("Error initializing theme:", error);
       setTheme("light");
+    } finally {
+      setIsLoaded(true);
     }
   }, []);
 
@@ -78,6 +87,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // Update theme in localStorage and apply to document
   useEffect(() => {
+    if (!isLoaded) return;
+
     try {
       localStorage.setItem("theme", theme);
     } catch (error) {
@@ -91,10 +102,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [theme, systemTheme]);
+  }, [theme, systemTheme, isLoaded]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, systemTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, systemTheme, isLoaded }}>
       {children}
     </ThemeContext.Provider>
   );

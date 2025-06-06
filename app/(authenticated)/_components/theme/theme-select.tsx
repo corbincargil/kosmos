@@ -10,7 +10,15 @@ import { Theme, useTheme } from "./theme-manager";
 import { ThemeIcon } from "./theme-icons";
 
 export default function ThemeSelect() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, isLoaded } = useTheme();
+
+  if (!isLoaded) {
+    return (
+      <div className="w-[40px] h-[40px] flex items-center justify-center">
+        <div className="w-5 h-5 border-2 border-workspace border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <Select value={theme} onValueChange={(value: Theme) => setTheme(value)}>
