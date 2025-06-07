@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Task, PrimaryTaskStatuses } from "@/types/task";
 import { KanbanBoard } from "../kanban-board";
 import { useToast } from "@/hooks/use-toast";
@@ -19,6 +19,8 @@ export const TaskView: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const statusFilter = searchParams.get("status")?.split(",") as TaskStatus[] || [];
+
+  const [localTasks, setLocalTasks] = useState<Task[]>([]);
 
   const { user } = useUser();
   const { toast } = useToast();
@@ -58,7 +60,18 @@ export const TaskView: React.FC = () => {
   });
 
   const handleUpdateStatus = async (taskId: number, newStatus: TaskStatus) => {
-    await updateStatusMutation.mutate({ id: taskId, status: newStatus });
+    setLocalTasks(prev => prev.map(task => 
+      task.id === taskId ? { ...task, status: newStatus } : task
+    ));
+
+    try {
+      updateStatusMutation.mutate({ id: taskId, status: newStatus });
+    } catch (error) {
+      console.error(error);
+      setLocalTasks(prev => prev.map(task => 
+        task.id === taskId ? { ...task, status: task.status } : task
+      ));
+    }
   };
 
   const handleEditTask = (task: Task) => {
@@ -66,9 +79,13 @@ export const TaskView: React.FC = () => {
     router.push(`/tasks/edit/${task.uuid}?${params.toString()}`);
   };
 
-  if (tasksError) return <p>Error loading tasks</p>;
+  useEffect(() => {
+    if (tasks) {
+      setLocalTasks(tasks as unknown as Task[]);
+    }
+  }, [tasks]);
 
-  const typedTasks = tasks as unknown as Task[] || []; //todo: update tRPC procedures so this is not needed
+  if (tasksError) return <p>Error loading tasks</p>;
 
   return (
     <div className="h-full flex flex-col">
@@ -92,11 +109,11 @@ export const TaskView: React.FC = () => {
         </Button>
       </div>
       {tasksLoading && <KanbanLoading />}
-      {typedTasks.length > 0 && (
+      {localTasks.length > 0 && (
         <div className="flex-1 overflow-hidden">
           <KanbanBoard
             columns={columns}
-            tasks={typedTasks}
+            tasks={localTasks}
             workspaces={workspaces}
             userId={user?.publicMetadata.dbUserId as number}
             onUpdateStatus={handleUpdateStatus}
@@ -104,7 +121,7 @@ export const TaskView: React.FC = () => {
           />
         </div>
       )}
-      {typedTasks.length === 0 && !tasksLoading && (
+      {localTasks.length === 0 && !tasksLoading && (
         <div className="flex justify-center items-center h-full">
           <p className="text-gray-500">No tasks found 🥺</p>
         </div>

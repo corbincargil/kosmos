@@ -37,14 +37,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const handleQuickMoveToNext = async (task: Task) => {
     const nextStatus = getNextStatus(task.status);
     if (nextStatus) {
-      await onUpdateStatus(task.id!, nextStatus);
+      await onUpdateStatus(task.id, nextStatus);
     }
   };
 
   const handleQuickMoveToPrevious = async (task: Task) => {
     const previousStatus = getPreviousStatus(task.status);
     if (previousStatus) {
-      await onUpdateStatus(task.id!, previousStatus);
+      await onUpdateStatus(task.id, previousStatus);
     }
   };
 

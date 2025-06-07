@@ -7,6 +7,7 @@ import { useWorkspace } from "@/contexts/workspace-context";
 import { Workspace } from "@/types/workspace";
 import DeleteWorkspaceModal from "./_components/delete-workspace-modal";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 export default function AdminPage() {
   const { workspaces } = useWorkspace();
@@ -21,21 +22,20 @@ export default function AdminPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4">
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-2">Your Workspaces</h2>
+        <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Your Workspaces</h2>
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          >
+          Add Workspace
+        </Button>
+          </div>
         <WorkspaceList
           workspaces={workspaces}
           onDeleteWorkspace={openDeleteModal}
         />
-      </div>
       <div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded inline-block"
-        >
-          Add Workspace
-        </button>
-        <div className="mt-10 p-2 text-xs text-muted-foreground/70 border-t border-border">
+        <div className="mt-4 p-2 text-xs text-muted-foreground/70 border-t border-border">
           <Tooltip>
             <TooltipTrigger>
               <span className="mr-2">app version</span>
