@@ -209,12 +209,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="sm:max-w-7xl sm:p-4 max-w-[96vw] max-h-[90vh] p-2 space-y-2 bg-white dark:bg-gray-800 rounded-md shadow-sm"
+      className="sm:max-w-7xl sm:p-4 max-w-[96vw] max-h-[90vh] p-2 space-y-4 bg-white dark:bg-gray-800 rounded-md shadow-sm overflow-y-auto"
       tabIndex={-1}
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="md:flex md:space-x-4">
-        <div className="md:w-2/3 space-y-2">
+      <div className="flex flex-col lg:flex-row lg:space-x-4 space-y-4 lg:space-y-0">
+        <div className="w-full lg:w-2/3 space-y-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Pencil size={16} className="text-gray-600 dark:text-gray-400" />
@@ -247,7 +247,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
                 Description
               </label>
             </div>
-            <div className="sm:h-[40vh] h-[20vh] overflow-y-auto ring-1 ring-gray-300 dark:ring-gray-600 rounded-md">
+            <div className="h-[30vh] sm:h-[40vh] overflow-y-auto ring-1 ring-gray-300 dark:ring-gray-600 rounded-md">
               <RichTextEditor
                 content={formData.description}
                 onChange={(value) =>
@@ -259,7 +259,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
           </div>
         </div>
 
-        <div className="md:w-1/3 space-y-4 bg-gray-100 dark:bg-gray-700 p-1 rounded-md">
+        <div className="w-full lg:w-1/3 space-y-4 bg-gray-100 dark:bg-gray-700 p-3 rounded-md">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Warehouse
@@ -398,28 +398,29 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
         </div>
       </div>
 
-      <div className="mt-6 flex justify-between items-center">
+      <div className="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           {task && (
             <Button
               type="button"
               variant="destructive"
               onClick={() => setShowDeleteModal(true)}
+              className="w-full sm:w-auto"
             >
               <Trash2 size={20} />
             </Button>
           )}
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
           {onCancel && (
-            <Button type="button" variant="glow" onClick={onCancel}>
+            <Button type="button" variant="glow" onClick={onCancel} className="w-full sm:w-auto">
               Cancel
             </Button>
           )}
           <Button
             type="submit"
             disabled={isSubmitting}
-            className={`px-6 py-2 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300 ${
+            className={`w-full sm:w-auto px-6 py-2 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300 ${
               isSubmitting ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
