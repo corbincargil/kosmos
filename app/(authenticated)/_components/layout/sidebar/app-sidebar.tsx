@@ -57,64 +57,34 @@ export function AppSidebar() {
           workspaces={workspaces}
         />
       </SidebarHeader>
-      <SidebarContent className="">
-        <SidebarGroup>
-          <SidebarMenuButton
-            asChild
-            className={
-              pathname === dashboardLink.href
-                ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
-                : ""
-            }
-            onClick={handleNavigation}
-          >
-            <Link
-              href={constructUrl(dashboardLink.href)}
-              className="rounded-none"
+      <SidebarContent className="flex flex-col h-full">
+        <div className="flex-1">
+          <SidebarGroup>
+            <SidebarMenuButton
+              asChild
+              className={
+                pathname === dashboardLink.href
+                  ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
+                  : ""
+              }
+              onClick={handleNavigation}
             >
-              <dashboardLink.icon size={20} />
-              <span>{dashboardLink.label}</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-            General
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {generalLinks.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    className={
-                      pathname === item.href
-                        ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
-                        : ""
-                    }
-                    onClick={handleNavigation}
-                  >
-                    <Link
-                      href={constructUrl(item.href)}
-                      className="rounded-none"
-                    >
-                      <item.icon size={20} />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        {workspaceLinks[currentWorkspaceType].length > 0 && (
+              <Link
+                href={constructUrl(dashboardLink.href)}
+                className="rounded-none"
+              >
+                <dashboardLink.icon size={20} />
+                <span>{dashboardLink.label}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarGroup>
           <SidebarGroup>
             <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-              {currentWorkspaceType}
+              General
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {workspaceLinks[currentWorkspaceType].map((item) => (
+                {generalLinks.map((item) => (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
                       asChild
@@ -138,35 +108,71 @@ export function AppSidebar() {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-        )}
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-            Settings
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem key={"settings"}>
-                <SidebarMenuButton
-                  asChild
-                  className={
-                    pathname === "/workspaces"
-                      ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
-                      : ""
-                  }
-                  onClick={handleNavigation}
-                >
-                  <Link
-                    href={constructUrl("/workspaces")}
-                    className="rounded-none"
+          {workspaceLinks[currentWorkspaceType].length > 0 && (
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                {currentWorkspaceType}
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {workspaceLinks[currentWorkspaceType].map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton
+                        asChild
+                        className={
+                          pathname === item.href
+                            ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
+                            : ""
+                        }
+                        onClick={handleNavigation}
+                      >
+                        <Link
+                          href={constructUrl(item.href)}
+                          className="rounded-none"
+                        >
+                          <item.icon size={20} />
+                          <span>{item.label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+              Settings
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem key={"settings"}>
+                  <SidebarMenuButton
+                    asChild
+                    className={
+                      pathname === "/workspaces"
+                        ? "border-b border-b-workspace-lighter text-workspace-darker hover:text-workspace-darker"
+                        : ""
+                    }
+                    onClick={handleNavigation}
                   >
-                    <GalleryHorizontalEnd size={20} />
-                    <span>Manage Workspaces</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                    <Link
+                      href={constructUrl("/workspaces")}
+                      className="rounded-none"
+                    >
+                      <GalleryHorizontalEnd size={20} />
+                      <span>Manage Workspaces</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </div>
+        <div className="mt-auto p-2 text-xs text-muted-foreground/70 border-t border-border">
+          <span className="mr-2">
+          </span>
+        </div>
       </SidebarContent>
     </Sidebar>
   );

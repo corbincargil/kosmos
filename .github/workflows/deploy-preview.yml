@@ -9,7 +9,8 @@ env:
   NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
   TIPTAP_PRO_TOKEN: ${{ secrets.TIPTAP_PRO_TOKEN }}
-
+  NEXT_PUBLIC_BUILD_TIME: ${{ github.event.repository.updated_at }}
+  NEXT_PUBLIC_BRANCH: ${{ github.ref_name }}
 
 jobs:
   deploy-preview:
@@ -37,7 +38,6 @@ jobs:
           username: ${{ env.NEON_DATABASE_USERNAME }}
           api_key: ${{ env.NEON_API_KEY }}
 
-
       - name: Run Migrations
         run: |
             touch .env
@@ -47,7 +47,6 @@ jobs:
 
             npx prisma generate
             npx prisma migrate deploy
-
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest

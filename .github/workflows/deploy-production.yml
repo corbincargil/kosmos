@@ -10,6 +10,9 @@ env:
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
   DIRECT_URL: ${{ secrets.DIRECT_URL }}
   TIPTAP_PRO_TOKEN: ${{ secrets.TIPTAP_PRO_TOKEN }}
+  NEXT_PUBLIC_BUILD_TIME: ${{ github.event.repository.updated_at }}
+  NEXT_PUBLIC_BRANCH: ${{ github.ref_name }}
+
 jobs:
   deploy-production:
     permissions: write-all
