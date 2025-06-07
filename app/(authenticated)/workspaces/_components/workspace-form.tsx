@@ -11,6 +11,7 @@ import {
 import { WorkspaceType } from "@prisma/client";
 import { Input } from "@/components/ui/input";
 import IconSelect from "./icon-select";
+import { Button } from "@/components/ui/button";
 
 interface WorkspaceFormProps {
   closeModal: () => void;
@@ -135,9 +136,9 @@ export default function WorkspaceForm({
           ))}
         </SelectContent>
       </Select>
-      <button
+      <Button
         type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded w-full disabled:opacity-50"
+        className="w-full disabled:opacity-50"
         disabled={isSubmitting}
       >
         {isSubmitting
@@ -145,15 +146,16 @@ export default function WorkspaceForm({
           : initialName
           ? "Update Workspace"
           : "Add Workspace"}
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
+        variant="outline"
         onClick={closeModal}
-        className="bg-gray-300 text-black px-4 py-2 rounded w-full mt-2"
+        className="w-full hover:bg-muted-foreground/50"
         disabled={isSubmitting}
       >
         Cancel
-      </button>
+      </Button>
     </form>
   );
 }
