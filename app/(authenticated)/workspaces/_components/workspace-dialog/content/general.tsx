@@ -1,14 +1,16 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import WorkspaceForm from "../../workspace-form";
+import { Workspace } from "@/types/workspace";
 
-export function GeneralContent() {
+export function GeneralContent({workspace}: {workspace: Workspace}) {
+  const { id, name, color, type, icon } = workspace;
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>General Settings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Workspace general settings will go here.</p>
-        </CardContent>
-      </Card>
+        <WorkspaceForm
+          workspaceId={id}
+          initialName={name}
+          initialColor={color}
+          initialType={type}
+          initialIcon={icon}
+          closeModal={() => {}}
+        />
     );
   }
