@@ -19,6 +19,7 @@ model User {
   notes            Note[]
   oauthStates      OAuthState[]
   oauthConnections OAuthConnection[]
+  authors          Author[]
 
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
@@ -39,6 +40,7 @@ model Workspace {
   notes     Note[]
   tags      Tag[]
   taskTypes TaskType[]
+  posts     Post[]
   
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
@@ -77,6 +79,7 @@ model Tag {
   workspaceId   Int
   
   tasks         TaskTag[]
+  posts         PostTag[]
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -122,6 +125,56 @@ model Note {
   workspaceUuid String
   workspaceId   Int?
 
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Post {
+  autoId        Int           @id @default(autoincrement())
+  cuid          String        @unique @default(cuid())
+  title         String        @db.VarChar(100)
+  slug          String        @unique
+  content       String
+  image         String?
+  readTime      Int
+  views         Int           @default(0)
+  status        PostStatus    @default(DRAFT)
+  publishedAt   DateTime?
+  
+  author        Author        @relation(fields: [authorId], references: [autoId])
+  authorId      Int
+  
+  workspace     Workspace     @relation(fields: [workspaceId], references: [id])
+  workspaceId   Int
+  
+  tags          PostTag[]
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model PostTag {
+  post          Post      @relation(fields: [postId], references: [autoId])
+  postId        Int
+  
+  tag           Tag       @relation(fields: [tagId], references: [autoId])
+  tagId         Int
+  
+  createdAt     DateTime  @default(now())
+
+  @@id([postId, tagId])
+}
+
+model Author {
+  autoId        Int       @id @default(autoincrement())
+  firstName     String    @db.VarChar(100)
+  lastName      String    @db.VarChar(100)
+  
+  user          User      @relation(fields: [userId], references: [id])
+  userId        Int
+  
+  posts         Post[]
+  
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -175,6 +228,12 @@ enum WorkspaceType {
   PERSONAL
   SCHOOL
   WORK
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }
 
 enum OAuthProvider {
