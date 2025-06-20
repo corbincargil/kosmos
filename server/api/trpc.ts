@@ -48,12 +48,15 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
   return result;
 });
 
-// const isAuthed = t.middleware(({ ctx, next }) => {
-//   if (!ctx.user?.id) {
-//     throw new TRPCError({ code: "UNAUTHORIZED" });
-//   }
-//   return next({ ctx: { user: ctx.user } });
-// });
+const isAuthed = t.middleware(({ ctx, next }) => {
+  if (!ctx.userId) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({ ctx: { userId: ctx.userId } });
+});
 
-export const protectedProcedure = t.procedure.use(timingMiddleware);
-// .use(isAuthed);
+export const protectedProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(isAuthed);
+
+export const publicProcedure = t.procedure.use(timingMiddleware);

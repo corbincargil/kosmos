@@ -18,6 +18,29 @@ export const PostSchema = z.object({
   updatedAt: z.date(),
 });
 
+export const FetchPostSchema = z.object({
+  cuid: z.string(),
+  title: z.string().max(100),
+  slug: z.string(),
+  content: z.string(),
+  image: z.string().nullable(),
+  readTime: z.number().int().positive(),
+  views: z.number().int().nonnegative(),
+  status: z.nativeEnum(PostStatus),
+  publishedAt: z.date().nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  author: z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+  }),
+  tags: z.array(z.object({
+    tag: z.object({
+      name: z.string(),
+    }),
+  })),
+});
+
 export const CreatePostSchema = z.object({
   title: z
     .string()
@@ -56,5 +79,6 @@ export const UpdatePostSchema = z.object({
 });
 
 export type Post = z.infer<typeof PostSchema>;
+export type FetchPost = z.infer<typeof FetchPostSchema>;
 export type CreatePostInput = z.infer<typeof CreatePostSchema>;
 export type UpdatePostInput = z.infer<typeof UpdatePostSchema>; 

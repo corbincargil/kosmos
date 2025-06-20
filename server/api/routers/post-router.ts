@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { CreatePostSchema, UpdatePostSchema } from "@/types/post";
 
 export const postRouter = createTRPCRouter({
-  getCurrentWorkspacePosts: protectedProcedure
+  publicGetCurrentWorkspacePosts: publicProcedure
     .input(
       z.object({
         workspaceId: z.string(),
@@ -24,11 +24,31 @@ export const postRouter = createTRPCRouter({
         where: {
           workspaceId: workspace?.id,
         },
-        include: {
-          author: true,
+        select: {
+          cuid: true,
+          title: true,
+          slug: true,
+          content: true,
+          status: true,
+          publishedAt: true,
+          image: true,
+          readTime: true,
+          views: true,
+          createdAt: true,
+          updatedAt: true, 
+          author: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
           tags: {
-            include: {
-              tag: true,
+            select: {
+              tag: {
+                select: {
+                  name: true,
+                },
+              },
             },
           },
         },

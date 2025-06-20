@@ -1,6 +1,6 @@
 "use client";
 
-import { Post } from "@/types/post";
+import { FetchPost } from "@/types/post";
 import { PostStatus } from "@prisma/client";
 import {
   Card,
@@ -24,7 +24,7 @@ import remarkGfm from "remark-gfm";
 dayjs.extend(relativeTime);
 
 interface PostCardProps {
-  post: Post;
+  post: FetchPost;
   className?: string;
 }
 

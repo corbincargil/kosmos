@@ -4,7 +4,7 @@ import { PostCard } from "./_components/post-card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
-import { Post } from "@/types/post";
+import { FetchPost } from "@/types/post";
 import { notFound } from "next/navigation";
 import { api } from "@/trpc/react";
 import { useSearchParams } from "next/navigation";
@@ -18,7 +18,7 @@ export default function PostsPage() {
     notFound();
   }
 
-  const { data: posts, isLoading } = api.posts.getCurrentWorkspacePosts.useQuery({ 
+  const { data: posts, isLoading } = api.posts.publicGetCurrentWorkspacePosts.useQuery({ 
     workspaceId 
   });
 
@@ -39,7 +39,7 @@ export default function PostsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts?.map((post: Post) => (
+        {posts?.map((post: FetchPost) => (
           <PostCard key={post.cuid} post={post} />
         ))}
       </div>

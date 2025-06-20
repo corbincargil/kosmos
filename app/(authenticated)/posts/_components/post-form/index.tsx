@@ -80,7 +80,7 @@ export default function PostForm({
   const { mutate: createPost, isPending: isCreating } =
     api.posts.createPost.useMutation({
       onSuccess: () => {
-        utils.posts.getCurrentWorkspacePosts.invalidate({ workspaceId });
+        utils.posts.publicGetCurrentWorkspacePosts.invalidate({ workspaceId });
         form.reset();
         toast({
           title: "Success",
@@ -96,7 +96,7 @@ export default function PostForm({
   const { mutate: updatePost, isPending: isUpdating } =
     api.posts.updatePost.useMutation({
       onSuccess: () => {
-        utils.posts.getCurrentWorkspacePosts.invalidate({ workspaceId });
+        utils.posts.publicGetCurrentWorkspacePosts.invalidate({ workspaceId });
         utils.posts.getPostByCuid.invalidate(post?.cuid || "");
         setLastSavedContent(form.getValues("content"));
         setLastSavedTitle(form.getValues("title"));
@@ -109,6 +109,8 @@ export default function PostForm({
     post && (hasContentChanges || form.watch("title") !== lastSavedTitle);
   const isSaving = isCreating || isUpdating;
 
+  const title = form.watch("title");
+
   //* auto-generate slug when title changes
   useEffect(() => {
     const title = form.watch("title");
@@ -116,7 +118,7 @@ export default function PostForm({
       const generatedSlug = slugify(title);
       form.setValue("slug", generatedSlug);
     }
-  }, [form.watch("title"), post, form]);
+  }, [title, post, form]);
 
   const onSubmit = useCallback(
     (data: CreatePostInput) => {
