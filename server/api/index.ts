@@ -7,6 +7,8 @@ import { schwabRouter } from "./routers/schwab-router";
 import { oauthRouter } from "./routers/oauth-router";
 import { tagRouter } from "./routers/tag-router";
 import { taskTypeRouter } from "./routers/task-type-router";
+import { authorRouter } from "./routers/author-router";
+import { postRouter } from "./routers/post-router";
 
 export const appRouter = createTRPCRouter({
   users: userRouter,
@@ -17,6 +19,8 @@ export const appRouter = createTRPCRouter({
   taskTypes: taskTypeRouter,
   oauth: oauthRouter,
   schwab: schwabRouter,
+  authors: authorRouter,
+  posts: postRouter,
 });
 
 export type AppRouter = typeof appRouter;

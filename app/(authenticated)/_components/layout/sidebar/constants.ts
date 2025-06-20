@@ -40,6 +40,7 @@ import {
   Send,
   Brush,
   Mail,
+  Text,
 } from "lucide-react";
 
 export const dashboardLink = {
@@ -73,6 +74,7 @@ export const workspaceLinks: Record<
   PERSONAL: [],
   SCHOOL: [{ href: "/courses", label: "Courses", icon: GraduationCap }],
   WORK: [{ href: "/projects", label: "Projects", icon: BriefcaseBusiness }],
+  BLOG: [{ href: "/posts", label: "Posts", icon: Text }],
 };
 
 export const ICON_MAP: Record<string, LucideIcon> = {

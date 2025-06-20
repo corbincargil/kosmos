@@ -20,13 +20,13 @@ export default function WorkspaceDialog({ workspace }: { workspace: Workspace })
   const renderContent = () => {
     switch (activeSection) {
       case "general":
-        return <GeneralContent />;
+        return <GeneralContent workspace={workspace} />;
       case "tags":
         return <TagsContent workspaceId={workspace.id} workspaceUuid={workspace.uuid} />;
       case "task-types":
         return <TaskTypesContent  workspaceId={workspace.id} workspaceUuid={workspace.uuid} />;
       default:
-        return <GeneralContent />;
+        return <GeneralContent workspace={workspace} />;
     }
   };
 
