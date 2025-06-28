@@ -21,6 +21,13 @@ export const metadata: Metadata = {
   description: "Keep your life organized",
   icons: {
     icon: [{ url: "/favicon.svg" }, { url: "/favicon.ico", sizes: "any" }],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Kosmos",
   },
 };
 
@@ -32,16 +39,6 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <head>
-          <meta name="apple-mobile-web-app-title" content="Kosmos" />
-          <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-          <link
-            rel="alternate icon"
-            href="/favicon.ico"
-            type="image/png"
-            sizes="16x16"
-          />
-        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
