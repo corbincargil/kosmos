@@ -6,8 +6,13 @@ import WorkspaceForm from "./_components/workspace-form";
 import { useWorkspace } from "@/contexts/workspace-context";
 import { Workspace } from "@/types/workspace";
 import DeleteWorkspaceModal from "./_components/delete-workspace-modal";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import PushNotificationManager from "./_components/notifications";
 
 export default function AdminPage() {
   const { workspaces } = useWorkspace();
@@ -22,18 +27,17 @@ export default function AdminPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4">
-        <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Your Workspaces</h2>
-        <Button
-          onClick={() => setIsModalOpen(true)}
-          >
-          Add Workspace
-        </Button>
-          </div>
-        <WorkspaceList
-          workspaces={workspaces}
-          onDeleteWorkspace={openDeleteModal}
-        />
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Workspaces</h2>
+        <Button onClick={() => setIsModalOpen(true)}>Add</Button>
+      </div>
+      <WorkspaceList
+        workspaces={workspaces}
+        onDeleteWorkspace={openDeleteModal}
+      />
+
+      <PushNotificationManager />
+
       <div>
         <div className="mt-4 p-2 text-xs text-muted-foreground/70 border-t border-border">
           <Tooltip>
@@ -42,10 +46,12 @@ export default function AdminPage() {
             </TooltipTrigger>
             <TooltipContent>
               <p>
-                <span className="font-semibold">Ref:</span> {process.env.NEXT_PUBLIC_BRANCH || "unavailable"}
+                <span className="font-semibold">Ref:</span>{" "}
+                {process.env.NEXT_PUBLIC_BRANCH || "unavailable"}
               </p>
               <p>
-                <span className="font-semibold">Build Time:</span> {process.env.NEXT_PUBLIC_BUILD_TIME || "--:--:--"} UTC (GMT)
+                <span className="font-semibold">Build Time:</span>{" "}
+                {process.env.NEXT_PUBLIC_BUILD_TIME || "--:--:--"} UTC (GMT)
               </p>
             </TooltipContent>
           </Tooltip>

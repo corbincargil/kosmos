@@ -33,6 +33,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <head>
+          <meta name="apple-mobile-web-app-title" content="Kosmos" />
           <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
           <link
             rel="alternate icon"
