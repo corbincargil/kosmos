@@ -88,6 +88,7 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   Brush,
   BugIcon,
   Cake,
+  Calendar,
   CirclePlus,
   Church,
   Code,

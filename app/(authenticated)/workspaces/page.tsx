@@ -13,9 +13,10 @@ import {
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import PushNotificationManager from "./_components/notifications";
+import Link from "next/link";
 
 export default function AdminPage() {
-  const { workspaces } = useWorkspace();
+  const { workspaces, selectedWorkspace } = useWorkspace();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deletingWorkspace, setDeletingWorkspace] = useState<Workspace | null>(
     null
@@ -28,7 +29,15 @@ export default function AdminPage() {
   return (
     <div className="max-w-3xl mx-auto px-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Workspaces</h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-xl font-semibold">Workspaces</h2>
+          <Link
+            href={`/workspaces/about?workspace=${selectedWorkspace}`}
+            className="text-xs text-muted-foreground"
+          >
+            <span className="underline">help</span>
+          </Link>
+        </div>
         <Button onClick={() => setIsModalOpen(true)}>Add</Button>
       </div>
       <WorkspaceList
