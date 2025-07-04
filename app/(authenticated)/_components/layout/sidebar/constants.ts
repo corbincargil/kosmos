@@ -41,6 +41,7 @@ import {
   Brush,
   Mail,
   Text,
+  Bed,
 } from "lucide-react";
 
 export const dashboardLink = {
@@ -59,19 +60,20 @@ export const workspaceLinks: Record<
   Array<{ href: string; label: string; icon: LucideIcon }>
 > = {
   DEFAULT: [],
-  DEV: [{ href: "/projects", label: "Projects", icon: Binary }],
+  DEVELOPMENT: [{ href: "/projects", label: "Projects", icon: Binary }],
   FAITH: [
     { href: "/bible-studies", label: "Bible Studies", icon: BookOpen },
     { href: "/prayers", label: "Prayers", icon: ListCheck },
     { href: "/sermons", label: "Sermons", icon: FileText },
   ],
-  FAMILY: [{ href: "/events", label: "Events", icon: Calendar }],
   FINANCE: [
     { href: "/budget", label: "Budget", icon: DollarSign },
     { href: "/finance/schwab", label: "Schwab", icon: ChartNoAxesCombined },
   ],
-  FITNESS: [{ href: "/workouts", label: "Workouts", icon: BicepsFlexed }],
-  PERSONAL: [],
+  HEALTH: [
+    { href: "/workouts", label: "Workouts", icon: Dumbbell },
+    { href: "/sleep", label: "Sleep", icon: Bed },
+  ],
   SCHOOL: [{ href: "/courses", label: "Courses", icon: GraduationCap }],
   WORK: [{ href: "/projects", label: "Projects", icon: BriefcaseBusiness }],
   BLOG: [{ href: "/posts", label: "Posts", icon: Text }],
@@ -80,6 +82,7 @@ export const workspaceLinks: Record<
 export const ICON_MAP: Record<string, LucideIcon> = {
   Anchor,
   BicepsFlexed,
+  Bed,
   Binary,
   BriefcaseBusiness,
   Brush,

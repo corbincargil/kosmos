@@ -220,12 +220,10 @@ enum TaskPriority {
 enum WorkspaceType {
   BLOG
   DEFAULT
-  DEV
+  DEVELOPMENT
   FAITH
-  FAMILY
-  FITNESS
   FINANCE
-  PERSONAL
+  HEALTH
   SCHOOL
   WORK
 }
