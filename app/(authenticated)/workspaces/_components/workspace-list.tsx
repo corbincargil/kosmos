@@ -13,7 +13,7 @@ export default function WorkspaceList({
   onDeleteWorkspace,
 }: WorkspaceListProps) {
   return (
-    <ul className="space-y-2 max-h-[600px] overflow-y-auto">
+    <ul className="space-y-2 max-h-[650px] overflow-y-auto">
       {workspaces.map((workspace) => (
         <li
           key={workspace.id}

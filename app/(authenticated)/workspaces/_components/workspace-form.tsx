@@ -14,7 +14,7 @@ import IconSelect from "./icon-select";
 import { Button } from "@/components/ui/button";
 
 interface WorkspaceFormProps {
-  closeModal: () => void;
+  closeModal?: () => void;
   workspaceId?: number;
   initialName?: string;
   initialColor?: string;
@@ -45,12 +45,13 @@ export default function WorkspaceForm({
     api.workspaces.addWorkspace.useMutation({
       onSuccess: () => {
         utils.workspaces.getUserWorkspaces.invalidate();
-        closeModal();
         toast({
           title: "Success",
           description: "Workspace added successfully",
           variant: "success",
         });
+        setIsSubmitting(false);
+        closeModal?.();
       },
       onError: () => {
         toast({
@@ -65,12 +66,12 @@ export default function WorkspaceForm({
     api.workspaces.editWorkspace.useMutation({
       onSuccess: () => {
         utils.workspaces.getUserWorkspaces.invalidate();
-        closeModal();
         toast({
           title: "Success",
           description: "Workspace updated successfully",
           variant: "success",
         });
+        setIsSubmitting(false);
       },
       onError: () => {
         toast({
@@ -147,15 +148,17 @@ export default function WorkspaceForm({
           ? "Update Workspace"
           : "Add Workspace"}
       </Button>
-      <Button
-        type="button"
-        variant="outline"
-        onClick={closeModal}
-        className="w-full hover:bg-muted-foreground/50"
-        disabled={isSubmitting}
-      >
-        Cancel
-      </Button>
+      {closeModal && (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={closeModal}
+          className="w-full hover:bg-muted-foreground/50"
+          disabled={isSubmitting}
+        >
+          Cancel
+        </Button>
+      )}
     </form>
   );
 }
