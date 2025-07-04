@@ -2,11 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
-
 
 @layer base {
   :root {
@@ -26,7 +24,7 @@ body {
     --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
+    --border: 0 0% 80%;
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
     --chart-1: 12 76% 61%;
@@ -35,9 +33,9 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --accent-color: #3B82F6;
-    --accent-darker: #2563EB;
-    --accent-lighter: #60A5FA;
+    --accent-color: #3b82f6;
+    --accent-darker: #2563eb;
+    --accent-lighter: #60a5fa;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -64,7 +62,7 @@ body {
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
+    --border: 0 0% 25%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
     --chart-1: 220 70% 50%;
@@ -83,7 +81,6 @@ body {
   }
 }
 
-
 @layer base {
   * {
     @apply border-border;
@@ -94,13 +91,21 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 @keyframes fadeInDown {
@@ -155,7 +160,7 @@ body {
 
 /* Webkit browsers (Chrome, Safari, newer Edge) */
 ::-webkit-scrollbar {
-  width: 6px;  /* Reduced width */
+  width: 6px; /* Reduced width */
   height: 6px; /* For horizontal scrollbars */
 }
 
@@ -164,21 +169,21 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;  /* Tailwind slate-300 */
+  background: #cbd5e1; /* Tailwind slate-300 */
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;  /* Tailwind slate-400 */
+  background: #94a3b8; /* Tailwind slate-400 */
 }
 
 /* Dark mode */
 .dark ::-webkit-scrollbar-thumb {
-  background: #475569;  /* Tailwind slate-600 */
+  background: #475569; /* Tailwind slate-600 */
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;  /* Tailwind slate-500 */
+  background: #64748b; /* Tailwind slate-500 */
 }
 
 /* Firefox */

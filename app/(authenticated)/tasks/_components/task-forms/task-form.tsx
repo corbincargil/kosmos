@@ -146,7 +146,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
         status: task.status,
         priority: task.priority || "",
         workspaceUuid: task.workspaceUuid,
-        tags: task.tags.map(tag => tag.autoId),
+        tags: task.tags.map((tag) => tag.autoId),
         taskTypeId: task.taskTypeId,
       });
     }
@@ -165,16 +165,16 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
   };
 
   const handleTagChange = (tagIds: number[]) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      tags: tagIds
+      tags: tagIds,
     }));
   };
 
   const handleTaskTypeChange = (taskTypeId: number | null) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      taskTypeId
+      taskTypeId,
     }));
   };
 
@@ -413,7 +413,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
           {onCancel && (
-            <Button type="button" variant="glow" onClick={onCancel} className="w-full sm:w-auto">
+            <Button
+              type="button"
+              variant="glow"
+              onClick={onCancel}
+              className="w-full sm:w-auto"
+            >
               Cancel
             </Button>
           )}
@@ -436,7 +441,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ taskId, onCancel }) => {
         isOpen={showDeleteModal}
         onClose={() => {
           setShowDeleteModal(false);
-          // router.back();
+          router.back();
         }}
         recordId={task?.id || 0}
       />

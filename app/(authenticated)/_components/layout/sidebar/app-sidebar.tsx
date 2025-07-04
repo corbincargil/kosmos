@@ -170,8 +170,7 @@ export function AppSidebar() {
           </SidebarGroup>
         </div>
         <div className="mt-auto p-2 text-xs text-muted-foreground/70 border-t border-border">
-          <span className="mr-2">
-          </span>
+          <span className="mr-2"></span>
         </div>
       </SidebarContent>
     </Sidebar>
