@@ -11,6 +11,9 @@ export const workspaceRouter = createTRPCRouter({
       where: {
         userId: Number(ctx.userId),
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
   }),
 
