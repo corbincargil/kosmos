@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kosmos - Life Organization Platform
 
-## Getting Started
+A modern, full-stack productivity application that combines task management, note-taking, and blogging into a unified platform. Used as my personal replacement for Notion.
 
-First, run the development server:
+![Kosmos Task Board](https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbGVscWp4Mmt5MmlmZmZxeG1ldDVxc2RtcTY3ZmF5a3lwcjM2bjhlZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/tP4TwcuWBV0IUxJf2c/giphy.gif)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Feature Highlights
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🎯 **Smart Task Management**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Kanban Board** with quick-update functionality and swipe gestures
+- **Advanced Filtering** by status, priority, tags, due dates, and workspaces
+- **Optimistic Updates** for instant UI feedback
+- **Mobile-First Design** with touch gestures
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 📝 **Rich Content Creation**
 
-## Learn More
+- **Auto-Save** with debounced saving to prevent data loss
+- **Blog Publishing** used as the CMS for my personal blog with SEO-friendly slug generation and reading time calculation
+- **Dual Editor Support** - Rich text (TipTap) and Markdown with live preview
 
-To learn more about Next.js, take a look at the following resources:
+### 🔧 **Scalable Infrastructure**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Database Branching** for preview environments
+- **CI/CD Pipeline** with GitHub Actions
+- **Vercel Deployment** with automatic preview deployments
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Tech Stack
 
-## Deploy on Vercel
+### Frontend
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Next.js 14** with App Router and Server Components
+- **TypeScript** for type safety across the entire stack
+- **Tailwind CSS** with custom design system
+- **tRPC** for end-to-end type-safe APIs
+- **React Query** for server state management
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Backend & Database
+
+- **PostgreSQL** with Prisma ORM
+- **Neon Database** with automatic branching for preview environments
+- **Clerk Authentication** with username/password support
+
+## Additional Features
+
+### 🏢 **Multi-Workspace Organization**
+
+- **Life Area Separation** - Development, Faith, Work, Finance, Health, etc.
+- **Customizable Workspaces** with colors, icons, and themes
+- **Context Switching** with workspace-specific content and filters
+
+### 📱 **Mobile Experience**
+
+- **Installable** - Add to home screen
+- **Touch Gestures** - Swipe to complete tasks, expand cards
+- **Offline Support** - Service worker caching
+
+### 📊 **Performance & UX**
+
+- **Optimistic UI** - Instant feedback for user actions
+- **Debounced Saving** - Prevents data loss while maintaining performance
+- **Skeleton Loading** - Smooth loading states throughout the app
+- **Error Boundaries** - Graceful error handling and recovery
+
+### 🎨 **Design System**
+
+- **Custom Color System** - Workspace-specific theming
+- **Responsive Design** - Seamless experience across all devices
+- **Dark/Light Themes** - Automatic theme switching
