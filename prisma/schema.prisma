@@ -20,6 +20,7 @@ model User {
   oauthStates      OAuthState[]
   oauthConnections OAuthConnection[]
   authors          Author[]
+  sermonNotes      SermonNote[]
 
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
@@ -41,6 +42,7 @@ model Workspace {
   tags      Tag[]
   taskTypes TaskType[]
   posts     Post[]
+  sermonNotes SermonNote[]
   
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
@@ -179,6 +181,24 @@ model Author {
   updatedAt     DateTime  @updatedAt
 }
 
+model SermonNote {
+  id          Int                @id @default(autoincrement())
+  cuid        String             @unique @default(cuid())
+  title       String             @db.VarChar(100)
+  markdown    String?
+  ocrText     String?
+  imageUrl    String?
+  status      SermonNoteStatus   @default(UPLOADED)
+  
+  user        User               @relation(fields: [userId], references: [id])
+  userId      Int
+  workspace   Workspace?         @relation(fields: [workspaceId], references: [id])
+  workspaceId Int?
+  
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
 model OAuthState {
   id        Int           @id @default(autoincrement())
   state     String        @unique
@@ -236,4 +256,11 @@ enum PostStatus {
 
 enum OAuthProvider {
   SCHWAB
+}
+
+enum SermonNoteStatus {
+  UPLOADED
+  PROCESSING
+  COMPLETED
+  FAILED
 }
