@@ -5,13 +5,12 @@ import path from "path";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_MIME_TYPES = [
-  "image/heic",
   "image/jpeg",
   "image/png",
   "image/webp",
   "image/gif",
 ];
-const ALLOWED_EXTENSIONS = [".heic", ".jpg", ".jpeg", ".png", ".webp", ".gif"];
+const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
 
 export async function POST(request: NextRequest) {
   try {

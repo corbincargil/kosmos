@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Upload, X, FileImage } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "@/trpc/react";
 import { useWorkspace } from "@/contexts/workspace-context";
 import { useUser } from "@clerk/nextjs";
@@ -26,16 +26,57 @@ export default function UploadSermon() {
   const { user } = useUser();
   const { toast } = useToast();
 
+  const [createdSermonNoteId, setCreatedSermonNoteId] = useState<number | null>(
+    null
+  );
+  const [isPolling, setIsPolling] = useState(false);
+
+  const { data: sermonNote } = api.sermons.getSermonNote.useQuery(
+    { id: createdSermonNoteId! },
+    {
+      enabled: !!createdSermonNoteId,
+      refetchInterval: isPolling ? 2000 : false,
+      refetchIntervalInBackground: false,
+    }
+  );
+
+  // Handle polling logic
+  useEffect(() => {
+    if (sermonNote) {
+      if (sermonNote.status === "PROCESSING") {
+        setIsPolling(true);
+      } else {
+        setIsPolling(false);
+        // Processing complete, show appropriate message
+        if (sermonNote.status === "COMPLETED") {
+          toast({
+            title: "Processing Complete",
+            description: "Your sermon notes are ready!",
+            variant: "default",
+          });
+        } else if (sermonNote.status === "FAILED") {
+          toast({
+            title: "Processing Failed",
+            description: "There was an error processing your sermon image.",
+            variant: "destructive",
+          });
+        }
+      }
+    }
+  }, [sermonNote?.status, toast]);
+
   const { mutate: createSermonNote } = api.sermons.createSermonNote.useMutation(
     {
-      onSuccess: () => {
+      onSuccess: (sermonNote) => {
         toast({
           title: "Success",
-          description: "Sermon note created successfully",
+          description: "Sermon note created successfully. Processing image...",
           variant: "default",
         });
         setSelectedFiles([]);
         setIsCreating(false);
+        setCreatedSermonNoteId(sermonNote.id);
+        setIsPolling(true);
       },
       onError: (error) => {
         toast({
@@ -241,6 +282,35 @@ export default function UploadSermon() {
                   ))}
                 </div>
               </div>
+            </div>
+          )}
+
+          {sermonNote && (
+            <div className="p-3 border rounded-lg bg-muted/50">
+              <div className="flex items-center gap-2">
+                <div className="text-sm font-medium">Status:</div>
+                <div
+                  className={`text-sm ${
+                    sermonNote.status === "COMPLETED"
+                      ? "text-green-600"
+                      : sermonNote.status === "PROCESSING"
+                      ? "text-blue-600"
+                      : sermonNote.status === "FAILED"
+                      ? "text-red-600"
+                      : "text-gray-600"
+                  }`}
+                >
+                  {sermonNote.status === "PROCESSING" && "🔄 Processing..."}
+                  {sermonNote.status === "COMPLETED" && "✅ Complete"}
+                  {sermonNote.status === "FAILED" && "❌ Failed"}
+                  {sermonNote.status === "UPLOADED" && "📤 Uploaded"}
+                </div>
+              </div>
+              {sermonNote.status === "COMPLETED" && sermonNote.markdown && (
+                <div className="mt-2 text-xs text-muted-foreground">
+                  Generated {sermonNote.markdown.length} characters of markdown
+                </div>
+              )}
             </div>
           )}
 
