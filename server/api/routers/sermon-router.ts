@@ -6,6 +6,38 @@ import { z } from "zod";
 import { processSermonNote } from "@/server/utils/sermon-processor";
 
 export const sermonRouter = createTRPCRouter({
+  getCurrentWorkspaceSermonNotes: protectedProcedure
+    .input(
+      z.object({
+        workspaceId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      // Convert workspace UUID to workspace ID
+      const workspace = await ctx.db.workspace.findUnique({
+        where: { uuid: input.workspaceId },
+      });
+
+      if (!workspace) {
+        return [];
+      }
+
+      return ctx.db.sermonNote.findMany({
+        where: {
+          userId: ctx.userId,
+          workspaceId: workspace.id,
+        },
+        orderBy: { updatedAt: "desc" },
+      });
+    }),
+
+  getCurrentUserSermonNotes: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.sermonNote.findMany({
+      where: { userId: ctx.userId },
+      orderBy: { updatedAt: "desc" },
+    });
+  }),
+
   getSermonNote: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
@@ -18,6 +50,15 @@ export const sermonRouter = createTRPCRouter({
     .input(CreateSermonNoteSchema)
     .mutation(async ({ ctx, input }) => {
       const { title, workspaceId, uploadId, imageUrl } = input;
+
+      // Convert workspace UUID to workspace ID
+      const workspace = await ctx.db.workspace.findUnique({
+        where: { uuid: workspaceId.toString() },
+      });
+
+      if (!workspace) {
+        throw new Error("Workspace not found");
+      }
 
       // If uploadId and imageUrl are provided, validate file exists
       if (uploadId && imageUrl) {
@@ -45,7 +86,7 @@ export const sermonRouter = createTRPCRouter({
           },
           workspace: {
             connect: {
-              id: workspaceId,
+              id: workspace.id,
             },
           },
         },

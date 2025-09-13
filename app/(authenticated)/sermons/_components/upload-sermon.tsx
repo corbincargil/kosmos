@@ -181,7 +181,7 @@ export default function UploadSermon() {
       // Create SermonNote with upload result
       createSermonNote({
         title: "", // Will auto-generate from uploadId
-        workspaceId: parseInt(selectedWorkspace),
+        workspaceId: selectedWorkspace,
         uploadId: uploadResult.uploadId,
         imageUrl: uploadResult.imageUrl,
       });
