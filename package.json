@@ -15,6 +15,8 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.888.0",
+    "@aws-sdk/s3-request-presigner": "^3.888.0",
     "@clerk/nextjs": "^5.7.2",
     "@hookform/resolvers": "^3.10.0",
     "@prisma/adapter-neon": "^6.8.2",
@@ -48,7 +50,6 @@
     "cmdk": "^1.1.1",
     "dayjs": "^1.11.13",
     "lucide-react": "^0.452.0",
-    "nanoid": "^5.1.5",
     "next": "^14.2.18",
     "openai": "^5.20.2",
     "react": "^18",

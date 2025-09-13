@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { nanoid } from "nanoid";
-import { writeFile } from "fs/promises";
+import crypto from "crypto";
 import path from "path";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_MIME_TYPES = [
@@ -11,6 +11,20 @@ const ALLOWED_MIME_TYPES = [
   "image/gif",
 ];
 const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
+
+const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME;
+const S3_BUCKET_REGION = process.env.S3_BUCKET_REGION;
+const S3_ACCESS_KEY = process.env.S3_ACCESS_KEY;
+const S3_SECRET_ACCESS_KEY = process.env.S3_SECRET_ACCESS_KEY;
+const ENV = process.env.ENV || "development";
+
+const client = new S3Client({
+  region: S3_BUCKET_REGION,
+  credentials: {
+    accessKeyId: S3_ACCESS_KEY!,
+    secretAccessKey: S3_SECRET_ACCESS_KEY!,
+  },
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -83,21 +97,37 @@ export async function POST(request: NextRequest) {
     }
 
     // Process the first valid file
-    const uploadId = nanoid();
+    const uploadId = crypto.randomBytes(16).toString("hex");
     const extension = path.extname(firstValidFile.name).toLowerCase();
-    const fileName = `sermon-${uploadId}${extension}`;
-    const filePath = path.join(process.cwd(), "public", "uploads", fileName);
+    const fileName = `${uploadId}${extension}`;
+
+    // Folder structure: sermons/userId/fileName
+    const s3Key = `${ENV}/sermons/${userId}/${fileName}`;
 
     // Convert file to buffer and save
     const bytes = await firstValidFile.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    await writeFile(filePath, buffer);
+
+    const params = {
+      Bucket: S3_BUCKET_NAME,
+      Key: s3Key,
+      Body: buffer,
+      ContentType: firstValidFile.type,
+      Metadata: {
+        userId: userId,
+        uploadId: uploadId,
+        originalName: firstValidFile.name,
+      },
+    };
+
+    const command = new PutObjectCommand(params);
+    await client.send(command);
 
     // Return success response
     return NextResponse.json({
       uploadId,
       fileName,
-      imageUrl: `/uploads/${fileName}`,
+      s3Key,
     });
   } catch (error) {
     console.error("Upload error:", error);

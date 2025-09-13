@@ -16,9 +16,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export default function UploadSermon() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [title, setTitle] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -180,10 +182,9 @@ export default function UploadSermon() {
 
       // Create SermonNote with upload result
       createSermonNote({
-        title: "", // Will auto-generate from uploadId
+        title: title.trim(),
         workspaceId: selectedWorkspace,
-        uploadId: uploadResult.uploadId,
-        imageUrl: uploadResult.imageUrl,
+        s3Key: uploadResult.s3Key,
       });
     } catch (error) {
       setIsUploading(false);
@@ -213,6 +214,15 @@ export default function UploadSermon() {
           Upload sermon images to generate notes.
         </DialogDescription>
         <div className="flex flex-col gap-3 sm:gap-4">
+          <div className="flex flex-col gap-2">
+            <Label className="text-sm sm:text-base">Title (optional)</Label>
+            <Input
+              type="text"
+              placeholder="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
           <div className="relative">
             <div
               className={`

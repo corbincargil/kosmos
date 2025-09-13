@@ -90,10 +90,14 @@ export function SermonNoteCard({ sermonNote, className }: SermonNoteCardProps) {
         </div>
         <CardDescription className="flex items-center gap-4">
           <span>Last updated {dayjs(sermonNote.updatedAt).fromNow()}</span>
-          {sermonNote.imageUrl && (
+          {sermonNote.s3Key && (
             <span className="flex items-center gap-1">
-              <ImageIcon className="h-3 w-3" />
-              Image
+              <img
+                src={sermonNote.s3Key}
+                alt="Sermon Note"
+                width={16}
+                height={16}
+              />
             </span>
           )}
           {sermonNote.markdown && (
@@ -115,7 +119,7 @@ export function SermonNoteCard({ sermonNote, className }: SermonNoteCardProps) {
             {sermonNote.status === "PROCESSING" ? (
               <div className="flex items-center gap-2">
                 <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
-                Processing sermon image...
+                Processing sermon notes...
               </div>
             ) : sermonNote.status === "FAILED" ? (
               "Processing failed. Please try uploading again."

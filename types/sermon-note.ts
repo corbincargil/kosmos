@@ -7,7 +7,7 @@ export const SermonNoteSchema = z.object({
   title: z.string().max(100),
   markdown: z.string().nullable(),
   ocrText: z.string().nullable(),
-  imageUrl: z.string().nullable(),
+  s3Key: z.string().nullable(),
   status: z.nativeEnum(SermonNoteStatus),
 
   userId: z.number().int().positive(),
@@ -20,8 +20,11 @@ export const SermonNoteSchema = z.object({
 export const CreateSermonNoteSchema = z.object({
   title: z.string().max(100),
   workspaceId: z.string(),
-  uploadId: z.string().optional(),
-  imageUrl: z.string().optional(),
+  s3Key: z.string(),
 });
+
+export type SermonNoteWithS3Url = z.TypeOf<typeof SermonNoteSchema> & {
+  s3Key: string | null;
+};
 
 export type SermonNote = z.infer<typeof SermonNoteSchema>;
