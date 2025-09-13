@@ -187,13 +187,13 @@ model SermonNote {
   title       String             @db.VarChar(100)
   markdown    String?
   ocrText     String?
-  imageUrl    String?
+  s3Key       String?            
   status      SermonNoteStatus   @default(UPLOADED)
   
   user        User               @relation(fields: [userId], references: [id])
   userId      Int
-  workspace   Workspace?         @relation(fields: [workspaceId], references: [id])
-  workspaceId Int?
+  workspace   Workspace         @relation(fields: [workspaceId], references: [id])
+  workspaceId Int
   
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
