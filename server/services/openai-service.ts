@@ -65,6 +65,41 @@ export class OpenAIService {
     }
   }
 
+  async extractTextFromMultipleImages(imageUrls: string[]): Promise<string> {
+    try {
+      const content: any[] = [
+        {
+          type: "text",
+          text: "These images may or may not be in order. Analyze all the sermon note images and determine the logical order, then extract all text maintaining the sermon flow structure. The first image typically contains date/church/author information. Extract the text from all images and present it in the correct logical order as a cohesive sermon note.",
+        },
+      ];
+
+      // Add all images to the content array
+      imageUrls.forEach((url) => {
+        content.push({
+          type: "image_url",
+          image_url: { url },
+        });
+      });
+
+      const response = await this.openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "user",
+            content,
+          },
+        ],
+        max_tokens: 2000, // Increased for multiple images
+      });
+
+      return response.choices[0]?.message?.content || "";
+    } catch (error) {
+      console.error("Error extracting text from multiple images:", error);
+      throw new Error("Failed to extract text from multiple images");
+    }
+  }
+
   async convertTextToMarkdown(text: string): Promise<string> {
     try {
       const response = await this.openai.chat.completions.create({
@@ -72,7 +107,7 @@ export class OpenAIService {
         messages: [
           {
             role: "user",
-            content: `Convert this sermon text to clean markdown format:
+            content: `Convert this sermon text to clean markdown format. Do not wrap the text in \`\`\`markdown\`\`\`:
 
 ${text}
 

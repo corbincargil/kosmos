@@ -1,14 +1,13 @@
-import {
-  CreateSermonNoteSchema,
-  SermonNoteWithS3Url,
-} from "@/types/sermon-note";
+import { CreateSermonNoteSchema } from "@/types/sermon-note";
+import { CreateImageSchema } from "@/types/image";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { z } from "zod";
 import { processSermonNote } from "@/server/utils/sermon-processor";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { ImageEntityType } from "@prisma/client";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const client = new S3Client({
+const s3Client = new S3Client({
   region: process.env.S3_BUCKET_REGION,
   credentials: {
     accessKeyId: process.env.S3_ACCESS_KEY!,
@@ -23,7 +22,7 @@ export const sermonRouter = createTRPCRouter({
         workspaceId: z.string(),
       })
     )
-    .query(async ({ ctx, input }): Promise<SermonNoteWithS3Url[]> => {
+    .query(async ({ ctx, input }) => {
       const workspace = await ctx.db.workspace.findUnique({
         where: { uuid: input.workspaceId },
       });
@@ -37,50 +36,93 @@ export const sermonRouter = createTRPCRouter({
           userId: ctx.userId,
           workspaceId: workspace.id,
         },
+        include: {
+          images: true,
+        },
         orderBy: { updatedAt: "desc" },
       });
 
       for (const note of notes) {
-        if (!note.s3Key) {
-          continue;
+        for (const image of note.images) {
+          const command = new GetObjectCommand({
+            Bucket: process.env.S3_BUCKET_NAME,
+            Key: image.s3Key,
+          });
+
+          const presignedUrl = await getSignedUrl(s3Client, command, {
+            expiresIn: 5 * 60, // 5 minutes
+          });
+
+          image.s3Key = presignedUrl;
         }
-
-        const command = new GetObjectCommand({
-          Bucket: process.env.S3_BUCKET_NAME,
-          Key: note.s3Key,
-        });
-
-        const s3Url = await getSignedUrl(client, command, {
-          expiresIn: 60 * 5, // 5 minutes
-        });
-
-        note.s3Key = s3Url;
       }
 
       return notes;
     }),
 
   getCurrentUserSermonNotes: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.sermonNote.findMany({
+    const notes = await ctx.db.sermonNote.findMany({
       where: { userId: ctx.userId },
+      include: {
+        images: true,
+      },
       orderBy: { updatedAt: "desc" },
     });
+
+    for (const note of notes) {
+      for (const image of note.images) {
+        const command = new GetObjectCommand({
+          Bucket: process.env.S3_BUCKET_NAME,
+          Key: image.s3Key,
+        });
+
+        const presignedUrl = await getSignedUrl(s3Client, command, {
+          expiresIn: 5 * 60, // 5 minutes
+        });
+
+        image.s3Key = presignedUrl;
+      }
+    }
+
+    return notes;
   }),
 
   getSermonNote: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
-      return ctx.db.sermonNote.findUnique({
+      const note = await ctx.db.sermonNote.findUnique({
         where: { id: input.id },
+        include: {
+          images: true,
+        },
       });
+
+      if (!note) {
+        return null;
+      }
+
+      // Generate presigned URLs for all images
+      for (const image of note.images) {
+        const command = new GetObjectCommand({
+          Bucket: process.env.S3_BUCKET_NAME,
+          Key: image.s3Key,
+        });
+
+        const presignedUrl = await getSignedUrl(s3Client, command, {
+          expiresIn: 5 * 60, // 5 minutes
+        });
+
+        image.s3Key = presignedUrl;
+      }
+
+      return note;
     }),
 
   createSermonNote: protectedProcedure
     .input(CreateSermonNoteSchema)
     .mutation(async ({ ctx, input }) => {
-      const { title, workspaceId, s3Key } = input;
+      const { title, workspaceId } = input;
 
-      // Convert workspace UUID to workspace ID
       const workspace = await ctx.db.workspace.findUnique({
         where: { uuid: workspaceId.toString() },
       });
@@ -89,13 +131,11 @@ export const sermonRouter = createTRPCRouter({
         throw new Error("Workspace not found");
       }
 
-      // Auto-generate title from uploadId if not provided
       const finalTitle = title || `Sermon ${new Date().toLocaleDateString()}`;
 
       const sermonNote = await ctx.db.sermonNote.create({
         data: {
           title: finalTitle,
-          s3Key,
           user: {
             connect: {
               id: ctx.userId,
@@ -109,19 +149,79 @@ export const sermonRouter = createTRPCRouter({
         },
       });
 
-      const command = new GetObjectCommand({
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: s3Key,
+      return sermonNote;
+    }),
+
+  createSermonNoteWithImages: protectedProcedure
+    .input(
+      z.object({
+        title: z.string().max(100),
+        workspaceId: z.string(),
+        images: z.array(
+          z.object({
+            s3Key: z.string(),
+            originalName: z.string(),
+            mimeType: z.string(),
+            fileSize: z.number(),
+          })
+        ),
+        allUploadsSuccessful: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { title, workspaceId, images, allUploadsSuccessful } = input;
+
+      const workspace = await ctx.db.workspace.findUnique({
+        where: { uuid: workspaceId.toString() },
       });
 
-      const s3Url = await getSignedUrl(client, command, {
-        expiresIn: 60 * 5, // 5 minutes
+      if (!workspace) {
+        throw new Error("Workspace not found");
+      }
+
+      const finalTitle = title || `Sermon ${new Date().toLocaleDateString()}`;
+
+      // Create SermonNote first
+      const sermonNote = await ctx.db.sermonNote.create({
+        data: {
+          title: finalTitle,
+          status: allUploadsSuccessful ? "UPLOADED" : "FAILED",
+          user: {
+            connect: {
+              id: ctx.userId,
+            },
+          },
+          workspace: {
+            connect: {
+              id: workspace.id,
+            },
+          },
+        },
       });
 
-      // Fire-and-forget background processing
-      processSermonNote(sermonNote.id, s3Url).catch((error) => {
-        console.error("Background sermon processing failed:", error);
-      });
+      // Create Image records for successful uploads
+      if (images.length > 0) {
+        await ctx.db.image.createMany({
+          data: images.map((img) => ({
+            s3Key: img.s3Key,
+            originalName: img.originalName,
+            mimeType: img.mimeType,
+            fileSize: img.fileSize,
+            width: null,
+            height: null,
+            alt: null,
+            entityType: ImageEntityType.SERMON_NOTE,
+            entityId: sermonNote.id,
+          })),
+        });
+      }
+
+      // Trigger AI processing only if all uploads succeeded
+      if (allUploadsSuccessful && images.length > 0) {
+        processSermonNote(sermonNote.id).catch((error) => {
+          console.error("Background sermon processing failed:", error);
+        });
+      }
 
       return sermonNote;
     }),

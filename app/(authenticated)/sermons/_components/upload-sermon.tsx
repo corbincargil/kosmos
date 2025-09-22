@@ -91,6 +91,29 @@ export default function UploadSermon() {
     }
   );
 
+  const { mutate: createSermonNoteWithImages } =
+    api.sermons.createSermonNoteWithImages.useMutation({
+      onSuccess: (sermonNote) => {
+        toast({
+          title: "Success",
+          description: "Sermon note created successfully. Processing images...",
+          variant: "default",
+        });
+        setSelectedFiles([]);
+        setIsCreating(false);
+        setCreatedSermonNoteId(sermonNote.id);
+        setIsPolling(true);
+      },
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: `Failed to create sermon note: ${error.message}`,
+          variant: "destructive",
+        });
+        setIsCreating(false);
+      },
+    });
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
@@ -130,6 +153,42 @@ export default function UploadSermon() {
       toast({
         title: "Error",
         description: "Please select at least one file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Frontend validation
+    if (selectedFiles.length > 4) {
+      toast({
+        title: "Error",
+        description: "Maximum 4 files allowed",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const maxFileSize = 2.4 * 1024 * 1024; // 2.4MB
+    const oversizedFiles = selectedFiles.filter(
+      (file) => file.size > maxFileSize
+    );
+    if (oversizedFiles.length > 0) {
+      toast({
+        title: "Error",
+        description: `Files exceed 2MB limit: ${oversizedFiles
+          .map((f) => f.name)
+          .join(", ")}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
+    const maxTotalSize = 6 * 1024 * 1024; // 6MB
+    if (totalSize > maxTotalSize) {
+      toast({
+        title: "Error",
+        description: "Total file size exceeds 6MB limit",
         variant: "destructive",
       });
       return;
@@ -180,11 +239,23 @@ export default function UploadSermon() {
       setIsUploading(false);
       setIsCreating(true);
 
-      // Create SermonNote with upload result
-      createSermonNote({
-        title: title.trim(),
+      // Handle partial upload failures
+      if (uploadResult.uploadErrors && uploadResult.uploadErrors.length > 0) {
+        toast({
+          title: "Partial Upload Failure",
+          description: `Some uploads failed: ${uploadResult.uploadErrors.join(
+            ", "
+          )}. Sermon created with successful uploads only.`,
+          variant: "destructive",
+        });
+      }
+
+      // Create SermonNote with upload results
+      createSermonNoteWithImages({
+        title: title.trim() || "",
         workspaceId: selectedWorkspace,
-        s3Key: uploadResult.s3Key,
+        images: uploadResult.images,
+        allUploadsSuccessful: uploadResult.allUploadsSuccessful,
       });
     } catch (error) {
       setIsUploading(false);

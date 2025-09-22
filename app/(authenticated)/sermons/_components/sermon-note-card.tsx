@@ -1,6 +1,6 @@
 "use client";
 
-import { SermonNote } from "@/types/sermon-note";
+import { SermonNoteWithImages } from "@/types/sermon-note";
 import { SermonNoteStatus } from "@prisma/client";
 import {
   Card,
@@ -22,7 +22,7 @@ import remarkGfm from "remark-gfm";
 dayjs.extend(relativeTime);
 
 interface SermonNoteCardProps {
-  sermonNote: SermonNote;
+  sermonNote: SermonNoteWithImages;
   className?: string;
 }
 
@@ -90,16 +90,11 @@ export function SermonNoteCard({ sermonNote, className }: SermonNoteCardProps) {
         </div>
         <CardDescription className="flex items-center gap-4">
           <span>Last updated {dayjs(sermonNote.updatedAt).fromNow()}</span>
-          {sermonNote.s3Key && (
-            <span className="flex items-center gap-1">
-              <img
-                src={sermonNote.s3Key}
-                alt="Sermon Note"
-                width={16}
-                height={16}
-              />
+          {sermonNote.images.map((image) => (
+            <span key={image.id} className="flex items-center gap-1">
+              <img src={image.s3Key} alt="Sermon Note" width={16} height={16} />
             </span>
-          )}
+          ))}
           {sermonNote.markdown && (
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />

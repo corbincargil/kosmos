@@ -3,7 +3,9 @@ import crypto from "crypto";
 import path from "path";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 2.4 * 1024 * 1024; // 2.4MB per file
+const MAX_TOTAL_SIZE = 7.2 * 1024 * 1024; // 7.2MB total
+const MAX_FILE_COUNT = 4;
 const ALLOWED_MIME_TYPES = [
   "image/jpeg",
   "image/png",
@@ -26,6 +28,13 @@ const client = new S3Client({
   },
 });
 
+interface UploadedImageData {
+  s3Key: string;
+  originalName: string;
+  mimeType: string;
+  fileSize: number;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -38,24 +47,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get all files from form data
     const files = formData.getAll("files") as File[];
 
     if (!files || files.length === 0) {
       return NextResponse.json({ error: "No files provided" }, { status: 400 });
     }
 
-    // Validate all files
+    // File count validation
+    if (files.length > MAX_FILE_COUNT) {
+      return NextResponse.json(
+        { error: `Maximum ${MAX_FILE_COUNT} files allowed` },
+        { status: 400 }
+      );
+    }
+
+    // Total size validation
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    if (totalSize > MAX_TOTAL_SIZE) {
+      return NextResponse.json(
+        {
+          error: `Total file size exceeds ${
+            MAX_TOTAL_SIZE / (1024 * 1024)
+          }MB limit`,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate all files and collect valid ones
     const validationErrors: string[] = [];
-    let firstValidFile: File | null = null;
+    const validFiles: File[] = [];
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
 
-      // Check file size
+      // Check individual file size
       if (file.size > MAX_FILE_SIZE) {
         validationErrors.push(
-          `File ${i + 1} (${file.name}) exceeds 10MB limit`
+          `File ${i + 1} (${file.name}) exceeds ${
+            MAX_FILE_SIZE / (1024 * 1024)
+          }MB limit`
         );
         continue;
       }
@@ -77,14 +108,10 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      // If this is the first valid file, store it
-      if (!firstValidFile) {
-        firstValidFile = file;
-      }
+      validFiles.push(file);
     }
 
-    // If we have validation errors but no valid file, return errors
-    if (!firstValidFile) {
+    if (validFiles.length === 0) {
       return NextResponse.json(
         {
           error:
@@ -96,38 +123,56 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Process the first valid file
-    const uploadId = crypto.randomBytes(16).toString("hex");
-    const extension = path.extname(firstValidFile.name).toLowerCase();
-    const fileName = `${uploadId}${extension}`;
+    // Upload all valid files to S3
+    const uploadedImages: UploadedImageData[] = [];
+    const uploadErrors: string[] = [];
 
-    // Folder structure: sermons/userId/fileName
-    const s3Key = `${ENV}/sermons/${userId}/${fileName}`;
+    for (const file of validFiles) {
+      try {
+        const uploadId = crypto.randomBytes(16).toString("hex");
+        const extension = path.extname(file.name).toLowerCase();
+        const fileName = `${uploadId}${extension}`;
+        const s3Key = `${ENV}/sermons/${userId}/${fileName}`;
 
-    // Convert file to buffer and save
-    const bytes = await firstValidFile.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
 
-    const params = {
-      Bucket: S3_BUCKET_NAME,
-      Key: s3Key,
-      Body: buffer,
-      ContentType: firstValidFile.type,
-      Metadata: {
-        userId: userId,
-        uploadId: uploadId,
-        originalName: firstValidFile.name,
-      },
-    };
+        const params = {
+          Bucket: S3_BUCKET_NAME,
+          Key: s3Key,
+          Body: buffer,
+          ContentType: file.type,
+          Metadata: {
+            userId: userId,
+            uploadId: uploadId,
+            originalName: file.name,
+          },
+        };
 
-    const command = new PutObjectCommand(params);
-    await client.send(command);
+        const command = new PutObjectCommand(params);
+        await client.send(command);
 
-    // Return success response
+        uploadedImages.push({
+          s3Key,
+          originalName: file.name,
+          mimeType: file.type,
+          fileSize: file.size,
+        });
+      } catch (error) {
+        console.error(`Failed to upload ${file.name}:`, error);
+        uploadErrors.push(`Failed to upload ${file.name}`);
+      }
+    }
+
+    const allUploadsSuccessful = uploadErrors.length === 0;
+
     return NextResponse.json({
-      uploadId,
-      fileName,
-      s3Key,
+      success: true,
+      images: uploadedImages,
+      totalUploaded: uploadedImages.length,
+      totalFiles: files.length,
+      uploadErrors: uploadErrors.length > 0 ? uploadErrors : undefined,
+      allUploadsSuccessful,
     });
   } catch (error) {
     console.error("Upload error:", error);

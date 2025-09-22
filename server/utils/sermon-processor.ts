@@ -1,12 +1,20 @@
 import { db } from "@/server/db";
 import { OpenAIService } from "@/server/services/openai-service";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { ImageEntityType } from "@prisma/client";
 
 const openaiService = new OpenAIService();
 
-export async function processSermonNote(
-  sermonNoteId: number,
-  imageUrl: string
-): Promise<void> {
+const s3Client = new S3Client({
+  region: process.env.S3_BUCKET_REGION,
+  credentials: {
+    accessKeyId: process.env.S3_ACCESS_KEY!,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
+  },
+});
+
+export async function processSermonNote(sermonNoteId: number): Promise<void> {
   try {
     console.log(`Starting processing for sermon note ${sermonNoteId}`);
 
@@ -16,26 +24,49 @@ export async function processSermonNote(
       data: { status: "PROCESSING" },
     });
 
-    console.log(`Extracting text from image: ${imageUrl}`);
+    // Query database for sermon images
+    const images = await db.image.findMany({
+      where: {
+        entityType: ImageEntityType.SERMON_NOTE,
+        entityId: sermonNoteId,
+      },
+      orderBy: { createdAt: "asc" },
+    });
 
-    // Convert full URL to local path for development, or use URL for production
-    let imagePath: string;
-    if (imageUrl.includes("localhost") || imageUrl.includes("127.0.0.1")) {
-      // Extract the path from localhost URL
-      const url = new URL(imageUrl);
-      imagePath = url.pathname; // e.g., "/uploads/sermon-abc123.jpg"
-    } else {
-      // Production URL, use as-is
-      imagePath = imageUrl;
+    if (images.length === 0) {
+      throw new Error("No images found for sermon note");
     }
 
-    // Step 1: Extract text from image
-    const ocrText = await openaiService.extractTextFromImage(imagePath);
+    console.log(`Found ${images.length} images for processing`);
 
-    console.log(`OCR extraction completed, text length: ${ocrText.length}`);
+    // Generate presigned URLs for all images
+    const imageUrls: string[] = [];
+    for (const image of images) {
+      const command = new GetObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: image.s3Key,
+      });
 
-    // Step 2: Convert text to markdown
-    const markdown = await openaiService.convertTextToMarkdown(ocrText);
+      const presignedUrl = await getSignedUrl(s3Client, command, {
+        expiresIn: 3600, // 1 hour
+      });
+
+      imageUrls.push(presignedUrl);
+    }
+
+    console.log(`Generated presigned URLs for ${imageUrls.length} images`);
+
+    // Process all images through OCR with updated prompt
+    const combinedOcrText = await openaiService.extractTextFromMultipleImages(
+      imageUrls
+    );
+
+    console.log(
+      `OCR extraction completed, text length: ${combinedOcrText.length}`
+    );
+
+    // Convert combined text to markdown
+    const markdown = await openaiService.convertTextToMarkdown(combinedOcrText);
 
     console.log(
       `Markdown conversion completed, markdown length: ${markdown.length}`
@@ -45,7 +76,7 @@ export async function processSermonNote(
     await db.sermonNote.update({
       where: { id: sermonNoteId },
       data: {
-        ocrText,
+        ocrText: combinedOcrText,
         markdown,
         status: "COMPLETED",
       },
