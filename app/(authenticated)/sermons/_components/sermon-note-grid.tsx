@@ -1,8 +1,8 @@
-import { SermonNote } from "@/types/sermon-note";
+import { SermonNoteWithImages } from "@/types/sermon-note";
 import { SermonNoteCard } from "./sermon-note-card";
 
 interface SermonNoteGridProps {
-  sermonNotes: SermonNote[];
+  sermonNotes: SermonNoteWithImages[];
 }
 
 export function SermonNoteGrid({ sermonNotes }: SermonNoteGridProps) {

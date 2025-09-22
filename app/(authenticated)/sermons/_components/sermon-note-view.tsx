@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { SermonNote } from "@/types/sermon-note";
+import { SermonNoteWithImages } from "@/types/sermon-note";
 import { SermonNoteGrid } from "./sermon-note-grid";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,7 +14,7 @@ import {
 import { Search } from "lucide-react";
 
 interface SermonNoteViewProps {
-  sermonNotes: SermonNote[] | undefined;
+  sermonNotes: SermonNoteWithImages[] | undefined;
 }
 
 export function SermonNoteView({ sermonNotes }: SermonNoteViewProps) {

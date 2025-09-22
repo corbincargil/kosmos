@@ -65,31 +65,7 @@ export default function UploadSermon() {
         }
       }
     }
-  }, [sermonNote?.status, toast]);
-
-  const { mutate: createSermonNote } = api.sermons.createSermonNote.useMutation(
-    {
-      onSuccess: (sermonNote) => {
-        toast({
-          title: "Success",
-          description: "Sermon note created successfully. Processing image...",
-          variant: "default",
-        });
-        setSelectedFiles([]);
-        setIsCreating(false);
-        setCreatedSermonNoteId(sermonNote.id);
-        setIsPolling(true);
-      },
-      onError: (error) => {
-        toast({
-          title: "Error",
-          description: `Failed to create sermon note: ${error.message}`,
-          variant: "destructive",
-        });
-        setIsCreating(false);
-      },
-    }
-  );
+  }, [sermonNote?.status, toast, sermonNote]);
 
   const { mutate: createSermonNoteWithImages } =
     api.sermons.createSermonNoteWithImages.useMutation({

@@ -15,9 +15,10 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Image as ImageIcon } from "lucide-react";
+import { Clock } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Image from "next/image";
 
 dayjs.extend(relativeTime);
 
@@ -92,7 +93,12 @@ export function SermonNoteCard({ sermonNote, className }: SermonNoteCardProps) {
           <span>Last updated {dayjs(sermonNote.updatedAt).fromNow()}</span>
           {sermonNote.images.map((image) => (
             <span key={image.id} className="flex items-center gap-1">
-              <img src={image.s3Key} alt="Sermon Note" width={16} height={16} />
+              <Image
+                src={image.s3Key}
+                alt="Sermon Note"
+                width={16}
+                height={16}
+              />
             </span>
           ))}
           {sermonNote.markdown && (
