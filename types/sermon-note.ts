@@ -1,5 +1,6 @@
 import { SermonNoteStatus } from "@prisma/client";
 import { z } from "zod";
+import { ImageSchema } from "./image";
 
 export const SermonNoteSchema = z.object({
   id: z.number().int().positive(),
@@ -7,24 +8,22 @@ export const SermonNoteSchema = z.object({
   title: z.string().max(100),
   markdown: z.string().nullable(),
   ocrText: z.string().nullable(),
-  s3Key: z.string().nullable(),
   status: z.nativeEnum(SermonNoteStatus),
-
   userId: z.number().int().positive(),
-  workspaceId: z.number().int().positive().nullable(),
-
+  workspaceId: z.number().int().positive(),
   createdAt: z.date(),
   updatedAt: z.date(),
+});
+
+export const SermonNoteWithImagesSchema = SermonNoteSchema.extend({
+  images: z.array(ImageSchema),
 });
 
 export const CreateSermonNoteSchema = z.object({
   title: z.string().max(100),
   workspaceId: z.string(),
-  s3Key: z.string(),
 });
 
-export type SermonNoteWithS3Url = z.TypeOf<typeof SermonNoteSchema> & {
-  s3Key: string | null;
-};
-
 export type SermonNote = z.infer<typeof SermonNoteSchema>;
+export type SermonNoteWithImages = z.infer<typeof SermonNoteWithImagesSchema>;
+export type CreateSermonNote = z.infer<typeof CreateSermonNoteSchema>;

@@ -187,16 +187,52 @@ model SermonNote {
   title       String             @db.VarChar(100)
   markdown    String?
   ocrText     String?
-  s3Key       String?            
   status      SermonNoteStatus   @default(UPLOADED)
   
   user        User               @relation(fields: [userId], references: [id])
   userId      Int
-  workspace   Workspace         @relation(fields: [workspaceId], references: [id])
+  workspace   Workspace          @relation(fields: [workspaceId], references: [id])
   workspaceId Int
+  
+  images      Image[]            
   
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
+}
+
+enum SermonNoteStatus {
+  UPLOADED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model Image {
+  id              Int       @id @default(autoincrement())
+  cuid            String    @unique @default(cuid())
+  s3Key           String    // S3 storage key
+  originalName    String    // Original filename
+  mimeType        String    // image/jpeg, etc.
+  fileSize        Int       // Size in bytes
+  width           Int?      // Image dimensions
+  height          Int?
+  alt             String?   // Alt text for accessibility
+  
+  entityType      ImageEntityType
+  entityId        Int
+  
+  sermonNote      SermonNote?     @relation(fields: [entityId], references: [id], map: "Image_SermonNote")
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  @@index([entityType, entityId])
+}
+
+enum ImageEntityType {
+  SERMON_NOTE
+  NOTE  
+  POST
 }
 
 model OAuthState {
@@ -256,11 +292,4 @@ enum PostStatus {
 
 enum OAuthProvider {
   SCHWAB
-}
-
-enum SermonNoteStatus {
-  UPLOADED
-  PROCESSING
-  COMPLETED
-  FAILED
 }
