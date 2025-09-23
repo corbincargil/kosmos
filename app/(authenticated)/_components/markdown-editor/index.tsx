@@ -4,9 +4,12 @@ import { Textarea } from "@/components/ui/textarea";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
+import type { Image as ImageType } from "@/types/image";
+import Image from "next/image";
 
 interface MarkdownEditorProps {
   content: string;
+  images?: ImageType[];
   onChange?: (value: string) => void;
   readOnly?: boolean;
   onCompareContent?: (hasChanges: boolean) => void;
@@ -16,18 +19,24 @@ interface MarkdownEditorProps {
 
 const MarkdownEditor = ({
   content,
+  images,
   onChange,
   readOnly = false,
   onCompareContent,
   lastSavedContent,
   className,
 }: MarkdownEditorProps) => {
-  const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
+  const [activeTab, setActiveTab] = useState<"edit" | "preview" | "images">(
+    "edit"
+  );
   const initialContentRef = useRef(content);
+  console.log(images);
 
   useEffect(() => {
     if (onCompareContent) {
-      onCompareContent(content !== (lastSavedContent || initialContentRef.current));
+      onCompareContent(
+        content !== (lastSavedContent || initialContentRef.current)
+      );
     }
   }, [content, lastSavedContent, onCompareContent]);
 
@@ -36,11 +45,20 @@ const MarkdownEditor = ({
   };
 
   return (
-    <div className={cn("flex flex-col h-full min-h-[400px] md:min-h-0", className)}>
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "edit" | "preview")} className="flex-1 flex flex-col h-full">
-        <TabsList className="grid w-full grid-cols-2 md:w-[200px] flex-shrink-0">
+    <div
+      className={cn("flex flex-col h-full min-h-[400px] md:min-h-0", className)}
+    >
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) =>
+          setActiveTab(value as "edit" | "preview" | "images")
+        }
+        className="flex-1 flex flex-col h-full"
+      >
+        <TabsList className="grid w-full grid-cols-3 md:w-[300px] flex-shrink-0">
           <TabsTrigger value="edit">Edit</TabsTrigger>
           <TabsTrigger value="preview">Preview</TabsTrigger>
+          {images && <TabsTrigger value="images">Images</TabsTrigger>}
         </TabsList>
         <TabsContent value="edit" className="flex-1 min-h-0 mt-2">
           <Textarea
@@ -51,14 +69,36 @@ const MarkdownEditor = ({
             placeholder="Write your markdown here..."
           />
         </TabsContent>
-        <TabsContent value="preview" className="flex-1 min-h-0 mt-2 overflow-auto p-4 prose dark:prose-invert max-w-none h-full">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {content || "Nothing to preview"}
-            </ReactMarkdown>
+        <TabsContent
+          value="preview"
+          className="flex-1 min-h-0 mt-2 overflow-auto p-4 prose dark:prose-invert max-w-none h-full"
+        >
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {content || "Nothing to preview"}
+          </ReactMarkdown>
         </TabsContent>
+        {images && (
+          <TabsContent
+            value="images"
+            className="flex-1 min-h-0 mt-2 overflow-scroll h-full"
+          >
+            <div className="flex flex-col gap-2 overflow-scroll h-full">
+              {images.map((image) => (
+                <Image
+                  key={image.id}
+                  src={image.s3Key}
+                  alt={image.originalName}
+                  className="rounded-sm w-[80%] object-cover"
+                  width={600}
+                  height={600}
+                />
+              ))}
+            </div>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
 };
 
-export default MarkdownEditor; 
+export default MarkdownEditor;

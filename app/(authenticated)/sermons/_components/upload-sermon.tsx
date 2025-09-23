@@ -33,7 +33,7 @@ export default function UploadSermon() {
   );
   const [isPolling, setIsPolling] = useState(false);
 
-  const { data: sermonNote } = api.sermons.getSermonNote.useQuery(
+  const { data: sermonNote } = api.sermons.getSermonNoteById.useQuery(
     { id: createdSermonNoteId! },
     {
       enabled: !!createdSermonNoteId,

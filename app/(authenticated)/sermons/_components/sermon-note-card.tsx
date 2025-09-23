@@ -19,6 +19,7 @@ import { Clock } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 
 dayjs.extend(relativeTime);
 
@@ -59,6 +60,8 @@ const getStatusIcon = (status: SermonNoteStatus) => {
 
 export function SermonNoteCard({ sermonNote, className }: SermonNoteCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleButtonClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -78,6 +81,9 @@ export function SermonNoteCard({ sermonNote, className }: SermonNoteCardProps) {
         !isExpanded && "max-h-[400px]",
         className
       )}
+      onClick={() =>
+        router.push(`/sermons/${sermonNote.cuid}?${searchParams.toString()}`)
+      }
     >
       <CardHeader className="p-2 md:p-4 lg:p-6">
         <div className="flex justify-between items-start">
@@ -93,12 +99,15 @@ export function SermonNoteCard({ sermonNote, className }: SermonNoteCardProps) {
           <span>Last updated {dayjs(sermonNote.updatedAt).fromNow()}</span>
           {sermonNote.images.map((image) => (
             <span key={image.id} className="flex items-center gap-1">
-              <Image
-                src={image.s3Key}
-                alt="Sermon Note"
-                width={16}
-                height={16}
-              />
+              <span className="relative w-4 h-4">
+                <Image
+                  src={image.s3Key}
+                  alt="Sermon Note"
+                  sizes="16px"
+                  fill
+                  className="object-cover rounded-sm"
+                />
+              </span>
             </span>
           ))}
           {sermonNote.markdown && (

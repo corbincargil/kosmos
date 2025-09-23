@@ -24,6 +24,13 @@ export const CreateSermonNoteSchema = z.object({
   workspaceId: z.string(),
 });
 
+export const UpdateSermonNoteSchema = z.object({
+  cuid: z.string(),
+  title: z.string().max(100),
+  markdown: z.string(),
+});
+
 export type SermonNote = z.infer<typeof SermonNoteSchema>;
 export type SermonNoteWithImages = z.infer<typeof SermonNoteWithImagesSchema>;
 export type CreateSermonNote = z.infer<typeof CreateSermonNoteSchema>;
+export type UpdateSermonNote = z.infer<typeof UpdateSermonNoteSchema>;

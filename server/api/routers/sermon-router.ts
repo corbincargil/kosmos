@@ -1,4 +1,7 @@
-import { CreateSermonNoteSchema } from "@/types/sermon-note";
+import {
+  CreateSermonNoteSchema,
+  UpdateSermonNoteSchema,
+} from "@/types/sermon-note";
 import { CreateImageSchema } from "@/types/image";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { z } from "zod";
@@ -87,11 +90,42 @@ export const sermonRouter = createTRPCRouter({
     return notes;
   }),
 
-  getSermonNote: protectedProcedure
+  getSermonNoteById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       const note = await ctx.db.sermonNote.findUnique({
         where: { id: input.id },
+        include: {
+          images: true,
+        },
+      });
+
+      if (!note) {
+        return null;
+      }
+
+      // Generate presigned URLs for all images
+      for (const image of note.images) {
+        const command = new GetObjectCommand({
+          Bucket: process.env.S3_BUCKET_NAME,
+          Key: image.s3Key,
+        });
+
+        const presignedUrl = await getSignedUrl(s3Client, command, {
+          expiresIn: 5 * 60, // 5 minutes
+        });
+
+        image.s3Key = presignedUrl;
+      }
+
+      return note;
+    }),
+
+  getSermonNoteByCuid: protectedProcedure
+    .input(z.object({ cuid: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const note = await ctx.db.sermonNote.findUnique({
+        where: { cuid: input.cuid },
         include: {
           images: true,
         },
@@ -222,6 +256,23 @@ export const sermonRouter = createTRPCRouter({
           console.error("Background sermon processing failed:", error);
         });
       }
+
+      return sermonNote;
+    }),
+
+  updateSermonNoteByCuid: protectedProcedure
+    .input(z.object({ cuid: z.string(), data: UpdateSermonNoteSchema }))
+    .mutation(async ({ ctx, input }) => {
+      const { cuid, data } = input;
+      const { title, markdown } = data;
+
+      const sermonNote = await ctx.db.sermonNote.update({
+        where: { cuid },
+        data: {
+          title,
+          markdown,
+        },
+      });
 
       return sermonNote;
     }),
