@@ -9,6 +9,8 @@ import { tagRouter } from "./routers/tag-router";
 import { taskTypeRouter } from "./routers/task-type-router";
 import { authorRouter } from "./routers/author-router";
 import { postRouter } from "./routers/post-router";
+import { sermonRouter } from "./routers/sermon-router";
+import { imageRouter } from "./routers/image-router";
 
 export const appRouter = createTRPCRouter({
   users: userRouter,
@@ -21,6 +23,8 @@ export const appRouter = createTRPCRouter({
   schwab: schwabRouter,
   authors: authorRouter,
   posts: postRouter,
+  sermons: sermonRouter,
+  images: imageRouter,
 });
 
 export type AppRouter = typeof appRouter;

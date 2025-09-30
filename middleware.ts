@@ -4,9 +4,15 @@ import { NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/"]);
 const isV1ApiRoute = createRouteMatcher(["/api/v1(.*)"]);
+const isSermonUploadRoute = createRouteMatcher(["/api/v1/sermons/upload"]);
 
 export default clerkMiddleware((auth, request) => {
-  // Handle v1 API routes with API key authentication
+  // Handle sermon upload route without API key authentication
+  if (isSermonUploadRoute(request)) {
+    return NextResponse.next();
+  }
+
+  // Handle other v1 API routes with API key authentication
   if (isV1ApiRoute(request)) {
     const apiKeyValidation = validateApiKey(request);
     if (apiKeyValidation) {

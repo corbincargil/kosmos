@@ -52,7 +52,7 @@ const isAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.userId) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
-  return next({ ctx: { userId: ctx.userId } });
+  return next({ ctx: { userId: ctx.userId as number } });
 });
 
 export const protectedProcedure = t.procedure
