@@ -58,10 +58,12 @@ export default function InterceptedEditSermonNotePage() {
             Edit sermon note form
           </DialogDescription>
         </DialogHeader>
-        <SermonNoteForm
-          workspaceUuid={selectedWorkspace}
-          sermonNote={sermonNote}
-        />
+        <div className="flex-1 min-h-0">
+          <SermonNoteForm
+            workspaceUuid={selectedWorkspace}
+            sermonNote={sermonNote}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );
