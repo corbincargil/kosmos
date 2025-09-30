@@ -45,59 +45,55 @@ const MarkdownEditor = ({
   };
 
   return (
-    <div
-      className={cn("flex flex-col h-full min-h-[400px] md:min-h-0", className)}
+    <Tabs
+      value={activeTab}
+      onValueChange={(value) =>
+        setActiveTab(value as "edit" | "preview" | "images")
+      }
+      className="flex-1 flex flex-col h-full"
     >
-      <Tabs
-        value={activeTab}
-        onValueChange={(value) =>
-          setActiveTab(value as "edit" | "preview" | "images")
-        }
-        className="flex-1 flex flex-col h-full"
+      <TabsList className="grid w-full grid-cols-3 md:w-[300px] flex-shrink-0">
+        <TabsTrigger value="edit">Edit</TabsTrigger>
+        <TabsTrigger value="preview">Preview</TabsTrigger>
+        {images && <TabsTrigger value="images">Images</TabsTrigger>}
+      </TabsList>
+      <TabsContent value="edit" className="flex-1 min-h-0 mt-2">
+        <Textarea
+          value={content}
+          onChange={handleContentChange}
+          readOnly={readOnly}
+          className="h-full resize-none font-mono border-none"
+          placeholder="Write your markdown here..."
+        />
+      </TabsContent>
+      <TabsContent
+        value="preview"
+        className="flex-1 min-h-0 mt-2 overflow-auto p-4 prose dark:prose-invert max-w-none"
       >
-        <TabsList className="grid w-full grid-cols-3 md:w-[300px] flex-shrink-0">
-          <TabsTrigger value="edit">Edit</TabsTrigger>
-          <TabsTrigger value="preview">Preview</TabsTrigger>
-          {images && <TabsTrigger value="images">Images</TabsTrigger>}
-        </TabsList>
-        <TabsContent value="edit" className="flex-1 min-h-0 mt-2">
-          <Textarea
-            value={content}
-            onChange={handleContentChange}
-            readOnly={readOnly}
-            className="h-full resize-none font-mono"
-            placeholder="Write your markdown here..."
-          />
-        </TabsContent>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {content || "Nothing to preview"}
+        </ReactMarkdown>
+      </TabsContent>
+      {images && (
         <TabsContent
-          value="preview"
-          className="flex-1 min-h-0 mt-2 overflow-auto p-4 prose dark:prose-invert max-w-none h-full"
+          value="images"
+          className="flex-1 min-h-0 mt-2 overflow-auto"
         >
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {content || "Nothing to preview"}
-          </ReactMarkdown>
+          <div className="flex flex-col gap-2 h-full">
+            {images.map((image) => (
+              <Image
+                key={image.id}
+                src={image.s3Key}
+                alt={image.originalName}
+                className="rounded-sm w-[80%] object-cover"
+                width={600}
+                height={600}
+              />
+            ))}
+          </div>
         </TabsContent>
-        {images && (
-          <TabsContent
-            value="images"
-            className="flex-1 min-h-0 mt-2 overflow-scroll h-full"
-          >
-            <div className="flex flex-col gap-2 overflow-scroll h-full">
-              {images.map((image) => (
-                <Image
-                  key={image.id}
-                  src={image.s3Key}
-                  alt={image.originalName}
-                  className="rounded-sm w-[80%] object-cover"
-                  width={600}
-                  height={600}
-                />
-              ))}
-            </div>
-          </TabsContent>
-        )}
-      </Tabs>
-    </div>
+      )}
+    </Tabs>
   );
 };
 

@@ -144,15 +144,13 @@ export default function SermonNoteForm({
           render={({ field }) => (
             <FormItem className="flex-1 min-h-0">
               <FormControl>
-                <div className="h-full overflow-auto">
-                  <MarkdownEditor
-                    content={field.value}
-                    images={sermonNote?.images}
-                    onChange={(value) => form.setValue("markdown", value)}
-                    onCompareContent={setHasContentChanges}
-                    lastSavedContent={lastSavedContent}
-                  />
-                </div>
+                <MarkdownEditor
+                  content={field.value}
+                  images={sermonNote?.images}
+                  onChange={(value) => form.setValue("markdown", value)}
+                  onCompareContent={setHasContentChanges}
+                  lastSavedContent={lastSavedContent}
+                />
               </FormControl>
             </FormItem>
           )}
