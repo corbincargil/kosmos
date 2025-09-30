@@ -3,7 +3,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { cn } from "@/lib/utils";
 import type { Image as ImageType } from "@/types/image";
 import Image from "next/image";
 
@@ -24,7 +23,6 @@ const MarkdownEditor = ({
   readOnly = false,
   onCompareContent,
   lastSavedContent,
-  className,
 }: MarkdownEditorProps) => {
   const [activeTab, setActiveTab] = useState<"edit" | "preview" | "images">(
     "edit"
