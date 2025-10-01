@@ -25,7 +25,7 @@ const MarkdownEditor = ({
   lastSavedContent,
 }: MarkdownEditorProps) => {
   const [activeTab, setActiveTab] = useState<"edit" | "preview" | "images">(
-    "edit"
+    "preview"
   );
   const initialContentRef = useRef(content);
   console.log(images);
@@ -51,8 +51,8 @@ const MarkdownEditor = ({
       className="flex-1 flex flex-col h-full"
     >
       <TabsList className="grid w-full grid-cols-3 md:w-[300px] flex-shrink-0">
-        <TabsTrigger value="edit">Edit</TabsTrigger>
         <TabsTrigger value="preview">Preview</TabsTrigger>
+        <TabsTrigger value="edit">Edit</TabsTrigger>
         {images && <TabsTrigger value="images">Images</TabsTrigger>}
       </TabsList>
       <TabsContent value="edit" className="flex-1 min-h-0 mt-2">

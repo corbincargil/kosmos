@@ -54,7 +54,7 @@ export default function InterceptedEditSermonNotePage() {
       <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Edit Sermon Note</DialogTitle>
-          <DialogDescription sr-only="true">
+          <DialogDescription sr-only="true" hidden>
             Edit sermon note form
           </DialogDescription>
         </DialogHeader>
