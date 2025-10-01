@@ -8,6 +8,7 @@ import { api } from "@/trpc/react";
 import { useWorkspace } from "@/contexts/workspace-context";
 import { useUser } from "@clerk/nextjs";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,8 @@ export default function UploadSermon() {
   const { selectedWorkspace } = useWorkspace();
   const { user } = useUser();
   const { toast } = useToast();
+  const router = useRouter();
+  const utils = api.useUtils();
 
   const [createdSermonNoteId, setCreatedSermonNoteId] = useState<number | null>(
     null
@@ -56,6 +59,13 @@ export default function UploadSermon() {
             description: "Your sermon notes are ready!",
             variant: "default",
           });
+
+          // Navigate to the sermon note page
+          if (selectedWorkspace) {
+            router.push(
+              `/sermons/${sermonNote.cuid}?workspace=${selectedWorkspace}`
+            );
+          }
         } else if (sermonNote.status === "FAILED") {
           toast({
             title: "Processing Failed",
@@ -65,11 +75,15 @@ export default function UploadSermon() {
         }
       }
     }
-  }, [sermonNote?.status, toast, sermonNote]);
+  }, [sermonNote?.status, toast, sermonNote, router, selectedWorkspace]);
 
   const { mutate: createSermonNoteWithImages } =
     api.sermons.createSermonNoteWithImages.useMutation({
       onSuccess: (sermonNote) => {
+        // Invalidate relevant queries
+        utils.sermons.getCurrentWorkspaceSermonNotes.invalidate();
+        utils.sermons.getCurrentUserSermonNotes.invalidate();
+
         toast({
           title: "Success",
           description: "Sermon note created successfully. Processing images...",
